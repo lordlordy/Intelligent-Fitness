@@ -53,7 +53,7 @@ class HealthKitSetUp {
             let bodyMassIndex = HKObjectType.quantityType(forIdentifier: .bodyMassIndex),
             let height = HKObjectType.quantityType(forIdentifier: .height),
             let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass),
-            let activeEnergy = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate) else {
                 completion(false, HealthkitSetupError.dataTypeNotAvailable)
                 return
         }
@@ -68,6 +68,7 @@ class HealthKitSetUp {
                                                        bodyMassIndex,
                                                        height,
                                                        bodyMass,
+                                                       heartRate,
                                                        HKObjectType.workoutType()]
         
         //4. Request Authorization

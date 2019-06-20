@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import HealthKit
 
 class UserViewController: UIViewController {
 
@@ -23,6 +24,63 @@ class UserViewController: UIViewController {
         }catch{
             print(error)
         }
+    }
+    @IBAction func printWorkouts(_ sender: Any) {
+        let workouts = HKQuery.predicateForWorkouts(with: .running)
+        
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate,
+                                              ascending: true)
+        
+        let query = HKSampleQuery(sampleType: HKSampleType.workoutType(), predicate: workouts, limit: 0, sortDescriptors: [sortDescriptor]) { (query, samples, error) in
+            DispatchQueue.main.async {
+                
+                guard let samples = samples as? [HKWorkout] else {
+                    
+                    print(error)
+                    return
+                }
+
+                var c = 1
+                for s in samples{
+                    print(c)
+                    print(s.workoutEvents)
+                    print(s.totalDistance)
+                    print(s.totalEnergyBurned)
+                    print(s.duration)
+//                    print(s.workoutEvents)
+                    c += 1
+                }
+
+            }
+        }
+        
+        HKHealthStore().execute(query)
+        
+    }
+    
+    @IBAction func printHeartRate(_ sender: Any) {
+        let mostRecentPredicate = HKQuery.predicateForSamples(withStart: Date.distantPast,
+                                                              end: Date(),
+                                                              options: .strictEndDate)
+        
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate,
+                                              ascending: false)
+        
+        let query = HKSampleQuery(sampleType: HKSampleType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!, predicate: mostRecentPredicate, limit: 30, sortDescriptors: [sortDescriptor]) { (query, samples, error) in
+            DispatchQueue.main.async {
+                
+                guard let samples = samples else {
+                        
+                        print(error)
+                        return
+                }
+                
+                print(samples)
+            }
+        }
+        
+        HKHealthStore().execute(query)
+    
     }
     
     @IBAction func signOut(_ sender: Any) {
