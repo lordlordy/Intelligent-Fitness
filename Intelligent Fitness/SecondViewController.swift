@@ -10,11 +10,29 @@ import UIKit
 
 class SecondViewController: UIViewController {
 
+    @IBOutlet weak var carryTextField: UITextField!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        carryTextField.delegate = self
     }
 
 
+}
+
+extension SecondViewController: UITextFieldDelegate{
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        textField.resignFirstResponder()
+    }
+    
+    
 }
 

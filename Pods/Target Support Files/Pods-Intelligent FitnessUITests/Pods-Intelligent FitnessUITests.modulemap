@@ -1,0 +1,6 @@
+framework module Pods_Intelligent_FitnessUITests {
+  umbrella header "Pods-Intelligent FitnessUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

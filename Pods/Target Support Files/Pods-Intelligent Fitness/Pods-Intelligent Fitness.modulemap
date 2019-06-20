@@ -1,0 +1,6 @@
+framework module Pods_Intelligent_Fitness {
+  umbrella header "Pods-Intelligent Fitness-umbrella.h"
+
+  export *
+  module * { export * }
+}
