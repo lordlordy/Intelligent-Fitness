@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1457307ABA006E0C6F449065 /* Pods_Intelligent_FitnessTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A15EECFB09ABBC8856BA641 /* Pods_Intelligent_FitnessTests.framework */; };
+		7300458422C0DAEC00B5720B /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7300458322C0DAEC00B5720B /* TableViewController.swift */; };
 		731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731D517A22BA828600AA7EA4 /* LoginViewController.swift */; };
 		731D517D22BA83E100AA7EA4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */; };
 		736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1722B3B2E20071EA3B /* AppDelegate.swift */; };
@@ -20,6 +21,8 @@
 		736CFC3A22B3B2E30071EA3B /* Intelligent_FitnessUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC3922B3B2E30071EA3B /* Intelligent_FitnessUITests.swift */; };
 		736CFC8922B4F0AF0071EA3B /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC8722B4F0AF0071EA3B /* Model.xcdatamodeld */; };
 		737373BC22B508F200698DD4 /* CoreDataStackSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737373BB22B508F200698DD4 /* CoreDataStackSingleton.swift */; };
+		73759DB922C24F6600757C29 /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73759DB822C24F6600757C29 /* ProgressViewController.swift */; };
+		73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73759DBA22C25A1C00757C29 /* GraphView.swift */; };
 		73B5B10222BBE9DA00B238ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B5B10122BBE9DA00B238ED /* HealthKit.framework */; };
 		73B5B10422BBEB8700B238ED /* HealthKitSetUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73B5B10322BBEB8700B238ED /* HealthKitSetUp.swift */; };
 		9B7E1A27CAFCABAA54613FD0 /* Pods_Intelligent_Fitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD2F45FBC7133D7A831CCAF /* Pods_Intelligent_Fitness.framework */; };
@@ -49,6 +52,7 @@
 		57027BDECC969C348D8A3E12 /* Pods_Intelligent_FitnessUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Intelligent_FitnessUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AD2F45FBC7133D7A831CCAF /* Pods_Intelligent_Fitness.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Intelligent_Fitness.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		67A57F9DAF4C5E97858C9D9E /* Pods-Intelligent FitnessUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent FitnessUITests.release.xcconfig"; path = "Target Support Files/Pods-Intelligent FitnessUITests/Pods-Intelligent FitnessUITests.release.xcconfig"; sourceTree = "<group>"; };
+		7300458322C0DAEC00B5720B /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		731D517A22BA828600AA7EA4 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		736CFC1422B3B2E20071EA3B /* Intelligent Fitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Intelligent Fitness.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,6 +71,8 @@
 		736CFC3B22B3B2E30071EA3B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		736CFC8822B4F0AF0071EA3B /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		737373BB22B508F200698DD4 /* CoreDataStackSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStackSingleton.swift; sourceTree = "<group>"; };
+		73759DB822C24F6600757C29 /* ProgressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewController.swift; sourceTree = "<group>"; };
+		73759DBA22C25A1C00757C29 /* GraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 		73B5B10122BBE9DA00B238ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		73B5B10322BBEB8700B238ED /* HealthKitSetUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSetUp.swift; sourceTree = "<group>"; };
 		73BB343822BA932E001AAED7 /* Intelligent Fitness.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Intelligent Fitness.entitlements"; sourceTree = "<group>"; };
@@ -137,11 +143,14 @@
 				736CFC1922B3B2E20071EA3B /* UserViewController.swift */,
 				736CFC1B22B3B2E20071EA3B /* SecondViewController.swift */,
 				736CFC1D22B3B2E20071EA3B /* Main.storyboard */,
+				7300458322C0DAEC00B5720B /* TableViewController.swift */,
 				736CFC2022B3B2E20071EA3B /* Assets.xcassets */,
 				736CFC2222B3B2E20071EA3B /* LaunchScreen.storyboard */,
 				736CFC2522B3B2E20071EA3B /* Info.plist */,
 				731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */,
 				73B5B10322BBEB8700B238ED /* HealthKitSetUp.swift */,
+				73759DB822C24F6600757C29 /* ProgressViewController.swift */,
+				73759DBA22C25A1C00757C29 /* GraphView.swift */,
 			);
 			path = "Intelligent Fitness";
 			sourceTree = "<group>";
@@ -448,8 +457,11 @@
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
 				736CFC1C22B3B2E20071EA3B /* SecondViewController.swift in Sources */,
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
+				7300458422C0DAEC00B5720B /* TableViewController.swift in Sources */,
 				73B5B10422BBEB8700B238ED /* HealthKitSetUp.swift in Sources */,
+				73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */,
 				736CFC1A22B3B2E20071EA3B /* UserViewController.swift in Sources */,
+				73759DB922C24F6600757C29 /* ProgressViewController.swift in Sources */,
 				736CFC8922B4F0AF0071EA3B /* Model.xcdatamodeld in Sources */,
 				737373BC22B508F200698DD4 /* CoreDataStackSingleton.swift in Sources */,
 			);

@@ -16,7 +16,7 @@ class LoginViewController: UIViewController{
         if let authUI = FUIAuth.defaultAuthUI() {
             authUI.delegate = self
             let emailAuth = FUIEmailAuth()
-            emailAuth.signIn(withPresenting: self)
+            emailAuth.signIn(withPresenting: self, email: nil)
             authUI.providers = [emailAuth]
             let authVC = authUI.authViewController()
             present(authVC, animated: true, completion: nil)

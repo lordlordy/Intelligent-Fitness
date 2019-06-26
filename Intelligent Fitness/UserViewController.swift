@@ -36,16 +36,16 @@ class UserViewController: UIViewController {
                 
                 guard let samples = samples as? [HKWorkout] else {
                     
-                    print(error)
+                    print(error as Any)
                     return
                 }
 
                 var c = 1
                 for s in samples{
                     print(c)
-                    print(s.workoutEvents)
-                    print(s.totalDistance)
-                    print(s.totalEnergyBurned)
+                    print(s.workoutEvents as Any)
+                    print(s.totalDistance as Any)
+                    print(s.totalEnergyBurned as Any)
                     print(s.duration)
 //                    print(s.workoutEvents)
                     c += 1
@@ -57,6 +57,55 @@ class UserViewController: UIViewController {
         HKHealthStore().execute(query)
         
     }
+    
+    @IBAction func printCalories(_ sender: UIButton) {
+        let calendar = Calendar.current
+        var interval = DateComponents()
+        let today = Date()
+        interval.day = 1
+        
+        var anchorComponents = calendar.dateComponents([.day, .month, .year, .hour, .minute, .second], from: today)
+        print(anchorComponents)
+        anchorComponents.hour = 2  // to account for change in summer time - don't want removal of an hour to take us to previous day
+        anchorComponents.minute = 0
+        anchorComponents.second = 0
+        print(anchorComponents)
+        
+        guard let anchorDate = calendar.date(from: anchorComponents) else{
+            fatalError("!!! unable to create valid date from anchor components !!!")
+        }
+        
+        print(anchorDate)
+    
+        
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            fatalError("!!! unable to create activeEnergyBurned type !!!")
+        }
+        
+        let query = HKStatisticsCollectionQuery(quantityType: quantityType, quantitySamplePredicate: nil, options: .cumulativeSum, anchorDate: anchorDate, intervalComponents: interval)
+        
+        query.initialResultsHandler = {
+            query, results, error in
+            
+            guard let statsCollection = results else{
+                fatalError("!!! error occurred getting active daily calorie burn")
+            }
+            
+            let tomorrow = calendar.date(byAdding: DateComponents(day: 1), to: today)
+            
+            statsCollection.enumerateStatistics(from: Date.distantPast, to: tomorrow!, with: { (stats, stop) in
+                if let quantity = stats.sumQuantity(){
+                    let value = quantity.doubleValue(for: HKUnit.largeCalorie())
+                    print("\(stats.startDate): \(value) Cals")
+                }
+            })
+            
+        }
+        
+        HKHealthStore().execute(query)
+        
+    }
+    
     
     @IBAction func printHeartRate(_ sender: Any) {
         let mostRecentPredicate = HKQuery.predicateForSamples(withStart: Date.distantPast,
@@ -71,7 +120,7 @@ class UserViewController: UIViewController {
                 
                 guard let samples = samples else {
                         
-                        print(error)
+                    print(error as Any)
                         return
                 }
                 
