@@ -59,28 +59,46 @@ class CoreDataStackSingleton{
 
     //MARK: - New Entities
     
-    func newPerson() -> Person{
-        let mo: NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Person", into: modelPC.viewContext)
-        let user = mo as! Person
-        return user
+    func newFunctionalFitnessTest() -> FunctionalFitnessTest{
+        let fft: NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: "FunctionalFitnessTest", into: modelPC.viewContext)
+        let test = fft as! FunctionalFitnessTest
+        return test
     }
     
-    func getPerson() -> Person{
-        let userRequest = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Person")
-//        workoutRequest.predicate = NSPredicate(format: "day.trainingDiary = %@", argumentArray: [td])
+    
+    func getFunctionFitnessTests() -> [FunctionalFitnessTest]{
+        let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: "FunctionalFitnessTest")
         do{
-            let users = try modelPC.viewContext.fetch(userRequest)
-            if users.count > 0{
-                return users[0] as! Person
-            }else{
-                return newPerson()
-            }
+            let results = try modelPC.viewContext.fetch(fetch)
+            return results as! [FunctionalFitnessTest]
         }catch{
-            print("failed to get users for model")
-            return newPerson()
+            print("fetch faled with error: \(error)")
         }
+        return []
     }
     
+//    func newPerson() -> Person{
+//        let mo: NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Person", into: modelPC.viewContext)
+//        let user = mo as! Person
+//        return user
+//    }
+//    
+//    func getPerson() -> Person{
+//        let userRequest = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Person")
+////        workoutRequest.predicate = NSPredicate(format: "day.trainingDiary = %@", argumentArray: [td])
+//        do{
+//            let users = try modelPC.viewContext.fetch(userRequest)
+//            if users.count > 0{
+//                return users[0] as! Person
+//            }else{
+//                return newPerson()
+//            }
+//        }catch{
+//            print("failed to get users for model")
+//            return newPerson()
+//        }
+//    }
+//    
     private init(){
     }
     

@@ -12,7 +12,7 @@ import HealthKit
 
 class TestViewController: UIViewController {
 
-    @objc dynamic var person: Person?
+//    @objc dynamic var person: Person?
     
     @IBOutlet weak var surnameTextField: UITextField!
     @IBOutlet weak var firstNameTextField: UITextField!
@@ -57,6 +57,15 @@ class TestViewController: UIViewController {
             // Fallback on earlier versions
         }
     }
+    
+    @IBAction func printTests(_ sender: Any) {
+        print("printing tests")
+        let tests = CoreDataStackSingleton.shared.getFunctionFitnessTests()
+        for t in tests{
+            print("\(t.date): deadHang: \(t.deadHang)")
+        }
+    }
+    
     
     @IBAction func printWorkouts(_ sender: Any) {
         let workouts = HKQuery.predicateForWorkouts(with: .running)
@@ -196,26 +205,26 @@ class TestViewController: UIViewController {
     }
     
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        person = CoreDataStackSingleton.shared.getPerson()
-        if person?.firstName != nil{
-            firstNameTextField.text = person?.firstName
-        }
-        if person?.surname != nil{
-            surnameTextField.text = person?.surname
-        }
-    }
-
-    @IBAction func userSaveButton(_ sender: UIButton) {
-        print("\(firstNameTextField.text ?? "none set") \(surnameTextField.text ?? "none set")")
-        person?.firstName = firstNameTextField.text
-        person?.surname = surnameTextField.text
-        CoreDataStackSingleton.shared.save()
-//        getTest()
-        postTest(person: person!)
-        
-    }
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        person = CoreDataStackSingleton.shared.getPerson()
+//        if person?.firstName != nil{
+//            firstNameTextField.text = person?.firstName
+//        }
+//        if person?.surname != nil{
+//            surnameTextField.text = person?.surname
+//        }
+//    }
+//
+//    @IBAction func userSaveButton(_ sender: UIButton) {
+//        print("\(firstNameTextField.text ?? "none set") \(surnameTextField.text ?? "none set")")
+//        person?.firstName = firstNameTextField.text
+//        person?.surname = surnameTextField.text
+//        CoreDataStackSingleton.shared.save()
+////        getTest()
+//        postTest(person: person!)
+//
+//    }
     
     private func getTest(){
         guard let url = URL(string: "https://lord-lordy2.eu-gb.mybluemix.net/test") else {
@@ -235,38 +244,38 @@ class TestViewController: UIViewController {
         task.resume()
     }
     
-    private func postTest(person: Person){
-        
-        let parameters = ["FirstName": person.firstName!, "Surname": person.surname!]
-        
-        guard let url = URL(string: "https://lord-lordy2.eu-gb.mybluemix.net/test") else {
-            print("oops")
-            return
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else {return}
-        request.httpBody = httpBody
-        
-        let session = URLSession.shared
-        session.dataTask(with: request){ (data, response, error) in
-            if let response = response{
-                print(response)
-            }
-            if let data = data{
-                print(data)
-                do{
-                    let json = try JSONSerialization.jsonObject(with: data, options: [])
-                    print(json)
-                } catch {
-                    print(error)
-                }
-            }
-        }.resume()
-        
-        
-    }
+//    private func postTest(person: Person){
+//
+//        let parameters = ["FirstName": person.firstName!, "Surname": person.surname!]
+//
+//        guard let url = URL(string: "https://lord-lordy2.eu-gb.mybluemix.net/test") else {
+//            print("oops")
+//            return
+//        }
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "POST"
+//        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+//        guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else {return}
+//        request.httpBody = httpBody
+//
+//        let session = URLSession.shared
+//        session.dataTask(with: request){ (data, response, error) in
+//            if let response = response{
+//                print(response)
+//            }
+//            if let data = data{
+//                print(data)
+//                do{
+//                    let json = try JSONSerialization.jsonObject(with: data, options: [])
+//                    print(json)
+//                } catch {
+//                    print(error)
+//                }
+//            }
+//        }.resume()
+//
+//
+//    }
     
 }
 
