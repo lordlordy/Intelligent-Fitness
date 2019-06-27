@@ -69,8 +69,8 @@ class CoreDataStackSingleton{
     func getFunctionFitnessTests() -> [FunctionalFitnessTest]{
         let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: "FunctionalFitnessTest")
         do{
-            let results = try modelPC.viewContext.fetch(fetch)
-            return results as! [FunctionalFitnessTest]
+            let results = try modelPC.viewContext.fetch(fetch) as! [FunctionalFitnessTest]
+            return results.sorted(by: {$0.date! > $1.date!})
         }catch{
             print("fetch faled with error: \(error)")
         }

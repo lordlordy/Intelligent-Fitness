@@ -14,9 +14,10 @@
 		7342CB9122C51A34000A6FB6 /* FitnessTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9022C51A34000A6FB6 /* FitnessTestViewController.swift */; };
 		7342CB9422C51F36000A6FB6 /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */; };
 		7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */; };
+		7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */; };
+		7342CB9E22C54FE8000A6FB6 /* FunctionalFitnessTest+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9D22C54FE8000A6FB6 /* FunctionalFitnessTest+Extension.swift */; };
 		736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1722B3B2E20071EA3B /* AppDelegate.swift */; };
 		736CFC1A22B3B2E20071EA3B /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1922B3B2E20071EA3B /* TestViewController.swift */; };
-		736CFC1C22B3B2E20071EA3B /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1B22B3B2E20071EA3B /* SecondViewController.swift */; };
 		736CFC1F22B3B2E20071EA3B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 736CFC1D22B3B2E20071EA3B /* Main.storyboard */; };
 		736CFC2122B3B2E20071EA3B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 736CFC2022B3B2E20071EA3B /* Assets.xcassets */; };
 		736CFC2422B3B2E20071EA3B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 736CFC2222B3B2E20071EA3B /* LaunchScreen.storyboard */; };
@@ -62,10 +63,11 @@
 		7342CB9022C51A34000A6FB6 /* FitnessTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessTestViewController.swift; sourceTree = "<group>"; };
 		7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
+		7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
+		7342CB9D22C54FE8000A6FB6 /* FunctionalFitnessTest+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FunctionalFitnessTest+Extension.swift"; sourceTree = "<group>"; };
 		736CFC1422B3B2E20071EA3B /* Intelligent Fitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Intelligent Fitness.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		736CFC1722B3B2E20071EA3B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		736CFC1922B3B2E20071EA3B /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
-		736CFC1B22B3B2E20071EA3B /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
 		736CFC1E22B3B2E20071EA3B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		736CFC2022B3B2E20071EA3B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		736CFC2322B3B2E20071EA3B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -159,7 +161,6 @@
 				736CFC1722B3B2E20071EA3B /* AppDelegate.swift */,
 				731D517A22BA828600AA7EA4 /* LoginViewController.swift */,
 				736CFC1922B3B2E20071EA3B /* TestViewController.swift */,
-				736CFC1B22B3B2E20071EA3B /* SecondViewController.swift */,
 				736CFC1D22B3B2E20071EA3B /* Main.storyboard */,
 				7300458322C0DAEC00B5720B /* TableViewController.swift */,
 				736CFC2022B3B2E20071EA3B /* Assets.xcassets */,
@@ -171,6 +172,7 @@
 				73759DBA22C25A1C00757C29 /* GraphView.swift */,
 				73759DBC22C3B82600757C29 /* ProfileViewController.swift */,
 				7342CB9022C51A34000A6FB6 /* FitnessTestViewController.swift */,
+				7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */,
 			);
 			path = "Intelligent Fitness";
 			sourceTree = "<group>";
@@ -198,6 +200,7 @@
 			children = (
 				736CFC8722B4F0AF0071EA3B /* Model.xcdatamodeld */,
 				737373BB22B508F200698DD4 /* CoreDataStackSingleton.swift */,
+				7342CB9D22C54FE8000A6FB6 /* FunctionalFitnessTest+Extension.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -475,11 +478,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
-				736CFC1C22B3B2E20071EA3B /* SecondViewController.swift in Sources */,
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
 				7300458422C0DAEC00B5720B /* TableViewController.swift in Sources */,
 				73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */,
 				7342CB9122C51A34000A6FB6 /* FitnessTestViewController.swift in Sources */,
+				7342CB9E22C54FE8000A6FB6 /* FunctionalFitnessTest+Extension.swift in Sources */,
+				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
 				73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */,
 				7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */,
 				73759DBD22C3B82600757C29 /* ProfileViewController.swift in Sources */,
