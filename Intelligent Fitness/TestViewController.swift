@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import HealthKit
 
-class UserViewController: UIViewController {
+class TestViewController: UIViewController {
 
     @objc dynamic var person: Person?
     
@@ -18,13 +18,46 @@ class UserViewController: UIViewController {
     @IBOutlet weak var firstNameTextField: UITextField!
     
     @IBAction func printUserData(_ sender: Any) {
-        do{
-            let data = try HealthKitSetUp.getAgeAndSex()
-            print(data)
-        }catch{
-            print(error)
+        if #available(iOS 9.3, *) {
+            let endDate = Date()
+            let start = Calendar.current.date(byAdding: DateComponents(day:-7), to: endDate)!
+            
+//            let units: NSCalendarUnit = [.Day, .Month, .Year, .Era]
+            
+            var startDateComponents = Calendar.current.dateComponents([.day, .month, .year], from: start)
+            startDateComponents.calendar = Calendar.current
+            
+            var endDateComponents = Calendar.current.dateComponents([.day, .month, .year], from: endDate)
+            endDateComponents.calendar = Calendar.current
+            
+            
+            // Create the predicate for the query
+            let summariesWithinRange = HKQuery.predicate(forActivitySummariesBetweenStart: startDateComponents, end: endDateComponents)
+            
+            
+            let query = HKActivitySummaryQuery.init(predicate: nil) { (query, summaries, error) in
+                print(summaries ?? "Nothing Returned")
+                let calendar = Calendar.current
+                for summary in summaries! {
+                    let dc = summary.dateComponents(for: calendar)
+                    
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd"
+                    
+                    let date = dc.date
+                    
+                    print("Date: \(dateFormatter.string(from: date!)), Active Energy Burned: \(summary.activeEnergyBurned), Active Energy Burned Goal: \(summary.activeEnergyBurnedGoal)")
+                    print("Date: \(dateFormatter.string(from: date!)), Exercise Time: \(summary.appleExerciseTime), Exercise Goal: \(summary.appleExerciseTimeGoal)")
+                    print("Date: \(dateFormatter.string(from: date!)), Stand Hours: \(summary.appleStandHours), Stand Hours Goal: \(summary.appleStandHoursGoal)")
+                    print("----------------")
+                }
+            }
+            HKHealthStore().execute(query)
+        } else {
+            // Fallback on earlier versions
         }
     }
+    
     @IBAction func printWorkouts(_ sender: Any) {
         let workouts = HKQuery.predicateForWorkouts(with: .running)
         
@@ -143,7 +176,7 @@ class UserViewController: UIViewController {
     }
     
     @IBAction func authoriseHealthKit(_ sender: Any) {
-        HealthKitSetUp.authorizeHealthKit { (authorized, error) in
+        HealthKitAccess.shared.authorizeHealthKit { (authorized, error) in
             
             guard authorized else {
                 

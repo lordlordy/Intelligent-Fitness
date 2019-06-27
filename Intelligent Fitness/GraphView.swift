@@ -32,28 +32,50 @@ class Graph{
     
 }
 
+// TO DO - this class assumes the x axis points are equal distance apart. eg assumes we have y data for all days. Need to plot correctly even if days are missing
+
 @IBDesignable class GraphView: UIView {
 
     private struct Constants {
         static let cornerRadiusSize = CGSize(width: 8.0, height: 8.0)
         static let margin: CGFloat = 20.0
-        static let topBorder: CGFloat = 60
-        static let bottomBorder: CGFloat = 50
+        static let topBorder: CGFloat = 20.0
+        static let bottomBorder: CGFloat = 30.0
         static let colorAlpha: CGFloat = 0.3
         static let circleDiameter: CGFloat = 5.0
+        static let labelFontSize: CGFloat = 12.0
     }
 
     // colours for gradient.
-    @IBInspectable var startColour: UIColor = .red
-    @IBInspectable var endColor: UIColor = .green
+    @IBInspectable var startColour: UIColor = UIColor.init(red: 26.0, green: 120.0, blue: 184.0, alpha: 1.0)
+    @IBInspectable var endColor: UIColor = .white
     
-    var graphs: [Graph] = []
+    private var graphs: [Graph] = []
+    private var labels: [UITextField] = []
     
+    func setGraphs(graphs: [Graph]){
+        self.graphs = graphs
+        DispatchQueue.main.async {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    func addGraph(graph: Graph){
+        graphs.append(graph)
+        DispatchQueue.main.async {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    func removeAllGraphs(){
+        self.graphs = []
+    }
     
     override func draw(_ rect: CGRect) {
         
-        //temp
-        graphs = createDummyData()
+        if graphs.count == 0{
+            graphs = createDummyData()
+        }
         
         let path = UIBezierPath(roundedRect: rect,
                                 byRoundingCorners: UIRectCorner.allCorners,
@@ -81,8 +103,69 @@ class Graph{
         for g in graphs{
             addGraph(rect, graph: g)
         }
-
-
+        
+        addHorizontalLines(rect)
+        
+    }
+    
+    fileprivate func addHorizontalLines(_ rect: CGRect){
+        //remove old labels
+        for l in labels{
+            l.removeFromSuperview()
+        }
+        labels = []
+        
+        let min = minY()
+        let max = maxY()
+        let middle = (min<0.0) ? (max / 2.0) : ((max-min)/2.0)
+   
+        var line = UIBezierPath()
+        // max
+        var yCoord: CGFloat = graphYToRectCoordinate(rect, CGFloat(max))
+        line.move(to: CGPoint(x: Constants.margin, y: yCoord))
+        line.addLine(to: CGPoint(x: rect.width - Constants.margin, y: yCoord))
+        let maxLabel = createLabel(value: String(Int(max)), origin: CGPoint(x: 0.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
+        addSubview(maxLabel)
+        labels.append(maxLabel)
+        // middle
+        yCoord = graphYToRectCoordinate(rect, CGFloat(middle))
+        line.move(to: CGPoint(x: Constants.margin, y: yCoord))
+        line.addLine(to: CGPoint(x: rect.width - Constants.margin, y: yCoord))
+        let middleLabel = createLabel(value: String(Int(middle)), origin: CGPoint(x: 0.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
+        addSubview(middleLabel)
+        labels.append(middleLabel)
+        UIColor.white.setStroke()
+        line.lineWidth = 1.0
+        line.stroke()
+        
+        //min
+        line = UIBezierPath()
+        yCoord = graphYToRectCoordinate(rect, CGFloat(min))
+        line.move(to: CGPoint(x: Constants.margin, y: yCoord))
+        line.addLine(to: CGPoint(x: rect.width - Constants.margin, y: yCoord))
+        let minLabel = createLabel(value: String(Int(min)), origin: CGPoint(x: 0.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
+        addSubview(minLabel)
+        labels.append(minLabel)
+        startColour.setStroke()
+        line.lineWidth = 1.0
+        line.stroke()
+        
+        if min < 0.0{
+            // put in zero line
+            let xAxis = UIBezierPath()
+            let y = graphYToRectCoordinate(rect, 0.0)
+            print(y)
+            xAxis.move(to: CGPoint(x: Constants.margin, y: y))
+            xAxis.addLine(to: CGPoint(x: rect.width - Constants.margin, y: y))
+            let zeroLabel = createLabel(value: "0", origin: CGPoint(x: 0.0, y: y - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
+            addSubview(zeroLabel)
+            labels.append(zeroLabel)
+            UIColor.black.setStroke()
+            xAxis.lineWidth = 1.0
+            xAxis.stroke()
+        }
+        
+        
     }
 
     fileprivate func addGraph(_ rect: CGRect, graph: Graph) {
@@ -141,11 +224,10 @@ class Graph{
             cPath.close()
             cPath.addClip()
 
-            
-            var colours = [startColour.cgColor, endColor.cgColor]
+            var colours = (graph.max > 0) ? [startColour.cgColor, endColor.cgColor] : [endColor.cgColor, startColour.cgColor]
             var colourLocations: [CGFloat] = [0.0, 1.0]
             let colourSpace = CGColorSpaceCreateDeviceRGB()
-            if graph.min < 0{
+            if graph.min < 0 && graph.max > 0{
                 colours = [startColour.cgColor, endColor.cgColor, startColour.cgColor]
                 colourLocations = [0.0, (columnYPoint(0)-columnYPoint(graph.max))/(columnYPoint(graph.min)-columnYPoint(graph.max)) , 1.0]
                 print(colourLocations)
@@ -154,13 +236,25 @@ class Graph{
                                          colors: colours as CFArray,
                                          locations: colourLocations){
                 let context = UIGraphicsGetCurrentContext()!
-                context.drawLinearGradient(gradient, start: CGPoint(x: margin, y: columnYPoint(graph.max)), end: CGPoint(x: margin, y: columnYPoint(graph.min)), options: [])
+                let max = (graph.max < 0) ? 0.0 : graph.max
+                context.drawLinearGradient(gradient, start: CGPoint(x: margin, y: columnYPoint(max)), end: CGPoint(x: margin, y: columnYPoint(graph.min)), options: [])
 
             }
             UIGraphicsGetCurrentContext()?.restoreGState()
         }
         
     }
+    
+    private func graphYToRectCoordinate(_ rect: CGRect, _ graphPoint: CGFloat) -> CGFloat{
+        let minValue: CGFloat = CGFloat(minY())
+        let maxValue: CGFloat = CGFloat(maxY())
+        let graphHeight = rect.height - Constants.topBorder - Constants.bottomBorder
+
+        var y:CGFloat = (graphPoint - minValue) / (maxValue - minValue) * graphHeight
+        y = graphHeight + Constants.topBorder - y // Flip the graph
+        return y
+    }
+    
     
     private func maxY() -> Double{
         //checks all graphs for the max value
@@ -174,6 +268,19 @@ class Graph{
             g.min
         }).min() ?? 0.0
     }
+
+    
+    private func createLabel(value: String, origin: CGPoint, size: CGSize) -> UITextField {
+        let label = UITextField(frame: CGRect(origin: origin, size: size))
+        label.text = value
+        label.textColor = .black
+        label.font = UIFont(name: label.font!.fontName, size: Constants.labelFontSize)
+        label.backgroundColor = .clear
+        label.textAlignment = .left
+        label.borderStyle = .none
+        return label
+    }
+ 
     
     private func createDummyData() -> [Graph]{
         //    dummy data
@@ -193,7 +300,7 @@ class Graph{
                 dayTss = 0.9
             }
             let d = Calendar.current.date(byAdding: DateComponents(day:i), to: Date())!
-//            let d = Calendar.current.date(from: DateComponents(year:2019, month:6, day:i))!
+            //            let d = Calendar.current.date(from: DateComponents(year:2019, month:6, day:i))!
             dayCTL = dayTss * (1 - ctlFactor) + dayCTL * ctlFactor
             dayATL = dayTss * (1 - atlFactor) + dayATL * atlFactor
             ctlData.append((d, dayCTL))
@@ -207,5 +314,4 @@ class Graph{
         
         return [tsbGraph, Graph(data: ctlData, colour: .red), Graph(data: atlData, colour: .green)]
     }
-    
 }
