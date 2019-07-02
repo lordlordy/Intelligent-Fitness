@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.99" systemVersion="18F132" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="class">
+        <attribute name="actualReps" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="explanation" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="plannedKG" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="plannedReps" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="exerciseSet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ExerciseSet" inverseName="exercises" inverseEntity="ExerciseSet" syncable="YES"/>
+    </entity>
+    <entity name="ExerciseSet" representedClassName="ExerciseSet" syncable="YES" codeGenerationType="class">
+        <attribute name="endedSetEarly" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="explanation" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="secondsRestBetweenExercises" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Exercise" inverseName="exerciseSet" inverseEntity="Exercise" syncable="YES"/>
+        <relationship name="session" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Workout" inverseName="exerciseSets" inverseEntity="Workout" syncable="YES"/>
+    </entity>
     <entity name="FunctionalFitnessTest" representedClassName="FunctionalFitnessTest" syncable="YES" codeGenerationType="class">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="deadHang" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -11,11 +29,16 @@
         <attribute name="squat" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="standingBroadJump" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
     </entity>
-    <entity name="Session" representedClassName="Session" syncable="YES" codeGenerationType="class">
-        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+    <entity name="Workout" representedClassName="Workout" syncable="YES" codeGenerationType="class">
+        <attribute name="athleteNotes" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="explanation" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="exerciseSets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ExerciseSet" inverseName="session" inverseEntity="ExerciseSet" syncable="YES"/>
     </entity>
     <elements>
+        <element name="Exercise" positionX="-354.9296875" positionY="219.09375" width="128" height="148"/>
+        <element name="ExerciseSet" positionX="-598.65625" positionY="73.37890625" width="179.6796875" height="148"/>
         <element name="FunctionalFitnessTest" positionX="-63" positionY="-9" width="128" height="180"/>
-        <element name="Session" positionX="-63" positionY="-18" width="128" height="60"/>
+        <element name="Workout" positionX="-1117.46875" positionY="43.796875" width="128" height="105"/>
     </elements>
 </model>

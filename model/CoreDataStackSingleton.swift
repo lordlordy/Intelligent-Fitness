@@ -9,10 +9,13 @@
 import Foundation
 import CoreData
 
+
+enum EntityType: String{
+    case Exercise, ExerciseSet, Workout, FunctionalFitnessTest
+}
+
 /*
- This class is meant to be purely for mediating with the Core Data Stack. There is some
- additional functionality in here that should be extracted in to another class mainly
- around creation of Base Data
+ This class is meant to be purely for mediating with the Core Data Stack.
  */
 class CoreDataStackSingleton{
     
@@ -32,17 +35,6 @@ class CoreDataStackSingleton{
             let type = storeDescription.type
             let url = storeDescription.url
             if let error = error {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
                 fatalError("Unresolved error \(error)")
             }
         })
@@ -59,46 +51,35 @@ class CoreDataStackSingleton{
 
     //MARK: - New Entities
     
-    func newFunctionalFitnessTest() -> FunctionalFitnessTest{
-        let fft: NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: "FunctionalFitnessTest", into: modelPC.viewContext)
-        let test = fft as! FunctionalFitnessTest
-        return test
+    func newFunctionalFitnessTest() -> FunctionalFitnessTest { return newEntity(ofType: .FunctionalFitnessTest) as! FunctionalFitnessTest}
+    func newWorkout() -> Workout { return newEntity(ofType: .Workout) as! Workout}
+    func newExercise() -> Exercise { return newEntity(ofType: .Exercise) as! Exercise}
+    func newExcerciseSet() -> ExerciseSet { return newEntity(ofType: .ExerciseSet) as! ExerciseSet}
+
+    func getAllSessions() -> [Workout]{
+        let results = getAllEntities(ofType: .Workout) as! [Workout]
+        return results.sorted(by: {$0.date! > $1.date!})
     }
     
-    
     func getFunctionFitnessTests() -> [FunctionalFitnessTest]{
-        let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: "FunctionalFitnessTest")
+        let results = getAllEntities(ofType: .FunctionalFitnessTest) as! [FunctionalFitnessTest]
+        return results.sorted(by: {$0.date! > $1.date!})
+    }
+    
+    private func getAllEntities(ofType type: EntityType) -> [NSManagedObject]{
+        let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: type.rawValue)
         do{
-            let results = try modelPC.viewContext.fetch(fetch) as! [FunctionalFitnessTest]
-            return results.sorted(by: {$0.date! > $1.date!})
+            return try modelPC.viewContext.fetch(fetch) as! [NSManagedObject]
         }catch{
             print("fetch faled with error: \(error)")
         }
         return []
     }
     
-//    func newPerson() -> Person{
-//        let mo: NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Person", into: modelPC.viewContext)
-//        let user = mo as! Person
-//        return user
-//    }
-//    
-//    func getPerson() -> Person{
-//        let userRequest = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Person")
-////        workoutRequest.predicate = NSPredicate(format: "day.trainingDiary = %@", argumentArray: [td])
-//        do{
-//            let users = try modelPC.viewContext.fetch(userRequest)
-//            if users.count > 0{
-//                return users[0] as! Person
-//            }else{
-//                return newPerson()
-//            }
-//        }catch{
-//            print("failed to get users for model")
-//            return newPerson()
-//        }
-//    }
-//    
+    private func newEntity(ofType type: EntityType) -> NSManagedObject{
+        return NSEntityDescription.insertNewObject(forEntityName: type.rawValue, into: modelPC.viewContext)
+    }
+
     private init(){
     }
     
