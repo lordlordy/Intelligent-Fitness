@@ -28,7 +28,7 @@ class HistoryViewController: UITableViewController, Collapsable {
     }
 //    @IBOutlet var tableView: UITableView!
     
-    private var tests: [FunctionalFitnessTest] = []
+    private var tests: [TestSet] = []
     private var workouts: [String] = ["w1", "w2", "w3"]
     private var df: DateFormatter = DateFormatter()
     
@@ -66,7 +66,7 @@ class HistoryViewController: UITableViewController, Collapsable {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //get history
-        tests = CoreDataStackSingleton.shared.getFunctionFitnessTests()
+        tests = CoreDataStackSingleton.shared.getTestSets()
         tableView.reloadData()
     }
 
@@ -132,7 +132,7 @@ class HistoryViewController: UITableViewController, Collapsable {
         let cell = tableView.dequeueReusableCell(withIdentifier: "functionalFitnessTest", for: indexPath)
 
         if indexPath.section == HistorySection.Test.rawValue{
-            cell.textLabel?.text = String("\(df.string(from: tests[indexPath.row].date!)) - Test")
+            cell.textLabel?.text = String("\(df.string(from: tests[indexPath.row].date ?? Date())) - Test")
             cell.detailTextLabel?.text = tests[indexPath.row].summaryString()
         }else{
             cell.textLabel?.text = workouts[indexPath.row]

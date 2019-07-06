@@ -209,7 +209,6 @@ class HealthKitAccess {
     }
     
     private func getQuantityData(quantityType: HKQuantityType, dateRange: (from: Date, to:Date)?, completion: @escaping ([HKSample]) -> Swift.Void){
-        print(dateRange)
         var from: Date = Date.distantPast
         var to: Date = Date()
         var limit: Int = 90

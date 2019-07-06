@@ -33,7 +33,7 @@ extension LoginViewController: FUIAuthDelegate{
         if let error = error{
             // we have an error
             print(error)
-            return
+//            return
         }
         performSegue(withIdentifier: "MainTabController", sender: self)
     }

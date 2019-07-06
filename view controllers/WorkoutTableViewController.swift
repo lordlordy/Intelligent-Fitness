@@ -10,7 +10,7 @@ import UIKit
 
 class WorkoutTableViewController: UITableViewController{
 
-    var workout: Workout = WorkoutManager().createTestSession(onDate: Date())
+    var workout: Workout = WorkoutManager().createWorkout(onDate: Date())
     private let EXERCISE_SET_CELL = "ExerciseCell"
     private let EXERCISE_DESCRIPTION_CELL = "ExerciseDescriptionCell"
     private let DONE_CELL = "DoneCell"
@@ -19,8 +19,6 @@ class WorkoutTableViewController: UITableViewController{
     private let EXERCISE_SETS_SECTION: Int = 1
     private let EXERCISE_END_EARLY_SECTION: Int = 2
     fileprivate var currentExerciseSet: Int16 = 0
-    
-
     
     override func viewDidLoad() {
         super.viewDidLoad()

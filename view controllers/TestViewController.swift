@@ -16,6 +16,49 @@ class TestViewController: UIViewController {
     
     @IBOutlet weak var surnameTextField: UITextField!
     @IBOutlet weak var firstNameTextField: UITextField!
+    @IBOutlet weak var timerLabel: UILabel!
+    var timer: Timer?
+    var startTime: Date = Date()
+    var runningTime: TimeInterval = TimeInterval()
+
+    
+    @IBAction func start(_ sender: Any) {
+        timer = Timer(timeInterval: 0.1,
+                          target: self,
+                          selector: #selector(updateTimer),
+                          userInfo: nil,
+                          repeats: true)
+        startTime = Date()
+        RunLoop.current.add(timer!, forMode: .common)
+        timer!.tolerance = 0.1
+    }
+    
+    
+    @IBAction func stop(_ sender: Any) {
+        timer!.invalidate()
+        timer = nil
+    }
+
+    @objc func updateTimer(){
+        runningTime = Date().timeIntervalSince(startTime)
+        
+        let hours = Int(runningTime) / 3600
+        let minutes = Int(runningTime) / 60 % 60
+        let seconds = Int(runningTime) % 60
+        let subSeconds = Int((runningTime - Double(Int(runningTime))) * 10)
+        
+        var times: [String] = []
+        if hours > 0 {
+            times.append("\(hours)")
+        }
+        if minutes > 0 {
+            times.append("\(minutes)")
+        }
+        times.append("\(seconds).\(subSeconds)")
+        
+        timerLabel.text = times.joined(separator: ":")
+    }
+    
     
     @IBAction func printUserData(_ sender: Any) {
         if #available(iOS 9.3, *) {
@@ -32,7 +75,7 @@ class TestViewController: UIViewController {
             
             
             // Create the predicate for the query
-            let summariesWithinRange = HKQuery.predicate(forActivitySummariesBetweenStart: startDateComponents, end: endDateComponents)
+//            let summariesWithinRange = HKQuery.predicate(forActivitySummariesBetweenStart: startDateComponents, end: endDateComponents)
             
             
             let query = HKActivitySummaryQuery.init(predicate: nil) { (query, summaries, error) in
@@ -58,14 +101,14 @@ class TestViewController: UIViewController {
         }
     }
     
-    @IBAction func printTests(_ sender: Any) {
-        print("printing tests")
-        let tests = CoreDataStackSingleton.shared.getFunctionFitnessTests()
-        for t in tests{
-            print("\(t.date): deadHang: \(t.deadHang)")
-        }
-    }
-    
+//    @IBAction func printTests(_ sender: Any) {
+//        print("printing tests")
+//        let tests = CoreDataStackSingleton.shared.getFunctionFitnessTests()
+//        for t in tests{
+//            print("\(String(describing: t.date)): deadHang: \(t.deadHang)")
+//        }
+//    }
+//    
     
     @IBAction func printWorkouts(_ sender: Any) {
         let workouts = HKQuery.predicateForWorkouts(with: .running)

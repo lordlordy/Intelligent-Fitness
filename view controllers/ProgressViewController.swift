@@ -109,7 +109,7 @@ class ProgressViewController: UIViewController {
             for d in data{
                 tssData.append((date:d.date, value: d.value * tssFactor))
             }
-            var tsbData = self.createTSBData(from: tssData)
+            let tsbData = self.createTSBData(from: tssData)
 //            tsbData[0] = (tsbData[0].date, 0,0,0,0)
             // just show last 90 days of data
             let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!

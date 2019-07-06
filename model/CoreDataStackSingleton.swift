@@ -11,7 +11,7 @@ import CoreData
 
 
 enum EntityType: String{
-    case Exercise, ExerciseSet, Workout, FunctionalFitnessTest
+    case Exercise, ExerciseSet, Workout, Test, TestSet
 }
 
 /*
@@ -51,18 +51,25 @@ class CoreDataStackSingleton{
 
     //MARK: - New Entities
     
-    func newFunctionalFitnessTest() -> FunctionalFitnessTest { return newEntity(ofType: .FunctionalFitnessTest) as! FunctionalFitnessTest}
+    func newFunctionalFitnessTest() -> TestSet {
+        let test: TestSet = newEntity(ofType: .TestSet) as! TestSet
+        test.name  = "Functional Fitness Test"
+        return test
+    }
+    
     func newWorkout() -> Workout { return newEntity(ofType: .Workout) as! Workout}
     func newExercise() -> Exercise { return newEntity(ofType: .Exercise) as! Exercise}
     func newExcerciseSet() -> ExerciseSet { return newEntity(ofType: .ExerciseSet) as! ExerciseSet}
-
+    func newTest() -> Test { return newEntity(ofType: .Test) as! Test}
+    func newTestSet() -> TestSet { return newEntity(ofType: .TestSet) as! TestSet}
+    
     func getAllSessions() -> [Workout]{
         let results = getAllEntities(ofType: .Workout) as! [Workout]
         return results.sorted(by: {$0.date! > $1.date!})
     }
     
-    func getFunctionFitnessTests() -> [FunctionalFitnessTest]{
-        let results = getAllEntities(ofType: .FunctionalFitnessTest) as! [FunctionalFitnessTest]
+    func getTestSets() -> [TestSet]{
+        let results = getAllEntities(ofType: .TestSet) as! [TestSet]
         return results.sorted(by: {$0.date! > $1.date!})
     }
     

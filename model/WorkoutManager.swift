@@ -43,8 +43,26 @@ enum ExerciseType: Int, CaseIterable{
 
 class WorkoutManager{
   
+    private let functionalFitnessTestParts: [TestType] = [.StandingBroadJump, .DeadHang, .FarmersCarry, .Squat, .Plank, .SittingRisingTest]
     
-    func createTestSession(onDate date: Date) -> Workout{
+    func createFunctionalFitnessTest() -> TestSet{
+        let testSet: TestSet = CoreDataStackSingleton.shared.newTestSet()
+        var order: Int16 = 0
+        for fft in functionalFitnessTestParts{
+            let test: Test = CoreDataStackSingleton.shared.newTest()
+            test.name = fft.rawValue
+            test.order = order
+            if test.testType().hasKG(){
+                test.kg = 10
+            }
+            testSet.addToTests(test)
+            order += 1
+        }
+        return testSet
+    }
+    
+    // TO DO: this should be removed. Here only for testing
+    func createWorkout(onDate date: Date) -> Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
         workout.date = date
         workout.explanation = "This is an explanation"

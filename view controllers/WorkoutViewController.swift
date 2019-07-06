@@ -10,7 +10,7 @@ import UIKit
 
 class WorkoutViewController: UITableViewController {
 
-    var workout: Workout = WorkoutManager().createTestSession(onDate: Date())
+    var workout: Workout = WorkoutManager().createWorkout(onDate: Date())
     private let workoutCellID = "WorkoutCell"
     private let exerciseSetCellID = "ExerciseSetCell"
     
@@ -62,7 +62,7 @@ class WorkoutViewController: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: workoutCellID, for: indexPath)
             if let c = cell as? WorkoutTableViewCell{
                 c.descriptionLabel.text = workout.explanation
-                print(workout.explanation)
+                print(workout.explanation ?? "")
             }
             return cell
         }else{
