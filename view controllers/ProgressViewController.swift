@@ -63,9 +63,11 @@ class ProgressViewController: UIViewController {
     }
     
     private func createHRGraph(){
+        //check healthkit access
+        
+        
         let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
         HealthKitAccess.shared.getRestingHRData(dateRange: (from: ninetyDaysAgo, to:Date())) { (data) in
-            print(data)
             if data.count > 0{
                 self.graphView.addGraph(graph: Graph(data: data, colour: .red))
             }
@@ -75,7 +77,6 @@ class ProgressViewController: UIViewController {
     private func createHRVGraph(){
         let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
         HealthKitAccess.shared.getHRVData(dateRange: (from: ninetyDaysAgo, to:Date())) { (data) in
-            print(data)
             if data.count > 0{
                 self.graphView.addGraph(graph: Graph(data: data, colour: .magenta))
             }
@@ -83,7 +84,7 @@ class ProgressViewController: UIViewController {
     }
     
     private func createCalorieGraph(){
-        HealthKitAccess.shared.getCalorieSummary(dateRange: nil) { (data) in
+        let havePermission: Bool = HealthKitAccess.shared.getCalorieSummary(dateRange: nil) { (data) in
             let tsbData = self.createTSBData(from: data)
             // just show last 90 days of data
             let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
@@ -95,10 +96,13 @@ class ProgressViewController: UIViewController {
             tsbGraph.fill = true
             self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
         }
+        if !havePermission{
+            print("No permissions for calories. Ask user for permission")
+        }
     }
 
     private func createExerciseTSBGraph(){
-        HealthKitAccess.shared.getExerciseTimeSummary(dateRange: nil) { (data) in
+        let havePermission: Bool = HealthKitAccess.shared.getExerciseTimeSummary(dateRange: nil) { (data) in
             //this data is in hours. For now assume a RPE of 5 using 7 as benchmark for threshol. ie hour at RPE 7 is TSS 100
             //This comes about as estimating TSS from time and rpe we have: TSS ~ (RPE * RPE) * hrs
             //We want RPE 7 to give 100. Thus we have:
@@ -120,6 +124,9 @@ class ProgressViewController: UIViewController {
             let tsbGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.tsb) }), colour: .yellow)
             tsbGraph.fill = true
             self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
+        }
+        if !havePermission{
+            print("No permissions for hours. Ask user for permission")
         }
     }
 

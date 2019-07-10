@@ -55,7 +55,8 @@ class WorkoutViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        workoutTypeLabel.text = workout.type
+        let type: WorkoutType? = WorkoutType(rawValue: workout.type)
+        workoutTypeLabel.text = type?.string() ?? "Workout Type Unknown"
         
     }
     

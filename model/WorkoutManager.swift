@@ -8,8 +8,11 @@
 
 import Foundation
 
-enum ExerciseType: Int, CaseIterable{
+enum ExerciseType: Int16, CaseIterable{
     case gobletSquat, lunge, benchPress, pushUp, pullDown
+    case standingBroadJump, plank, deadHang, farmersCarry, squat, sittingRisingTest
+
+    
     func name() -> String{
         switch self{
         case .benchPress: return "Bench Press"
@@ -17,14 +20,21 @@ enum ExerciseType: Int, CaseIterable{
         case .lunge: return "Lunge"
         case .pullDown: return "Pull Down"
         case .pushUp: return "Push Up"
-        }
+        case .standingBroadJump: return "Standing Broad Jump"
+        case .plank: return  "Plank"
+        case .deadHang: return "Dead Hang"
+        case .farmersCarry: return "Farmers Carry"
+        case .squat: return "Squat"
+        case .sittingRisingTest: return "Sitting Rising Test"        }
     }
+    
     func usesWeights() -> Bool{
         switch self{
-        case .pushUp: return false
+        case .pushUp, .standingBroadJump, .plank, .deadHang, .squat, .sittingRisingTest: return false
         default: return true
         }
     }
+    
     func exerciseDescription() -> String{
         switch self{
         case .benchPress:
@@ -37,48 +47,76 @@ enum ExerciseType: Int, CaseIterable{
             return "This is how you do a pull down"
         case .pushUp:
             return "This is how you do a push up"
+        default:
+            return "Need to sort out description for \(self)"
+        }
+    }
+}
+
+enum WorkoutType: Int16{
+    case FFT, DescendingReps
+    
+    func string() -> String{
+        switch self{
+        case .FFT: return "Functional Fitness Test"
+        case .DescendingReps: return "Descending Reps"
+        }
+    }
+    func isTest() -> Bool{
+        switch self{
+        case .FFT: return true
+        default: return false
         }
     }
 }
 
 class WorkoutManager{
     
-    struct TestDefaults{
-        var type: TestType
-        var unitString: String
-        var defaultGoal: Double
+    struct ExerciseDefaults{
+        var type: ExerciseType
+        var exerciseType: ExerciseEntity
+        var defaultPlan: Double
+        var defaultKG: Double
     }
-  
-//    private let functionalFitnessTestParts: [TestType] = [.StandingBroadJump, .DeadHang, .FarmersCarry, .Squat, .Plank, .SittingRisingTest]
     
-    private let functionalFitnessTest: [TestDefaults] = [
-        TestDefaults(type: .StandingBroadJump, unitString: "cm", defaultGoal: 100.0),
-        TestDefaults(type: .DeadHang, unitString: "seconds", defaultGoal: 30.0),
-        TestDefaults(type: .FarmersCarry, unitString: "metres", defaultGoal: 100.0),
-        TestDefaults(type: .Plank, unitString: "seconds", defaultGoal: 30.0),
-        TestDefaults(type: .Squat, unitString: "seconds", defaultGoal: 30.0),
-        TestDefaults(type: .SittingRisingTest, unitString: "touches", defaultGoal: 2.0)
+    private let functionalFitnessTest: [ExerciseDefaults] = [
+        ExerciseDefaults(type: .standingBroadJump, exerciseType: .ExerciseDistance, defaultPlan: 100.0, defaultKG: 0.0),
+        ExerciseDefaults(type: .deadHang, exerciseType: .ExerciseInterval , defaultPlan: 30.0, defaultKG: 0.0),
+        ExerciseDefaults(type: .farmersCarry, exerciseType: .ExerciseDistance , defaultPlan: 100.0, defaultKG: 10.0),
+        ExerciseDefaults(type: .plank, exerciseType: .ExerciseInterval, defaultPlan: 30.0, defaultKG: 0.0),
+        ExerciseDefaults(type: .squat, exerciseType: .ExerciseInterval, defaultPlan: 30.0, defaultKG: 0.0),
+        ExerciseDefaults(type: .sittingRisingTest, exerciseType: .ExerciseReps, defaultPlan: 2.0, defaultKG: 0.0)
     ]
     
-    func createFunctionalFitnessTest() -> TestSet{
-        let testSet: TestSet = CoreDataStackSingleton.shared.newTestSet()
-        testSet.date = Date()
+    private let exerciseSet1: [ExerciseDefaults] = [
+        ExerciseDefaults(type: .gobletSquat, exerciseType: .ExerciseReps, defaultPlan: 5, defaultKG: 5.0),
+        ExerciseDefaults(type: .lunge, exerciseType: .ExerciseReps, defaultPlan: 5, defaultKG: 10.0),
+        ExerciseDefaults(type: .benchPress, exerciseType: .ExerciseReps, defaultPlan: 5, defaultKG: 5.0),
+        ExerciseDefaults(type: .pushUp, exerciseType: .ExerciseReps, defaultPlan: 5, defaultKG: 0.0),
+        ExerciseDefaults(type: .pullDown, exerciseType: .ExerciseReps, defaultPlan: 5, defaultKG: 5.0),
+    ]
+    
+    func createFunctionalFitnessTest() -> Workout{
+        let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
+        workout.date = Date()
+        workout.isTest = true
+        workout.type = WorkoutType.FFT.rawValue
         var order: Int16 = 0
         for fft in functionalFitnessTest{
-            let test: Test = CoreDataStackSingleton.shared.newTest()
-            test.name = fft.type.rawValue
-            test.order = order
-            test.resultUnit = fft.unitString
-            test.goalResult = fft.defaultGoal
-//            test.testSet = testSet
-            if fft.type.hasKG(){
-                test.kg = 10
-            }
-            testSet.addToTests(test)
+            let exercise: Exercise = CoreDataStackSingleton.shared.newExercise(forEntity: fft.exerciseType)
+            let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExerciseSet(forEntity: fft.exerciseType)
+            exerciseSet.order = 0
+            exerciseSet.set(planned: fft.defaultPlan)
+            exerciseSet.plannedKG = fft.defaultKG
+            exercise.add(exerciseSet: exerciseSet)
+            exercise.order = order
+            exercise.type = fft.type.rawValue
+            workout.addToExercises(exercise)
             order += 1
         }
-        return testSet
+        return workout
     }
+    
     
     func nextWorkout() -> Workout{
         let incompleteWorkouts: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts()
@@ -88,53 +126,35 @@ class WorkoutManager{
             result.date = Date()
             return result
         }
-        return createWorkout(onDate: Date())
+        return createWorkout()
     }
 
-    func createWorkout(onDate date: Date) -> Workout{
+    func createWorkout() -> Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
-        workout.date = date
-        workout.type = "Reducing Pyramid Set"
+        workout.date = Date()
+        workout.type = WorkoutType.DescendingReps.rawValue
         workout.explanation = "This is an explanation"
         // for now lets create one of each type
         var order: Int16 = 0
-        for e in ExerciseType.allCases{
-            let kg = e.usesWeights() ? 10.0 : 0.0
-            workout.addToExerciseSets(createReducingRepSet(ofType: e, kg: kg, reduceRepsFrom: 5, order: order))
+        for e in exerciseSet1{
+            let exercise: Exercise = CoreDataStackSingleton.shared.newExercise(forEntity: e.exerciseType)
+            exercise.order = order
+            workout.addToExercises(exercise)
+            let maxReps: Int16 = Int16(e.defaultPlan)
+            var setOrder: Int16 = 0
+            for r in (1...maxReps).reversed(){
+                let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExerciseSet(forEntity: e.exerciseType)
+                exerciseSet.order = setOrder
+                exerciseSet.plannedKG = e.defaultKG
+                exerciseSet.set(planned: Double(r))
+                exercise.add(exerciseSet: exerciseSet)
+                setOrder += 1
+            }
             order += 1
         }
         
         return workout
     }
 
-    func createReducingRepSet(ofType type: ExerciseType, kg: Double, reduceRepsFrom reps: Int16 , order setOrder: Int16) -> ExerciseSet{
-        let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExcerciseSet()
-        
-        exerciseSet.name = "Reducing reps of \(kg) kg \(type.name())"
-        
-        var order: Int16 = 0
-        for r in (1...reps).reversed(){
-            exerciseSet.addToExercises(createExercise(ofType: type, kg: kg, reps: r, order: order))
-            order += 1
-        }
-        exerciseSet.secondsRestBetweenExercises = 90
-        if kg > 0{
-            exerciseSet.explanation = "\(type.name().uppercased()): \(kg)kg"
-        }else{
-            exerciseSet.explanation = "\(type.name().uppercased())"
-        }
-        exerciseSet.order = setOrder
-        
-        return exerciseSet
-    }
-    
-    func createExercise(ofType type: ExerciseType, kg: Double, reps: Int16, order: Int16) -> Exercise{
-        let exercise = CoreDataStackSingleton.shared.newExercise()
-        exercise.type = type.name()
-        exercise.plannedKG = kg
-        exercise.plannedReps = reps
-        exercise.order = order
-        return exercise
-    }
     
 }

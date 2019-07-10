@@ -8,39 +8,21 @@
 
 import Foundation
 
-extension ExerciseSet{
-    
-    func numberOfSets() -> Int{
-        return exercises?.count ?? 0
+extension ExerciseSet: ExerciseSetProtocol{
+    // ExerciseSet is abstract in Core Data... these functions will need overriding in subclasses
+    func setCompleted() -> Bool{ return false }
+    func set(planned: Double) {
+        // do nothing here
+    }
+    func set(actual: Double) {
+        // do nothing here
     }
     
-    func exercise(atOrder order: Int16) -> Exercise?{
-        for exercise in exercises!{
-            if let e = exercise as? Exercise{
-                if e.order == order{
-                    return e
-                }
-            }
-        }
-        return nil
-    }
+    func getPlanned() -> Double { return 0.0 }
+    func getActual() -> Double { return 0.0 }
     
-    func allExercisesCompleted() -> Bool{
-        for e in orderedExerciseArray(){
-            if !e.exerciseComplete(){
-                return false
-            }
-        }
-        return true
+    func summary() -> String{
+        return "Shouldn't see this as subclass should have overridden"
     }
-    
-    func finished() -> Bool{
-        return endedSetEarly || allExercisesCompleted()
-    }
-    
-    func orderedExerciseArray() -> [Exercise]{
-        var array: [Exercise] = exercises?.allObjects as? [Exercise] ?? []
-        array.sort(by: {$0.order < $1.order})
-        return array
-    }
+
 }

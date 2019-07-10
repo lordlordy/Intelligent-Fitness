@@ -35,7 +35,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let height = super.tableView(tableView, heightForRowAt: indexPath)
-        if indexPath.row == timerRow && !(fitnessTest.test(atOrder: currentTest)?.testType().isTimed() ?? true){
+        if indexPath.row == timerRow && !(fitnessTest.exercise(atOrder: currentTest) is ExerciseInterval){
             return 0.0
         }
         return height
@@ -74,17 +74,18 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     var targetSeconds: Double = 30
     var lastTestSeconds: Double = 10
     
-    var fitnessTest: TestSet = WorkoutManager().createFunctionalFitnessTest()
+    var fitnessTest: Workout = WorkoutManager().createFunctionalFitnessTest()
     var testDate: Date = Date()
     private var currentTest: Int16 = 0
     private var testCompleted: Bool = false
     
     private func nextTest(){
         //save values first
-        let test = fitnessTest.test(atOrder: currentTest)
-        test?.result = (result.text! as NSString).doubleValue
-        test?.kg = (kgField.text! as NSString).doubleValue
-        progressTextField.text = fitnessTest.summaryString()
+        if let test = fitnessTest.exercise(atOrder: currentTest)?.exerciseSet(atOrder: 0){
+            test.actualKG = (kgField.text! as NSString).doubleValue
+            test.set(actual: (result.text! as NSString).doubleValue)
+        }
+        progressTextField.text += "\n\(fitnessTest.exercise(atOrder: currentTest)?.summary() ?? " no result")"
         currentTest += 1
         updateTest()
     }
@@ -170,61 +171,69 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     }
     
     private func updateTest(){
-        if let test = fitnessTest.test(atOrder: currentTest){
-            testName.text = test.testType().rawValue
-            testDescription.text = test.description()
-            progressView.progress = 0.0
-            progressView.secondaryProgress = 0.0
-            targetSeconds = test.goalResult
-            if let lastResult = test.mostRecentResult(){
-                lastTestSeconds = lastResult
-                previousResult.text = String(Int(lastTestSeconds))
-            }else{
-                lastTestSeconds = 0.5
-                previousResult.text = "None"
-            }
-            result.text = ""
-            elapsedTimeLabel.text = ""
-            if test.goalResult < 0{
-                goalResult.text = ""
-            }else{
-                goalResult.text = String(test.goalResult)
-            }
-            kgField.text = String(test.kg)
-            if test.testType().isTimed(){
-                timerStatus = .Initial
-                result.backgroundColor = nonEditableColour
-                result.textColor = .white
-                result.isEnabled = false
-            }else{
-                timerStatus = .Stopped
-                result.backgroundColor = editableColour
-                result.textColor = view.backgroundColor
-                result.isEnabled = true
-            }
-            if test.testType().hasKG(){
-                kgField.backgroundColor = editableColour
-                kgField.textColor = view.backgroundColor
-                kgField.isEnabled = true
-                minusButton.isEnabled = true
-                plusButton.isEnabled = true
-            }else{
-                kgField.backgroundColor = nonEditableColour
-                kgField.textColor = nonEditableColour
-                kgField.isEnabled = false
-                minusButton.isEnabled = false
-                plusButton.isEnabled = false
-            }
-            if currentTest == fitnessTest.numberOfTests() - 1{
-                // it's the last test
-                startStopButton.setTitle("Save Test", for: .normal)
-                testCompleted = true
-            }else{
-                startStopButton.setTitle(timerStatus.string(), for: .normal)
+        if let exercise = fitnessTest.exercise(atOrder: currentTest){
+            if let test = exercise.exerciseSet(atOrder: 0){
+                testName.text = exercise.exerciseType()?.name() ?? "Unkown exercise type"
+                testDescription.text = exercise.exerciseType()?.exerciseDescription() ?? "No explanation set"
+                progressView.progress = 0.0
+                progressView.secondaryProgress = 0.0
+                if let interval = test as? Interval{
+                    targetSeconds = Double(interval.plannedSeconds)
+                    timerStatus = .Initial
+                    result.backgroundColor = nonEditableColour
+                    result.textColor = .white
+                    result.isEnabled = false
+
+                }else{
+                    targetSeconds = 0
+                    timerStatus = .Stopped
+                    result.backgroundColor = editableColour
+                    result.textColor = view.backgroundColor
+                    result.isEnabled = true
+
+                }
+//                if let lastResult = test.mostRecentResult(){
+//                    lastTestSeconds = lastResult
+//                    previousResult.text = String(Int(lastTestSeconds))
+//                }else{
+//                    lastTestSeconds = 0.5
+//                    previousResult.text = "None"
+//                }
+                result.text = ""
+                elapsedTimeLabel.text = ""
+                if test.getPlanned() < 0{
+                    goalResult.text = ""
+                }else{
+                    goalResult.text = String(test.getPlanned())
+                }
+                kgField.text = String(test.plannedKG)
+
+                if test.plannedKG > 0.0{
+                    kgField.backgroundColor = editableColour
+                    kgField.textColor = view.backgroundColor
+                    kgField.isEnabled = true
+                    minusButton.isEnabled = true
+                    plusButton.isEnabled = true
+                }else{
+                    kgField.backgroundColor = nonEditableColour
+                    kgField.textColor = nonEditableColour
+                    kgField.isEnabled = false
+                    minusButton.isEnabled = false
+                    plusButton.isEnabled = false
+                }
+                
+                if currentTest == (fitnessTest.exercises?.count ?? 0) - 1{
+                    // it's the last test
+                    startStopButton.setTitle("Save Test", for: .normal)
+                    testCompleted = true
+                }else{
+                    startStopButton.setTitle(timerStatus.string(), for: .normal)
+                }
+                
+                tableView.reloadData()
+                view.setNeedsDisplay()
             }
 
-            tableView.reloadData()
-            view.setNeedsDisplay()
         }
     }
 }

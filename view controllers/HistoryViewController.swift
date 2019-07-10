@@ -27,7 +27,7 @@ class HistoryViewController: UITableViewController, Collapsable {
         }
     }
     
-    private var tests: [TestSet] = []
+    private var tests: [Workout] = []
     private var workouts: [Workout] = []
     private var df: DateFormatter = DateFormatter()
     
@@ -65,8 +65,8 @@ class HistoryViewController: UITableViewController, Collapsable {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //get history
-        tests = CoreDataStackSingleton.shared.getTestSets()
-        workouts = CoreDataStackSingleton.shared.getWorkouts()
+        tests = CoreDataStackSingleton.shared.getTests()
+        workouts = CoreDataStackSingleton.shared.getWorkouts(ofType: nil, isTest: false)
         tableView.reloadData()
     }
 
@@ -117,10 +117,10 @@ class HistoryViewController: UITableViewController, Collapsable {
 
         if indexPath.section == HistorySection.Test.rawValue{
             cell.textLabel?.text = String("\(df.string(from: tests[indexPath.row].date ?? Date())) - Test")
-            cell.detailTextLabel?.text = tests[indexPath.row].summaryString()
+            cell.detailTextLabel?.text = tests[indexPath.row].summary()
         }else{
             let w: Workout = workouts[indexPath.row]
-            cell.textLabel?.text = df.string(from: w.date! ) + " " + w.type!
+            cell.textLabel?.text = df.string(from: w.date! ) + " " + (w.workoutType()?.string() ?? "Unknown Workout Type")
         }
 
         return cell
@@ -132,7 +132,7 @@ class HistoryViewController: UITableViewController, Collapsable {
             print("Trying to delete")
             if indexPath.section == HistorySection.Test.rawValue{
                 //deleting a test
-                let testToDelete: TestSet = tests[indexPath.row]
+                let testToDelete: Workout = tests[indexPath.row]
                 tests.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 CoreDataStackSingleton.shared.delete(testToDelete)

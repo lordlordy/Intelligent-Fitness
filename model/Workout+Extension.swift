@@ -14,24 +14,28 @@ extension Workout{
         return "This is a session summary"
     }
     
-    func numberOfExerciseSets() -> Int{
-        return exerciseSets?.count ?? 0
+    func numberOfExercises() -> Int{
+        return exercises?.count ?? 0
     }
     
-    func exerciseSet(atOrder order: Int16) -> ExerciseSet?{
-        for exerciseSet in exerciseSets!{
-            if let es = exerciseSet as? ExerciseSet{
-                if es.order == order{
-                    return es
+    func exercise(atOrder order: Int16) -> Exercise?{
+        for exercise in exercises!{
+            if let e = exercise as? Exercise{
+                if e.order == order{
+                    return e
                 }
             }
         }
         return nil
     }
     
+    func workoutType() -> WorkoutType?{
+        return WorkoutType(rawValue: type)
+    }
+    
     func workoutCompleted() -> Bool{
-        for es in orderedExerciseSetArray(){
-            if !es.allExercisesCompleted(){
+        for e in orderedExerciseArray(){
+            if !e.exerciseCompleted(){
                 return false
             }
         }
@@ -40,26 +44,27 @@ extension Workout{
 
     //this means workout is done but that may be because it was finished incomplete.
     func workoutFinished() -> Bool{
-        for es in orderedExerciseSetArray(){
-            if !es.finished(){
+        for e in orderedExerciseArray(){
+            if !e.exerciseFinished(){
                 return false
             }
         }
         return true
+//        return false
     }
     
     //return nil if workout completed
     func currentSet() -> Int16?{
-        for es in orderedExerciseSetArray(){
-            if !es.finished(){
-                return es.order
+        for e in orderedExerciseArray(){
+            if !e.exerciseFinished(){
+                return e.order
             }
         }
         return nil
     }
     
-    func orderedExerciseSetArray() -> [ExerciseSet]{
-        var array: [ExerciseSet] = exerciseSets?.allObjects as? [ExerciseSet] ?? []
+    func orderedExerciseArray() -> [Exercise]{
+        var array: [Exercise] = exercises?.allObjects as? [Exercise] ?? []
         array.sort(by: {$0.order < $1.order})
         return array
     }

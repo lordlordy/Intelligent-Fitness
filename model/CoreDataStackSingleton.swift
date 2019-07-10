@@ -11,8 +11,24 @@ import CoreData
 
 
 enum EntityType: String{
-    case Exercise, ExerciseSet, Workout, Test, TestSet
+    case Distance, Exercise, ExerciseDistance, ExerciseInterval, ExerciseReps, ExerciseSet, Interval, Reps, Workout
 }
+
+enum ExerciseEntity: String{
+    case ExerciseDistance, ExerciseInterval, ExerciseReps
+    func entityType() -> EntityType{
+        return EntityType(rawValue: self.rawValue)!
+    }
+    func setEntityType() -> EntityType{
+        switch self{
+        case .ExerciseDistance: return EntityType.Distance
+        case .ExerciseInterval: return EntityType.Interval
+        case .ExerciseReps: return EntityType.Reps
+        }
+    }
+}
+
+
 
 /*
  This class is meant to be purely for mediating with the Core Data Stack.
@@ -51,20 +67,21 @@ class CoreDataStackSingleton{
 
     //MARK: - New Entities
     
-    func newFunctionalFitnessTest() -> TestSet {
-        let test: TestSet = newEntity(ofType: .TestSet) as! TestSet
-        test.name  = "Functional Fitness Test"
-        return test
-    }
     
     func newWorkout() -> Workout { return newEntity(ofType: .Workout) as! Workout}
-    func newExercise() -> Exercise { return newEntity(ofType: .Exercise) as! Exercise}
-    func newExcerciseSet() -> ExerciseSet { return newEntity(ofType: .ExerciseSet) as! ExerciseSet}
-    func newTest() -> Test { return newEntity(ofType: .Test) as! Test}
-    func newTestSet() -> TestSet { return newEntity(ofType: .TestSet) as! TestSet}
+//    func newExercise() -> Exercise { return newEntity(ofType: .Exercise) as! Exercise}
+//    func newExerciseDistance() -> ExerciseDistance { return newEntity(ofType: .ExerciseDistance) as! ExerciseDistance}
+//    func newExerciseInterval() -> ExerciseInterval { return newEntity(ofType: .ExerciseInterval) as! ExerciseInterval}
+//    func newExerciseReps() -> ExerciseReps { return newEntity(ofType: .ExerciseReps) as! ExerciseReps}
+//    func newDistance() -> Distance { return newEntity(ofType: .Distance) as! Distance}
+//    func newInterval() -> Interval { return newEntity(ofType: .Interval) as! Interval}
+//    func newReps() -> Reps { return newEntity(ofType: .Reps) as! Reps}
+    func newExerciseSet(forEntity entity: ExerciseEntity) -> ExerciseSet {return newEntity(ofType: entity.setEntityType()) as! ExerciseSet}
+    func newExercise(forEntity entity: ExerciseEntity) -> Exercise {return newEntity(ofType: entity.entityType()) as! Exercise}
+
     
     func getAllSessions() -> [Workout]{
-        let results = getAllEntities(ofType: .Workout) as! [Workout]
+        let results = getAllEntities(ofType: .Workout, predicate: nil) as! [Workout]
         return results.sorted(by: {$0.date! > $1.date!})
     }
     
@@ -79,45 +96,35 @@ class CoreDataStackSingleton{
         return []
     }
     
-    func getTestSets() -> [TestSet]{
-        let results = getAllEntities(ofType: .TestSet) as! [TestSet]
-        return results.sorted(by: {$0.date! > $1.date!})
-    }
-    
-    func getMostRecentTestSet() -> TestSet?{
-        let tests = getTestSets()
+    func getMostRecentTest() -> Workout?{
+        let tests = getTests()
         if tests.count > 0{
             return tests[0]
         }
         return nil
     }
     
-    func getMostRecentTest(ofType type: TestType) -> Test?{
-        let tests = getTests(forName: type.rawValue)
-        for t in tests{
-            print(t.testSet)
-            print(t.testSet?.date ?? "No Date" )
-        }
-        let sortedTests = tests.filter({$0.result >= 0.0}).sorted(by: {$0.testSet!.date! > $1.testSet!.date!})
-        if sortedTests.count > 0{
-            return sortedTests[0]
-        }
-        return nil
+    func getTests() -> [Workout]{
+        return getAllEntities(ofType: .Workout, predicate: NSPredicate(format: "isTest == %@", argumentArray: [true])) as! [Workout]
     }
     
-    func getTests(forName name: String) -> [Test]{
-        let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: EntityType.Test.rawValue)
-        fetch.predicate = NSPredicate(format: "name == %@", argumentArray: [name])
-        do{
-            return try modelPC.viewContext.fetch(fetch) as! [Test]
-        }catch{
-            print("fetch failed with error: \(error)")
-        }
-        return []
-    }
     
-    func getWorkouts() -> [Workout]{
-        let results = getAllEntities(ofType: .Workout) as! [Workout]
+    func getWorkouts(ofType type: WorkoutType?, isTest test: Bool? ) -> [Workout]{
+        var predicateStr: [String] = []
+        var variables: [Any] = []
+        if let t = type{
+            predicateStr.append("type == %@")
+            variables.append(t.string())
+        }
+        if let t = test{
+            predicateStr.append("isTest == %@")
+            variables.append(t)
+        }
+        var predicate: NSPredicate? = nil
+        if predicateStr.count > 0{
+            predicate = NSPredicate(format: predicateStr.joined(separator: " and "), argumentArray: variables)
+        }
+        let results = getAllEntities(ofType: .Workout, predicate: predicate) as! [Workout]
         return results.sorted(by: {$0.date! > $1.date!})
     }
     
@@ -125,9 +132,11 @@ class CoreDataStackSingleton{
         modelPC.viewContext.delete(obj)
     }
     
-    private func getAllEntities(ofType type: EntityType) -> [NSManagedObject]{
+    private func getAllEntities(ofType type: EntityType, predicate: NSPredicate?) -> [NSManagedObject]{
         let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: type.rawValue)
-        
+        if let p = predicate{
+            fetch.predicate = p
+        }
         do{
             return try modelPC.viewContext.fetch(fetch) as! [NSManagedObject]
         }catch{

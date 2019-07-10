@@ -52,8 +52,8 @@ class WorkoutTableViewController: UITableViewController{
             case EXERCISE_SECTION: return 1
             case EXERCISE_SETS_SECTION:
                 if let currentSet = workout.currentSet(){
-                    if let es = workout.exerciseSet(atOrder: currentSet){
-                        return es.numberOfSets()
+                    if let e = workout.exercise(atOrder: currentSet){
+                        return e.numberOfSets()
                     }
                 }
                 return 0
@@ -84,7 +84,7 @@ class WorkoutTableViewController: UITableViewController{
                 return UITableViewCell()
             }
             if let c = cell as? ExerciseDescriptionCell{
-                c.label.text = workout.exerciseSet(atOrder: currentExerciseSet)?.name ?? ""
+                c.label.text = workout.exercise(atOrder: currentExerciseSet)?.exerciseType()?.name() ?? ""
             }
             return cell
         }else if indexPath.section == EXERCISE_SETS_SECTION{
@@ -93,7 +93,7 @@ class WorkoutTableViewController: UITableViewController{
                 return UITableViewCell()
             }
             if let c = cell as? ExerciseCell{
-                c.setExercise(workout.exerciseSet(atOrder: currentExerciseSet)?.exercise(atOrder: Int16(indexPath.row)))
+                c.setExerciseSet(workout.exercise(atOrder: currentExerciseSet)?.exerciseSet(atOrder: Int16(indexPath.row)))
                 c.workoutCompletionDelegate = self
             }
             return cell
@@ -111,7 +111,7 @@ class WorkoutTableViewController: UITableViewController{
                 }
                 if let c = cell as? ExerciseDoneCell{
                     c.workoutCompletionDelegate = self
-                    c.setExerciseSet(workout.exerciseSet(atOrder: currentExerciseSet))
+                    c.setExercise(workout.exercise(atOrder: currentExerciseSet))
                 }
                 return cell
             }
@@ -157,7 +157,7 @@ extension WorkoutTableViewController: WorkoutCompletionDelegate{
 
 class ExerciseCell: UITableViewCell{
     
-    private var exercise: Exercise?
+    private var exercise: ExerciseSet?
     
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var repsLabel: UILabel!
@@ -165,12 +165,12 @@ class ExerciseCell: UITableViewCell{
     
     var workoutCompletionDelegate: WorkoutCompletionDelegate?
     
-    func setExercise(_ exercise: Exercise?){
+    func setExerciseSet(_ exercise: ExerciseSet?){
         self.exercise = exercise
-        if let e = exercise{
-            label.text = "\(e.type ?? ""): \(e.plannedReps) x \(e.plannedKG) KG"
+        if let e = exercise as? Reps{
+            label.text = "\(e.exerciseReps?.exerciseType()?.name() ?? ""): \(e.plannedReps) x \(e.plannedKG) KG"
             slider.maximumValue = Float(e.plannedReps)
-            repsLabel.text = String(e.actualReps)
+            repsLabel.text = e.actualReps > 0 ? String(e.actualReps) : ""
         }
         
     }
@@ -195,8 +195,10 @@ class ExerciseCell: UITableViewCell{
     
     private func setActualReps(to reps: Int){
         repsLabel.text = String(reps)
-        exercise?.actualReps = Int16(reps)
-        if exercise?.exerciseComplete() ?? false{
+        if let e  = exercise as? Reps{
+            e.actualReps = Int16(reps)
+        }
+        if exercise?.setCompleted() ?? false{
             if let wcd = workoutCompletionDelegate{
                 wcd.checkIfWorkoutFinished()
             }
@@ -226,16 +228,16 @@ class SaveSetCell: UITableViewCell{
 
 class ExerciseDoneCell: UITableViewCell{
     
-    private var exerciseSet: ExerciseSet?
+    private var exercise: Exercise?
     var workoutCompletionDelegate: WorkoutCompletionDelegate?
 
-    func setExerciseSet(_ exerciseSet: ExerciseSet?){
-        self.exerciseSet = exerciseSet
+    func setExercise(_ exercise: Exercise?){
+        self.exercise = exercise
     }
     
     @IBAction func done(_ sender: Any) {
-        if let es = exerciseSet{
-            es.endedSetEarly = true
+        if let e = exercise{
+            e.endedEarly = true
         }
         if let wcd = workoutCompletionDelegate{
             wcd.checkIfWorkoutFinished()
