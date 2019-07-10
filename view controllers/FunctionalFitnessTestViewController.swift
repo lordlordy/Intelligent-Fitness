@@ -46,5 +46,14 @@ class FunctionalFitnessTestViewController: UIViewController {
         dateTextField.text = df.string(from: datePicker.date)
         view.endEditing(true)
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "StartFFT"{
+            print("about to segue to FFT")
+            if let vc = segue.destination as? FunctionalFitnessTestTableViewController{
+                vc.testDate = datePicker?.date ?? Date()
+            }
+        }
+    }
 
 }

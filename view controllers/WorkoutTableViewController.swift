@@ -10,26 +10,16 @@ import UIKit
 
 class WorkoutTableViewController: UITableViewController{
 
-    var workout: Workout = WorkoutManager().createWorkout(onDate: Date())
+    var workout: Workout!
     private let EXERCISE_SET_CELL = "ExerciseCell"
     private let EXERCISE_DESCRIPTION_CELL = "ExerciseDescriptionCell"
     private let DONE_CELL = "DoneCell"
-    private let HOME_CELL = "HomeCell"
+    private let SAVE_SET_CELL = "SaveSetCell"
     private let EXERCISE_SECTION: Int = 0
     private let EXERCISE_SETS_SECTION: Int = 1
     private let EXERCISE_END_EARLY_SECTION: Int = 2
     fileprivate var currentExerciseSet: Int16 = 0
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
-    }
-
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -48,7 +38,6 @@ class WorkoutTableViewController: UITableViewController{
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
         return 3
     }
 
@@ -110,13 +99,10 @@ class WorkoutTableViewController: UITableViewController{
             return cell
         }else if indexPath.section == EXERCISE_END_EARLY_SECTION{
             if workout.workoutFinished(){
-                guard let cell = tableView.dequeueReusableCell(withIdentifier: HOME_CELL) else{
-                    print("No cell found for identifier: \(HOME_CELL)")
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: SAVE_SET_CELL) else{
+                    print("No cell found for identifier: \(SAVE_SET_CELL)")
                     return UITableViewCell()
                 }
-//                if let c = cell as? HomeCell{
-//                    c.viewController = self
-//                }
                 return cell
             }else{
                 guard let cell = tableView.dequeueReusableCell(withIdentifier: DONE_CELL) else{
@@ -131,6 +117,15 @@ class WorkoutTableViewController: UITableViewController{
             }
         }else{
             return UITableViewCell()
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        if segue.identifier == "SaveWorkoutSegue" {
+            if let tabVC = segue.destination as? UITabBarController{
+                tabVC.selectedIndex = 3
+            }
         }
     }
 
@@ -216,13 +211,14 @@ class ExerciseDescriptionCell: UITableViewCell{
     
 }
 
-class HomeCell: UITableViewCell{
+class SaveSetCell: UITableViewCell{
     
     var viewController: UIViewController?
 
     @IBAction func home(_ sender: Any) {
+        CoreDataStackSingleton.shared.save()
         if let vc = viewController{
-            vc.performSegue(withIdentifier: "MainTabViewController", sender: self)
+            vc.performSegue(withIdentifier: "SaveTestSegue", sender: self)
         }
     }
     

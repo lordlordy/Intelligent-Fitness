@@ -68,13 +68,66 @@ class CoreDataStackSingleton{
         return results.sorted(by: {$0.date! > $1.date!})
     }
     
+    func incompleteWorkouts() -> [Workout]{
+        let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: EntityType.Workout.rawValue)
+        fetch.predicate = NSPredicate(format: "complete == %@", argumentArray: [false])
+        do{
+            return try modelPC.viewContext.fetch(fetch) as! [Workout]
+        }catch{
+            print("fetch failed with error: \(error)")
+        }
+        return []
+    }
+    
     func getTestSets() -> [TestSet]{
         let results = getAllEntities(ofType: .TestSet) as! [TestSet]
         return results.sorted(by: {$0.date! > $1.date!})
     }
     
+    func getMostRecentTestSet() -> TestSet?{
+        let tests = getTestSets()
+        if tests.count > 0{
+            return tests[0]
+        }
+        return nil
+    }
+    
+    func getMostRecentTest(ofType type: TestType) -> Test?{
+        let tests = getTests(forName: type.rawValue)
+        for t in tests{
+            print(t.testSet)
+            print(t.testSet?.date ?? "No Date" )
+        }
+        let sortedTests = tests.filter({$0.result >= 0.0}).sorted(by: {$0.testSet!.date! > $1.testSet!.date!})
+        if sortedTests.count > 0{
+            return sortedTests[0]
+        }
+        return nil
+    }
+    
+    func getTests(forName name: String) -> [Test]{
+        let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: EntityType.Test.rawValue)
+        fetch.predicate = NSPredicate(format: "name == %@", argumentArray: [name])
+        do{
+            return try modelPC.viewContext.fetch(fetch) as! [Test]
+        }catch{
+            print("fetch failed with error: \(error)")
+        }
+        return []
+    }
+    
+    func getWorkouts() -> [Workout]{
+        let results = getAllEntities(ofType: .Workout) as! [Workout]
+        return results.sorted(by: {$0.date! > $1.date!})
+    }
+    
+    func delete(_ obj: NSManagedObject){
+        modelPC.viewContext.delete(obj)
+    }
+    
     private func getAllEntities(ofType type: EntityType) -> [NSManagedObject]{
         let fetch = NSFetchRequest<NSFetchRequestResult>.init(entityName: type.rawValue)
+        
         do{
             return try modelPC.viewContext.fetch(fetch) as! [NSManagedObject]
         }catch{

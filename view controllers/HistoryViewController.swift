@@ -26,10 +26,9 @@ class HistoryViewController: UITableViewController, Collapsable {
             }
         }
     }
-//    @IBOutlet var tableView: UITableView!
     
     private var tests: [TestSet] = []
-    private var workouts: [String] = ["w1", "w2", "w3"]
+    private var workouts: [Workout] = []
     private var df: DateFormatter = DateFormatter()
     
     private var testsCollapsed: Bool = false
@@ -39,7 +38,7 @@ class HistoryViewController: UITableViewController, Collapsable {
         super.viewDidLoad()
         df.dateFormat = "dd-MM-yyyy"
         // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+         self.clearsSelectionOnViewWillAppear = false
 
         self.navigationItem.rightBarButtonItem = self.editButtonItem
 
@@ -67,6 +66,7 @@ class HistoryViewController: UITableViewController, Collapsable {
         super.viewWillAppear(animated)
         //get history
         tests = CoreDataStackSingleton.shared.getTestSets()
+        workouts = CoreDataStackSingleton.shared.getWorkouts()
         tableView.reloadData()
     }
 
@@ -93,22 +93,13 @@ class HistoryViewController: UITableViewController, Collapsable {
         }
         return 0
     }
-//
-//    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if section == HistorySection.Test.rawValue{
-//            return "Tests"
-//        }else{
-//            return "Workouts"
-//        }
-//    }
+
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        print("getting custom header")
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CustomHeader.reuseIdentifier) else {
             print("returning nil")
             return nil
         }
-//        let header = tableView.dequeueReusableCell(withIdentifier: "functionalFitnessTest")
         if section == HistorySection.Test.rawValue{
             header.textLabel?.text = HistorySection.Test.name()
         }else{
@@ -120,25 +111,47 @@ class HistoryViewController: UITableViewController, Collapsable {
         return header
     }
     
-//    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return 20.0
-//    }
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
-        print(indexPath)
-        print("row: \(indexPath.row)")
-        print("seciotn: \(indexPath.section)")
         let cell = tableView.dequeueReusableCell(withIdentifier: "functionalFitnessTest", for: indexPath)
 
         if indexPath.section == HistorySection.Test.rawValue{
             cell.textLabel?.text = String("\(df.string(from: tests[indexPath.row].date ?? Date())) - Test")
             cell.detailTextLabel?.text = tests[indexPath.row].summaryString()
         }else{
-            cell.textLabel?.text = workouts[indexPath.row]
+            let w: Workout = workouts[indexPath.row]
+            cell.textLabel?.text = df.string(from: w.date! ) + " " + w.type!
         }
 
         return cell
+    }
+    
+    //METHOD TO MAKE DELETION POSSIBLE
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete{
+            print("Trying to delete")
+            if indexPath.section == HistorySection.Test.rawValue{
+                //deleting a test
+                let testToDelete: TestSet = tests[indexPath.row]
+                tests.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                CoreDataStackSingleton.shared.delete(testToDelete)
+            }else if indexPath.section == HistorySection.Workout.rawValue{
+                //deleting a workout
+                let workoutToDelete: Workout = workouts[indexPath.row]
+                workouts.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                CoreDataStackSingleton.shared.delete(workoutToDelete)
+
+            }
+        }else if editingStyle == .insert{
+            print("Trying to insert")
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+//        super.tableView(tableView, accessoryButtonTappedForRowWith: indexPath)
+        print("detail TAPPED")
     }
 
 }
@@ -153,20 +166,6 @@ class CustomHeader: UITableViewHeaderFooterView{
         super.init(reuseIdentifier: reuseIdentifier)
         
         textLabel?.font = UIFont.preferredFont(forTextStyle: .largeTitle)
-        
-//        detailTextLabel?.text = "Tap to hide"
-//        label.font = UIFont.preferredFont(forTextStyle: .largeTitle)
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        self.contentView.addSubview(label)
-        
-//        let margins = contentView.layoutMarginsGuide
-//        label.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
-//        label.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//        label.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
-//        label.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
-//        label.text = "This is a TEST"
-        
-        
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
         contentView.addGestureRecognizer(tapGesture)

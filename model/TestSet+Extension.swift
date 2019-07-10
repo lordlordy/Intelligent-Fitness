@@ -11,7 +11,8 @@ import Foundation
 extension TestSet{
     
     func summaryString() -> String{
-        return "THis is a test summary"
+        let results: [String] = allTests().map({$0.resultString()})
+        return results.joined(separator: "\n")
     }
     
     func numberOfTests() -> Int{
@@ -27,5 +28,10 @@ extension TestSet{
             }
         }
         return nil
+    }
+    
+    func allTests() -> [Test]{
+        let results = tests?.allObjects as? [Test] ?? []
+        return results.sorted(by: {$0.order < $1.order})
     }
 }

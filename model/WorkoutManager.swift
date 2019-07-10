@@ -42,17 +42,36 @@ enum ExerciseType: Int, CaseIterable{
 }
 
 class WorkoutManager{
+    
+    struct TestDefaults{
+        var type: TestType
+        var unitString: String
+        var defaultGoal: Double
+    }
   
-    private let functionalFitnessTestParts: [TestType] = [.StandingBroadJump, .DeadHang, .FarmersCarry, .Squat, .Plank, .SittingRisingTest]
+//    private let functionalFitnessTestParts: [TestType] = [.StandingBroadJump, .DeadHang, .FarmersCarry, .Squat, .Plank, .SittingRisingTest]
+    
+    private let functionalFitnessTest: [TestDefaults] = [
+        TestDefaults(type: .StandingBroadJump, unitString: "cm", defaultGoal: 100.0),
+        TestDefaults(type: .DeadHang, unitString: "seconds", defaultGoal: 30.0),
+        TestDefaults(type: .FarmersCarry, unitString: "metres", defaultGoal: 100.0),
+        TestDefaults(type: .Plank, unitString: "seconds", defaultGoal: 30.0),
+        TestDefaults(type: .Squat, unitString: "seconds", defaultGoal: 30.0),
+        TestDefaults(type: .SittingRisingTest, unitString: "touches", defaultGoal: 2.0)
+    ]
     
     func createFunctionalFitnessTest() -> TestSet{
         let testSet: TestSet = CoreDataStackSingleton.shared.newTestSet()
+        testSet.date = Date()
         var order: Int16 = 0
-        for fft in functionalFitnessTestParts{
+        for fft in functionalFitnessTest{
             let test: Test = CoreDataStackSingleton.shared.newTest()
-            test.name = fft.rawValue
+            test.name = fft.type.rawValue
             test.order = order
-            if test.testType().hasKG(){
+            test.resultUnit = fft.unitString
+            test.goalResult = fft.defaultGoal
+//            test.testSet = testSet
+            if fft.type.hasKG(){
                 test.kg = 10
             }
             testSet.addToTests(test)
@@ -61,10 +80,21 @@ class WorkoutManager{
         return testSet
     }
     
-    // TO DO: this should be removed. Here only for testing
+    func nextWorkout() -> Workout{
+        let incompleteWorkouts: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts()
+        if incompleteWorkouts.count > 0{
+            let result = incompleteWorkouts[0]
+            // update date to today
+            result.date = Date()
+            return result
+        }
+        return createWorkout(onDate: Date())
+    }
+
     func createWorkout(onDate date: Date) -> Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
         workout.date = date
+        workout.type = "Reducing Pyramid Set"
         workout.explanation = "This is an explanation"
         // for now lets create one of each type
         var order: Int16 = 0

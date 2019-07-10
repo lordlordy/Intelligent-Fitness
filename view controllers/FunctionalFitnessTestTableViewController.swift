@@ -37,8 +37,6 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
         let height = super.tableView(tableView, heightForRowAt: indexPath)
         if indexPath.row == timerRow && !(fitnessTest.test(atOrder: currentTest)?.testType().isTimed() ?? true){
             return 0.0
-        }else if indexPath.row == kgRow && !(fitnessTest.test(atOrder: currentTest)?.testType().hasKG() ?? true){
-            return 0.0
         }
         return height
     }
@@ -53,6 +51,8 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     @IBOutlet weak var progressTextField: UITextView!
     @IBOutlet weak var startStopButton: UIButton!
     @IBOutlet weak var kgField: UITextField!
+    @IBOutlet weak var minusButton: UIButton!
+    @IBOutlet weak var plusButton: UIButton!
     
     
     @IBAction func minusKG(_ sender: Any) {
@@ -75,17 +75,24 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     var lastTestSeconds: Double = 10
     
     var fitnessTest: TestSet = WorkoutManager().createFunctionalFitnessTest()
+    var testDate: Date = Date()
     private var currentTest: Int16 = 0
     private var testCompleted: Bool = false
     
     private func nextTest(){
+        //save values first
+        let test = fitnessTest.test(atOrder: currentTest)
+        test?.result = (result.text! as NSString).doubleValue
+        test?.kg = (kgField.text! as NSString).doubleValue
+        progressTextField.text = fitnessTest.summaryString()
         currentTest += 1
         updateTest()
     }
     
     @IBAction func startStopTimer(_ sender: Any) {
         if testCompleted{
-            print("need to save the test here")
+            fitnessTest.date = testDate
+            CoreDataStackSingleton.shared.save()
             performSegue(withIdentifier: "EndOfTest", sender: self)
         }
         timerStatus = timerStatus.nextStatus()
@@ -138,6 +145,11 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
         goalResult.backgroundColor = nonEditableColour
         goalResult.textColor = .white
         
+        minusButton.setTitleColor(.white, for: .normal)
+        minusButton.setTitleColor(nonEditableColour, for: .disabled)
+        plusButton.setTitleColor(.white, for: .normal)
+        plusButton.setTitleColor(nonEditableColour, for: .disabled)
+
         updateTest()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
         view.addGestureRecognizer(tapGesture)
@@ -149,17 +161,13 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print("Tab bar preparing for segue")
         super.prepare(for: segue, sender: sender)
-        print(segue.identifier)
         if segue.identifier == "EndOfTest" {
             if let tabVC = segue.destination as? UITabBarController{
                 tabVC.selectedIndex = 3
             }
         }
-        
     }
-    
     
     private func updateTest(){
         if let test = fitnessTest.test(atOrder: currentTest){
@@ -167,12 +175,20 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
             testDescription.text = test.description()
             progressView.progress = 0.0
             progressView.secondaryProgress = 0.0
+            targetSeconds = test.goalResult
+            if let lastResult = test.mostRecentResult(){
+                lastTestSeconds = lastResult
+                previousResult.text = String(Int(lastTestSeconds))
+            }else{
+                lastTestSeconds = 0.5
+                previousResult.text = "None"
+            }
             result.text = ""
             elapsedTimeLabel.text = ""
-            if test.getGoalOrDefault() < 0{
+            if test.goalResult < 0{
                 goalResult.text = ""
             }else{
-                goalResult.text = String(test.getGoalOrDefault())
+                goalResult.text = String(test.goalResult)
             }
             kgField.text = String(test.kg)
             if test.testType().isTimed(){
@@ -186,6 +202,19 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
                 result.textColor = view.backgroundColor
                 result.isEnabled = true
             }
+            if test.testType().hasKG(){
+                kgField.backgroundColor = editableColour
+                kgField.textColor = view.backgroundColor
+                kgField.isEnabled = true
+                minusButton.isEnabled = true
+                plusButton.isEnabled = true
+            }else{
+                kgField.backgroundColor = nonEditableColour
+                kgField.textColor = nonEditableColour
+                kgField.isEnabled = false
+                minusButton.isEnabled = false
+                plusButton.isEnabled = false
+            }
             if currentTest == fitnessTest.numberOfTests() - 1{
                 // it's the last test
                 startStopButton.setTitle("Save Test", for: .normal)
@@ -195,6 +224,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
             }
 
             tableView.reloadData()
+            view.setNeedsDisplay()
         }
     }
 }

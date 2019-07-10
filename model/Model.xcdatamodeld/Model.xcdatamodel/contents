@@ -25,24 +25,27 @@
         <attribute name="order" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="result" attributeType="Double" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="resultUnit" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="testSet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TestSet" inverseName="tests" inverseEntity="TestSet" syncable="YES"/>
+        <relationship name="testSet" maxCount="1" deletionRule="Nullify" destinationEntity="TestSet" inverseName="tests" inverseEntity="TestSet" syncable="YES"/>
     </entity>
     <entity name="TestSet" representedClassName="TestSet" syncable="YES" codeGenerationType="class">
-        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="complete" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
         <relationship name="tests" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Test" inverseName="testSet" inverseEntity="Test" syncable="YES"/>
     </entity>
     <entity name="Workout" representedClassName="Workout" syncable="YES" codeGenerationType="class">
         <attribute name="athleteNotes" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="complete" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="explanation" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="exerciseSets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ExerciseSet" inverseName="session" inverseEntity="ExerciseSet" syncable="YES"/>
     </entity>
     <elements>
         <element name="Exercise" positionX="-504.35546875" positionY="-47.5546875" width="128" height="148"/>
         <element name="ExerciseSet" positionX="-894.04296875" positionY="-68.01171875" width="179.6796875" height="148"/>
         <element name="Test" positionX="-774.078125" positionY="257.921875" width="128" height="150"/>
-        <element name="TestSet" positionX="-1003.19921875" positionY="285.5234375" width="128" height="90"/>
-        <element name="Workout" positionX="-1117.46875" positionY="43.796875" width="128" height="105"/>
+        <element name="TestSet" positionX="-1003.19921875" positionY="285.5234375" width="128" height="105"/>
+        <element name="Workout" positionX="-1117.46875" positionY="43.796875" width="128" height="135"/>
     </elements>
 </model>
