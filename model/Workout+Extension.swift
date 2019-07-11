@@ -11,8 +11,17 @@ import Foundation
 extension Workout{
     
     func summary() -> String{
-        return "This is a session summary"
+        if complete{
+            return "Completed"
+        }else{
+            if isTest{
+                return "Next test"
+            }else{
+                return "Next workout"
+            }
+        }
     }
+    
     
     func numberOfExercises() -> Int{
         return exercises?.count ?? 0

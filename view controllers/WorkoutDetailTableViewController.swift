@@ -38,7 +38,7 @@ class WorkoutDetailTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if let e = workout?.exercise(atOrder: Int16(section)){
-            return e.exerciseType()?.name()
+            return e.exerciseDefinition().name
         }else{
             return ""
         }

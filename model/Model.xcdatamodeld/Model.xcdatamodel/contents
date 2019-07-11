@@ -1,59 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.99" systemVersion="18F132" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Distance" representedClassName="Distance" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class">
-        <attribute name="actualMetres" attributeType="Double" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="plannedMetres" attributeType="Double" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="exerciseDistance" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ExerciseDistance" inverseName="distances" inverseEntity="ExerciseDistance" syncable="YES"/>
-    </entity>
     <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="class">
         <attribute name="endedEarly" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isTest" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="sets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ExerciseSet" inverseName="exercise" inverseEntity="ExerciseSet" syncable="YES"/>
         <relationship name="workout" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Workout" inverseName="exercises" inverseEntity="Workout" syncable="YES"/>
     </entity>
-    <entity name="ExerciseDistance" representedClassName="ExerciseDistance" parentEntity="Exercise" syncable="YES" codeGenerationType="class">
-        <relationship name="distances" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Distance" inverseName="exerciseDistance" inverseEntity="Distance" syncable="YES"/>
-    </entity>
-    <entity name="ExerciseInterval" representedClassName="ExerciseInterval" parentEntity="Exercise" syncable="YES" codeGenerationType="class">
-        <relationship name="intervals" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Interval" inverseName="exerciseInterval" inverseEntity="Interval" syncable="YES"/>
-    </entity>
-    <entity name="ExerciseReps" representedClassName="ExerciseReps" parentEntity="Exercise" syncable="YES" codeGenerationType="class">
-        <relationship name="reps" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Reps" inverseName="exerciseReps" inverseEntity="Reps" syncable="YES"/>
-    </entity>
-    <entity name="ExerciseSet" representedClassName="ExerciseSet" isAbstract="YES" syncable="YES" codeGenerationType="class">
+    <entity name="ExerciseSet" representedClassName="ExerciseSet" syncable="YES" codeGenerationType="class">
+        <attribute name="actual" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="actualKG" attributeType="Double" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="order" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="plan" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="plannedKG" attributeType="Double" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="restSeconds" attributeType="Integer 16" defaultValueString="30" usesScalarValueType="YES" syncable="YES"/>
-    </entity>
-    <entity name="Interval" representedClassName="Interval" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class">
-        <attribute name="actualSeconds" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="plannedSeconds" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="exerciseInterval" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ExerciseInterval" inverseName="intervals" inverseEntity="ExerciseInterval" syncable="YES"/>
-    </entity>
-    <entity name="Reps" representedClassName="Reps" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class">
-        <attribute name="actualReps" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="plannedReps" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="exerciseReps" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ExerciseReps" inverseName="reps" inverseEntity="ExerciseReps" syncable="YES"/>
+        <relationship name="exercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Exercise" inverseName="sets" inverseEntity="Exercise" syncable="YES"/>
     </entity>
     <entity name="Workout" representedClassName="Workout" syncable="YES" codeGenerationType="class">
-        <attribute name="complete" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="complete" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="explanation" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="isTest" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="exercises" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Exercise" inverseName="workout" inverseEntity="Exercise" syncable="YES"/>
+        <relationship name="nextWorkout" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Workout" inverseName="previousWorkout" inverseEntity="Workout" syncable="YES"/>
+        <relationship name="previousWorkout" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Workout" inverseName="nextWorkout" inverseEntity="Workout" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Exercise" positionX="-698.2109375" positionY="799.57421875" width="128" height="118"/>
-        <element name="ExerciseReps" positionX="-436.9921875" positionY="746.31640625" width="128" height="58"/>
-        <element name="ExerciseInterval" positionX="-433.046875" positionY="863.15625" width="128" height="58"/>
-        <element name="Workout" positionX="-927.49609375" positionY="833.37109375" width="128" height="133"/>
-        <element name="ExerciseSet" positionX="104.51953125" positionY="796.828125" width="128" height="103"/>
-        <element name="Interval" positionX="-193.12890625" positionY="844.8046875" width="128" height="88"/>
-        <element name="Reps" positionX="-194.69921875" positionY="717.453125" width="128" height="88"/>
-        <element name="Distance" positionX="-187.7734375" positionY="970.13671875" width="128" height="88"/>
-        <element name="ExerciseDistance" positionX="-428.16796875" positionY="984.91015625" width="128" height="58"/>
+        <element name="Exercise" positionX="-667.34765625" positionY="786.5625" width="128" height="133"/>
+        <element name="ExerciseSet" positionX="-416.7890625" positionY="753.59375" width="128" height="148"/>
+        <element name="Workout" positionX="-932.73828125" positionY="782.71484375" width="128" height="163"/>
     </elements>
 </model>

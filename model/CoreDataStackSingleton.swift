@@ -11,24 +11,8 @@ import CoreData
 
 
 enum EntityType: String{
-    case Distance, Exercise, ExerciseDistance, ExerciseInterval, ExerciseReps, ExerciseSet, Interval, Reps, Workout
+    case Exercise, ExerciseSet, Workout
 }
-
-enum ExerciseEntity: String{
-    case ExerciseDistance, ExerciseInterval, ExerciseReps
-    func entityType() -> EntityType{
-        return EntityType(rawValue: self.rawValue)!
-    }
-    func setEntityType() -> EntityType{
-        switch self{
-        case .ExerciseDistance: return EntityType.Distance
-        case .ExerciseInterval: return EntityType.Interval
-        case .ExerciseReps: return EntityType.Reps
-        }
-    }
-}
-
-
 
 /*
  This class is meant to be purely for mediating with the Core Data Stack.
@@ -69,16 +53,8 @@ class CoreDataStackSingleton{
     
     
     func newWorkout() -> Workout { return newEntity(ofType: .Workout) as! Workout}
-//    func newExercise() -> Exercise { return newEntity(ofType: .Exercise) as! Exercise}
-//    func newExerciseDistance() -> ExerciseDistance { return newEntity(ofType: .ExerciseDistance) as! ExerciseDistance}
-//    func newExerciseInterval() -> ExerciseInterval { return newEntity(ofType: .ExerciseInterval) as! ExerciseInterval}
-//    func newExerciseReps() -> ExerciseReps { return newEntity(ofType: .ExerciseReps) as! ExerciseReps}
-//    func newDistance() -> Distance { return newEntity(ofType: .Distance) as! Distance}
-//    func newInterval() -> Interval { return newEntity(ofType: .Interval) as! Interval}
-//    func newReps() -> Reps { return newEntity(ofType: .Reps) as! Reps}
-    func newExerciseSet(forEntity entity: ExerciseEntity) -> ExerciseSet {return newEntity(ofType: entity.setEntityType()) as! ExerciseSet}
-    func newExercise(forEntity entity: ExerciseEntity) -> Exercise {return newEntity(ofType: entity.entityType()) as! Exercise}
-
+    func newExerciseSet() -> ExerciseSet {return newEntity(ofType: .ExerciseSet) as! ExerciseSet}
+    func newExercise() -> Exercise {return newEntity(ofType: .Exercise) as! Exercise}
     
     func getAllSessions() -> [Workout]{
         let results = getAllEntities(ofType: .Workout, predicate: nil) as! [Workout]

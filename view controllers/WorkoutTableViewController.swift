@@ -84,7 +84,7 @@ class WorkoutTableViewController: UITableViewController{
                 return UITableViewCell()
             }
             if let c = cell as? ExerciseDescriptionCell{
-                c.label.text = workout.exercise(atOrder: currentExerciseSet)?.exerciseType()?.name() ?? ""
+                c.label.text = workout.exercise(atOrder: currentExerciseSet)?.exerciseDefinition().name ?? ""
             }
             return cell
         }else if indexPath.section == EXERCISE_SETS_SECTION{
@@ -123,6 +123,9 @@ class WorkoutTableViewController: UITableViewController{
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         if segue.identifier == "SaveWorkoutSegue" {
+            workout.complete = true
+            CoreDataStackSingleton.shared.save()
+            WorkoutManager.shared.createNextWorkout(after: workout)
             if let tabVC = segue.destination as? UITabBarController{
                 tabVC.selectedIndex = 3
             }
@@ -165,14 +168,11 @@ class ExerciseCell: UITableViewCell{
     
     var workoutCompletionDelegate: WorkoutCompletionDelegate?
     
-    func setExerciseSet(_ exercise: ExerciseSet?){
-        self.exercise = exercise
-        if let e = exercise as? Reps{
-            label.text = "\(e.exerciseReps?.exerciseType()?.name() ?? ""): \(e.plannedReps) x \(e.plannedKG) KG"
-            slider.maximumValue = Float(e.plannedReps)
-            repsLabel.text = e.actualReps > 0 ? String(e.actualReps) : ""
-        }
-        
+    func setExerciseSet(_ exerciseSet: ExerciseSet?){
+        self.exercise = exerciseSet
+        label.text = "\(exerciseSet?.exercise?.exerciseDefinition().name ?? "No name"): \(exerciseSet?.plan ?? 0) x \(exerciseSet?.plannedKG ?? 0) KG"
+        slider.maximumValue = Float(exerciseSet?.plan ?? 0.0)
+        repsLabel.text = (exerciseSet?.actual ?? 0.0) > 0.0 ? String(exerciseSet?.actual ?? 0) : ""
     }
     
     @IBAction func sliderChanged(_ sender: UISlider) {
@@ -196,10 +196,7 @@ class ExerciseCell: UITableViewCell{
     private func setActualReps(to reps: Int){
         repsLabel.text = String(reps)
         exercise?.actualKG = exercise?.plannedKG ?? 0.0
-        print(exercise)
-        if let e  = exercise as? Reps{
-            e.actualReps = Int16(reps)
-        }
+        exercise?.actual = Double(reps)
         if exercise?.setCompleted() ?? false{
             if let wcd = workoutCompletionDelegate{
                 wcd.checkIfWorkoutFinished()
@@ -215,18 +212,24 @@ class ExerciseDescriptionCell: UITableViewCell{
     
 }
 
-class SaveSetCell: UITableViewCell{
-    
-    var viewController: UIViewController?
-
-    @IBAction func home(_ sender: Any) {
-        CoreDataStackSingleton.shared.save()
-        if let vc = viewController{
-            vc.performSegue(withIdentifier: "SaveTestSegue", sender: self)
-        }
-    }
-    
-}
+//class SaveSetCell: UITableViewCell{
+//    
+//    var viewController: UIViewController?
+//    var workout: Workout?
+//
+//    @IBAction func home(_ sender: Any) {
+//        print("Saveing set")
+//        if let w = workout{
+//            w.complete = true
+//        }
+//        CoreDataStackSingleton.shared.save()
+//        WorkoutManager.shared.createNextWorkout()
+//        if let vc = viewController{
+//            vc.performSegue(withIdentifier: "SaveTestSegue", sender: self)
+//        }
+//    }
+//    
+//}
 
 class ExerciseDoneCell: UITableViewCell{
     

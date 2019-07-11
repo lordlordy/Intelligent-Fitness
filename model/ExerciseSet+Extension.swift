@@ -8,30 +8,102 @@
 
 import Foundation
 
-extension ExerciseSet: ExerciseSetProtocol{
-    func set(exercise: Exercise) {
-        print("shouldn't be called as ExerciseSet is abstract. Should call subclasses implementations")
+extension ExerciseSet{
+  
+    func setCompleted() -> Bool {
+        return actual >= plan
     }
     
-    // ExerciseSet is abstract in Core Data... these functions will need overriding in subclasses
-    func setCompleted() -> Bool{ return false }
-    func set(planned: Double) {
-        // do nothing here
-    }
-    func set(actual: Double) {
-        // do nothing here
-    }
-    
-    func getPlanned() -> Double { return 0.0 }
-    func getActual() -> Double { return 0.0 }
-    
-    func summary() -> String{
-        return "Shouldn't see this as subclass should have overridden"
+    func summary() -> String {
+        if let type = exercise?.exerciseDefinition().setType{
+            switch type{
+            case .Distance: return distanceDescription()
+            case .Reps: return repsDescription()
+            case .Time: return timeDescription()
+            case .Touches: return touchesDescription()
+            }
+        }else{
+            return "No type set"
+        }
+        
     }
     
     func partOfTest() -> Bool{
-        return false
+        return exercise?.isTest ?? false
     }
     
-
+    private func distanceDescription() -> String{
+        var str: String = ""
+        if actual >= 0{
+            str += "\(actual)m"
+            if actualKG > 0{
+                str += " with \(actualKG) kg"
+            }
+        }else{
+            str += "Not started"
+        }
+        str += " (\(partOfTest() ? "Goal:" : "Plan:") \(plan)"
+        if plannedKG > 0{
+            str += " with \(plannedKG)kg"
+        }
+        str += ")"
+        
+        return str
+    }
+    
+    private func repsDescription() -> String{
+        var str: String = ""
+        if actual >= 0{
+            str += "\(Int(actual))"
+            if actualKG > 0{
+                str += " x \(actualKG) kg"
+            }else{
+                str += " reps"
+            }
+        }else{
+            str += "Not started"
+        }
+        str += " (\(partOfTest() ? "Goal:" : "Plan:") \(Int(plan))"
+        if plannedKG > 0{
+            str += " x \(plannedKG)kg"
+        }else{
+            str += " reps"
+        }
+        str += ")"
+        
+        return str
+        
+    }
+    
+    private func timeDescription() -> String{
+        var str: String = ""
+        if actual >= 0{
+            str += "\(Int(actual))s"
+            if actualKG > 0{
+                str += " with \(actualKG) kg"
+            }
+        }else{
+            str += "Not started"
+        }
+        str += " (\(partOfTest() ? "Goal:" : "Plan:") \(Int(plan))s"
+        if plannedKG > 0{
+            str += " with \(plannedKG)kg"
+        }
+        str += ")"
+        
+        return str
+    }
+    
+    private func touchesDescription() -> String{
+        var str: String = ""
+        if actual >= 0{
+            str += "\(Int(actual)) touches"
+        }else{
+            str += "Not started"
+        }
+        str += " (\(partOfTest() ? "Goal:" : "Plan:") \(Int(plan)) touches)"
+        return str
+        
+    }
+    
 }
