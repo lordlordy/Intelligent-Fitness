@@ -10,7 +10,7 @@ import UIKit
 
 class WorkoutViewController: UIViewController {
 
-    var workout: Workout = WorkoutManager().nextWorkout()
+//    var workout: Workout = WorkoutManager.shared.nextWorkout()
     
     @IBOutlet weak var dateTextField: UITextField!
     @IBOutlet weak var workoutTypeLabel: UILabel!
@@ -22,7 +22,9 @@ class WorkoutViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         df.dateFormat = "yyyy-MM-dd"
-        dateTextField.text = df.string(from: Date())
+        let workoutDate: Date = WorkoutManager.shared.nextWorkout().date ?? Date()
+        print(WorkoutManager.shared.nextWorkout())
+        dateTextField.text = df.string(from: workoutDate)
         var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
         if view.backgroundColor?.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) ?? false{
             dateTextField.backgroundColor = UIColor(hue: hue, saturation: saturation, brightness: brightness * 1.1, alpha: alpha)
@@ -34,6 +36,7 @@ class WorkoutViewController: UIViewController {
         datePicker = UIDatePicker()
         datePicker?.datePickerMode = .date
         datePicker?.addTarget(self, action: #selector(dateChanged(datePicker:)), for: .valueChanged)
+        datePicker?.date = workoutDate
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
         view.addGestureRecognizer(tapGesture)
@@ -48,14 +51,14 @@ class WorkoutViewController: UIViewController {
     
     @objc func dateChanged(datePicker: UIDatePicker){
         dateTextField.text = df.string(from: datePicker.date)
-        workout.date = datePicker.date
+        WorkoutManager.shared.nextWorkout().date = datePicker.date
         view.endEditing(true)
     }
     
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let type: WorkoutType? = WorkoutType(rawValue: workout.type)
+        let type: WorkoutType? = WorkoutType(rawValue: WorkoutManager.shared.nextWorkout().type)
         workoutTypeLabel.text = type?.string() ?? "Workout Type Unknown"
         
     }
@@ -64,7 +67,10 @@ class WorkoutViewController: UIViewController {
         super.prepare(for: segue, sender: sender)
         if segue.identifier == "StartWorkout"{
             if let vc = segue.destination as? WorkoutTableViewController{
-                vc.workout = workout
+                //set workout to maximum of today
+                let w: Workout = WorkoutManager.shared.nextWorkout()
+                w.date = min(w.date ?? Date(), Date())
+                vc.workout = w
             }
         }
     }

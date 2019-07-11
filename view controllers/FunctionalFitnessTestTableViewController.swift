@@ -35,7 +35,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let height = super.tableView(tableView, heightForRowAt: indexPath)
-        if indexPath.row == timerRow && !(fitnessTest.exercise(atOrder: currentTest) is ExerciseInterval){
+        if indexPath.row == timerRow && !(fitnessTest.exercise(atOrder: currentTest)?.exerciseDefinition().setType == SetType.Time){
             return 0.0
         }
         return height
@@ -74,8 +74,8 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     var targetSeconds: Double = 30
     var lastTestSeconds: Double = 10
     
-    var fitnessTest: Workout = WorkoutManager().createFunctionalFitnessTest()
-    var testDate: Date = Date()
+    var fitnessTest: Workout = WorkoutManager.shared.nextFunctionalFitnessTest()
+//    var testDate: Date = Date()
     private var currentTest: Int16 = 0
     private var testCompleted: Bool = false
     
@@ -83,7 +83,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
         //save values first
         if let test = fitnessTest.exercise(atOrder: currentTest)?.exerciseSet(atOrder: 0){
             test.actualKG = (kgField.text! as NSString).doubleValue
-            test.set(actual: (result.text! as NSString).doubleValue)
+            test.actual = (result.text! as NSString).doubleValue
         }
         progressTextField.text += "\n\(fitnessTest.exercise(atOrder: currentTest)?.summary() ?? " no result")"
         currentTest += 1
@@ -92,8 +92,12 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     
     @IBAction func startStopTimer(_ sender: Any) {
         if testCompleted{
-            fitnessTest.date = testDate
+            fitnessTest.complete = true
+            // this ensures user doesn't forward date the test - then can backdate it. This allows in testing to build up some old tests
+            // in production would consider removing this and always setting the date to now.
+            fitnessTest.date = min(Date(), fitnessTest.date ?? Date())
             CoreDataStackSingleton.shared.save()
+            WorkoutManager.shared.createNextFunctionalFitnessTest(after: fitnessTest)
             performSegue(withIdentifier: "EndOfTest", sender: self)
         }
         timerStatus = timerStatus.nextStatus()
@@ -173,12 +177,12 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     private func updateTest(){
         if let exercise = fitnessTest.exercise(atOrder: currentTest){
             if let test = exercise.exerciseSet(atOrder: 0){
-                testName.text = exercise.exerciseType()?.name() ?? "Unkown exercise type"
-                testDescription.text = exercise.exerciseType()?.exerciseDescription() ?? "No explanation set"
+                testName.text = exercise.exerciseDefinition().name
+                testDescription.text = exercise.exerciseDefinition().description
                 progressView.progress = 0.0
                 progressView.secondaryProgress = 0.0
-                if let interval = test as? Interval{
-                    targetSeconds = Double(interval.plannedSeconds)
+                if exercise.exerciseDefinition().setType == SetType.Time{
+                    targetSeconds = Double(test.plan)
                     timerStatus = .Initial
                     result.backgroundColor = nonEditableColour
                     result.textColor = .white
@@ -201,10 +205,10 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
 //                }
                 result.text = ""
                 elapsedTimeLabel.text = ""
-                if test.getPlanned() < 0{
+                if test.plan < 0{
                     goalResult.text = ""
                 }else{
-                    goalResult.text = String(test.getPlanned())
+                    goalResult.text = String(test.plan)
                 }
                 kgField.text = String(test.plannedKG)
 

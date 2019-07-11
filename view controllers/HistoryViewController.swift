@@ -114,14 +114,10 @@ class HistoryViewController: UITableViewController, Collapsable {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "functionalFitnessTest", for: indexPath)
-
-        if indexPath.section == HistorySection.Test.rawValue{
-            cell.textLabel?.text = String("\(df.string(from: tests[indexPath.row].date ?? Date())) - Test")
-            cell.detailTextLabel?.text = tests[indexPath.row].summary()
-        }else{
-            let w: Workout = workouts[indexPath.row]
-            cell.textLabel?.text = df.string(from: w.date! ) + " " + (w.workoutType()?.string() ?? "Unknown Workout Type")
-        }
+        let workout: Workout = indexPath.section == HistorySection.Test.rawValue ? tests[indexPath.row] : workouts[indexPath.row]
+        
+        cell.textLabel?.text = "\(df.string(from: workout.date!)) - \(workout.workoutType()?.string() ?? "Unknown")"
+        cell.detailTextLabel?.text = workout.summary()
 
         return cell
     }
@@ -129,7 +125,6 @@ class HistoryViewController: UITableViewController, Collapsable {
     //METHOD TO MAKE DELETION POSSIBLE
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete{
-            print("Trying to delete")
             if indexPath.section == HistorySection.Test.rawValue{
                 //deleting a test
                 let testToDelete: Workout = tests[indexPath.row]
