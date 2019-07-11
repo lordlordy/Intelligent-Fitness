@@ -170,6 +170,10 @@ class Graph{
 
     fileprivate func addGraph(_ rect: CGRect, graph: Graph) {
         
+        if graph.data.count == 0{
+            return
+        }
+        
         let width = rect.width
         let height = rect.height
         //calculate the x point
@@ -204,7 +208,7 @@ class Graph{
         let graphPath = UIBezierPath()
         //go to start of line
         graphPath.move(to: CGPoint(x:columnXPoint(0), y:columnYPoint(graph.data[0].value)))
-        
+
         //add points for each item in the graphPoints array
         //at the correct (x, y) for the point
         for i in 1..<graph.data.count {

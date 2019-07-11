@@ -10,8 +10,6 @@
 		1457307ABA006E0C6F449065 /* Pods_Intelligent_FitnessTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A15EECFB09ABBC8856BA641 /* Pods_Intelligent_FitnessTests.framework */; };
 		7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7300458322C0DAEC00B5720B /* WorkoutViewController.swift */; };
 		730E63F122CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730E63F022CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift */; };
-		730E642F22CE419500A6A5F3 /* Test+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730E642E22CE419500A6A5F3 /* Test+Extension.swift */; };
-		730E643122CE443200A6A5F3 /* TestSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730E643022CE443200A6A5F3 /* TestSet+Extension.swift */; };
 		730E643422CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */; };
 		731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731D517A22BA828600AA7EA4 /* LoginViewController.swift */; };
 		731D517D22BA83E100AA7EA4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */; };
@@ -39,6 +37,16 @@
 		73D9BE2222C7911900879CF1 /* WorkoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2122C7911900879CF1 /* WorkoutManager.swift */; };
 		73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */; };
 		73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */; };
+		73EB4C4522D60E6800BC0C09 /* ExerciseSetProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C4422D60E6800BC0C09 /* ExerciseSetProtocol.swift */; };
+		73EB4C4722D60EA300BC0C09 /* ExerciseReps+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C4622D60EA300BC0C09 /* ExerciseReps+Extension.swift */; };
+		73EB4C4922D60FF300BC0C09 /* Reps+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C4822D60FF300BC0C09 /* Reps+Extension.swift */; };
+		73EB4C4B22D6108E00BC0C09 /* Interval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C4A22D6108E00BC0C09 /* Interval+Extension.swift */; };
+		73EB4C4D22D611FC00BC0C09 /* ExerciseProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C4C22D611FC00BC0C09 /* ExerciseProtocol.swift */; };
+		73EB4C4F22D6161D00BC0C09 /* ExerciseInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C4E22D6161D00BC0C09 /* ExerciseInterval+Extension.swift */; };
+		73EB4C5122D61C3900BC0C09 /* Distance+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5022D61C3900BC0C09 /* Distance+Extension.swift */; };
+		73EB4C5322D61C7400BC0C09 /* ExerciseDistance+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5222D61C7400BC0C09 /* ExerciseDistance+Extension.swift */; };
+		73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */; };
+		73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */; };
 		9B7E1A27CAFCABAA54613FD0 /* Pods_Intelligent_Fitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD2F45FBC7133D7A831CCAF /* Pods_Intelligent_Fitness.framework */; };
 		FA3860FA8964F1672AF23A42 /* Pods_Intelligent_FitnessUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57027BDECC969C348D8A3E12 /* Pods_Intelligent_FitnessUITests.framework */; };
 /* End PBXBuildFile section */
@@ -68,8 +76,6 @@
 		67A57F9DAF4C5E97858C9D9E /* Pods-Intelligent FitnessUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent FitnessUITests.release.xcconfig"; path = "Target Support Files/Pods-Intelligent FitnessUITests/Pods-Intelligent FitnessUITests.release.xcconfig"; sourceTree = "<group>"; };
 		7300458322C0DAEC00B5720B /* WorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViewController.swift; sourceTree = "<group>"; };
 		730E63F022CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionalFitnessTestTableViewController.swift; sourceTree = "<group>"; };
-		730E642E22CE419500A6A5F3 /* Test+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Test+Extension.swift"; sourceTree = "<group>"; };
-		730E643022CE443200A6A5F3 /* TestSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TestSet+Extension.swift"; sourceTree = "<group>"; };
 		730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionalFitnessTestViewController.swift; sourceTree = "<group>"; };
 		731D517A22BA828600AA7EA4 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -104,6 +110,16 @@
 		73D9BE2122C7911900879CF1 /* WorkoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutManager.swift; sourceTree = "<group>"; };
 		73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseSet+Extension.swift"; sourceTree = "<group>"; };
 		73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workout+Extension.swift"; sourceTree = "<group>"; };
+		73EB4C4422D60E6800BC0C09 /* ExerciseSetProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSetProtocol.swift; sourceTree = "<group>"; };
+		73EB4C4622D60EA300BC0C09 /* ExerciseReps+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseReps+Extension.swift"; sourceTree = "<group>"; };
+		73EB4C4822D60FF300BC0C09 /* Reps+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reps+Extension.swift"; sourceTree = "<group>"; };
+		73EB4C4A22D6108E00BC0C09 /* Interval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Interval+Extension.swift"; sourceTree = "<group>"; };
+		73EB4C4C22D611FC00BC0C09 /* ExerciseProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseProtocol.swift; sourceTree = "<group>"; };
+		73EB4C4E22D6161D00BC0C09 /* ExerciseInterval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseInterval+Extension.swift"; sourceTree = "<group>"; };
+		73EB4C5022D61C3900BC0C09 /* Distance+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Distance+Extension.swift"; sourceTree = "<group>"; };
+		73EB4C5222D61C7400BC0C09 /* ExerciseDistance+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseDistance+Extension.swift"; sourceTree = "<group>"; };
+		73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailTableViewController.swift; sourceTree = "<group>"; };
+		73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDefinition.swift; sourceTree = "<group>"; };
 		9A15EECFB09ABBC8856BA641 /* Pods_Intelligent_FitnessTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Intelligent_FitnessTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A621DD4A3C3F73C2603DB12E /* Pods-Intelligent Fitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent Fitness.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent Fitness/Pods-Intelligent Fitness.debug.xcconfig"; sourceTree = "<group>"; };
 		CC9FB4B13A229373A6DE344C /* Pods-Intelligent FitnessUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent FitnessUITests.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent FitnessUITests/Pods-Intelligent FitnessUITests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -151,6 +167,7 @@
 				73759DBC22C3B82600757C29 /* ProfileViewController.swift */,
 				7300458322C0DAEC00B5720B /* WorkoutViewController.swift */,
 				730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */,
+				73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */,
 			);
 			path = "view controllers";
 			sourceTree = "<group>";
@@ -227,15 +244,22 @@
 		737373BA22B508D400698DD4 /* model */ = {
 			isa = PBXGroup;
 			children = (
-				736CFC8722B4F0AF0071EA3B /* Model.xcdatamodeld */,
 				737373BB22B508F200698DD4 /* CoreDataStackSingleton.swift */,
-				73D9BE2122C7911900879CF1 /* WorkoutManager.swift */,
-				73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */,
-				73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */,
-				738E445322CB58C500F7BEA6 /* Exercise+Extension.swift */,
+				73EB4C5022D61C3900BC0C09 /* Distance+Extension.swift */,
 				7376663D22CCAD8B004324B5 /* Enumerations.swift */,
-				730E642E22CE419500A6A5F3 /* Test+Extension.swift */,
-				730E643022CE443200A6A5F3 /* TestSet+Extension.swift */,
+				738E445322CB58C500F7BEA6 /* Exercise+Extension.swift */,
+				73EB4C4E22D6161D00BC0C09 /* ExerciseInterval+Extension.swift */,
+				73EB4C5222D61C7400BC0C09 /* ExerciseDistance+Extension.swift */,
+				73EB4C4C22D611FC00BC0C09 /* ExerciseProtocol.swift */,
+				73EB4C4622D60EA300BC0C09 /* ExerciseReps+Extension.swift */,
+				73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */,
+				73EB4C4422D60E6800BC0C09 /* ExerciseSetProtocol.swift */,
+				73EB4C4A22D6108E00BC0C09 /* Interval+Extension.swift */,
+				736CFC8722B4F0AF0071EA3B /* Model.xcdatamodeld */,
+				73EB4C4822D60FF300BC0C09 /* Reps+Extension.swift */,
+				73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */,
+				73D9BE2122C7911900879CF1 /* WorkoutManager.swift */,
+				73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -513,19 +537,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
-				730E642F22CE419500A6A5F3 /* Test+Extension.swift in Sources */,
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
-				730E643122CE443200A6A5F3 /* TestSet+Extension.swift in Sources */,
+				73EB4C4522D60E6800BC0C09 /* ExerciseSetProtocol.swift in Sources */,
 				7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */,
 				73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */,
 				73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */,
 				73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */,
+				73EB4C4722D60EA300BC0C09 /* ExerciseReps+Extension.swift in Sources */,
+				73EB4C4F22D6161D00BC0C09 /* ExerciseInterval+Extension.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
+				73EB4C5322D61C7400BC0C09 /* ExerciseDistance+Extension.swift in Sources */,
+				73EB4C4922D60FF300BC0C09 /* Reps+Extension.swift in Sources */,
+				73EB4C4D22D611FC00BC0C09 /* ExerciseProtocol.swift in Sources */,
+				73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */,
 				73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */,
 				7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */,
+				73EB4C5122D61C3900BC0C09 /* Distance+Extension.swift in Sources */,
 				73759DBD22C3B82600757C29 /* ProfileViewController.swift in Sources */,
 				738E445222CA544400F7BEA6 /* WorkoutTableViewController.swift in Sources */,
 				736CFC1A22B3B2E20071EA3B /* TestViewController.swift in Sources */,
+				73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */,
 				7376663E22CCAD8B004324B5 /* Enumerations.swift in Sources */,
 				73759DB922C24F6600757C29 /* ProgressViewController.swift in Sources */,
 				7342CB9422C51F36000A6FB6 /* UITextField+Extension.swift in Sources */,
@@ -533,6 +564,7 @@
 				730E643422CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift in Sources */,
 				73D9BE2222C7911900879CF1 /* WorkoutManager.swift in Sources */,
 				730E63F122CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift in Sources */,
+				73EB4C4B22D6108E00BC0C09 /* Interval+Extension.swift in Sources */,
 				737373BC22B508F200698DD4 /* CoreDataStackSingleton.swift in Sources */,
 				738E445422CB58C500F7BEA6 /* Exercise+Extension.swift in Sources */,
 				7376664022CCB7D9004324B5 /* ProgressView.swift in Sources */,

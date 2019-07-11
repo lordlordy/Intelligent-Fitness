@@ -27,7 +27,7 @@ class HistoryViewController: UITableViewController, Collapsable {
         }
     }
     
-    private var tests: [TestSet] = []
+    private var tests: [Workout] = []
     private var workouts: [Workout] = []
     private var df: DateFormatter = DateFormatter()
     
@@ -65,8 +65,8 @@ class HistoryViewController: UITableViewController, Collapsable {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //get history
-        tests = CoreDataStackSingleton.shared.getTestSets()
-        workouts = CoreDataStackSingleton.shared.getWorkouts()
+        tests = CoreDataStackSingleton.shared.getTests()
+        workouts = CoreDataStackSingleton.shared.getWorkouts(ofType: nil, isTest: false)
         tableView.reloadData()
     }
 
@@ -117,10 +117,10 @@ class HistoryViewController: UITableViewController, Collapsable {
 
         if indexPath.section == HistorySection.Test.rawValue{
             cell.textLabel?.text = String("\(df.string(from: tests[indexPath.row].date ?? Date())) - Test")
-            cell.detailTextLabel?.text = tests[indexPath.row].summaryString()
+            cell.detailTextLabel?.text = tests[indexPath.row].summary()
         }else{
             let w: Workout = workouts[indexPath.row]
-            cell.textLabel?.text = df.string(from: w.date! ) + " " + w.type!
+            cell.textLabel?.text = df.string(from: w.date! ) + " " + (w.workoutType()?.string() ?? "Unknown Workout Type")
         }
 
         return cell
@@ -132,7 +132,7 @@ class HistoryViewController: UITableViewController, Collapsable {
             print("Trying to delete")
             if indexPath.section == HistorySection.Test.rawValue{
                 //deleting a test
-                let testToDelete: TestSet = tests[indexPath.row]
+                let testToDelete: Workout = tests[indexPath.row]
                 tests.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 CoreDataStackSingleton.shared.delete(testToDelete)
@@ -142,18 +142,50 @@ class HistoryViewController: UITableViewController, Collapsable {
                 workouts.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 CoreDataStackSingleton.shared.delete(workoutToDelete)
-
             }
+            CoreDataStackSingleton.shared.save()
         }else if editingStyle == .insert{
             print("Trying to insert")
         }
     }
     
-    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-//        super.tableView(tableView, accessoryButtonTappedForRowWith: indexPath)
-        print("detail TAPPED")
-    }
 
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("selected: \(indexPath)")
+        performSegue(withIdentifier: "ShowWorkoutDetail", sender: workout(atIndexPath: indexPath))
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowWorkoutDetail"{
+            print("about to show detail")
+            print("Source: \(segue.source)")
+            print("Destination: \(segue.destination)")
+            print("Sender: \(String(describing: sender))")
+            if let d = segue.destination as? WorkoutDetailTableViewController{
+                if let w = sender as? Workout{
+                    d.workout = w
+                }
+            }
+        }
+    }
+    
+    private func workout(atIndexPath indexPath: IndexPath) -> Workout?{
+        switch indexPath.section{
+        case HistorySection.Test.rawValue:
+            if indexPath.row < tests.count{
+                return tests[indexPath.row]
+            }
+        case HistorySection.Workout.rawValue:
+            if indexPath.row < workouts.count{
+                return workouts[indexPath.row]
+            }
+        default: return nil
+        }
+        return nil
+        
+    }
+    
 }
 
 class CustomHeader: UITableViewHeaderFooterView{
