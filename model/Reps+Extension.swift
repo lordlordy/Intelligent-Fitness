@@ -25,16 +25,37 @@ extension Reps{
     override func getPlanned() -> Double { return Double(plannedReps) }
     override func getActual() -> Double { return Double(actualReps)}
 
+    override func partOfTest() -> Bool {
+        return exerciseReps?.isTest ?? false
+    }
+    
+    override func set(exercise: Exercise){
+        if let r = exercise as? ExerciseReps{
+            self.exerciseReps = r
+        }
+    }
+
+    
     override func summary() -> String {
-        var str: String = exerciseReps?.exerciseType()?.name() ?? ""
+        var str: String = ""
+        let repStr: String = exerciseReps?.exerciseType()?.repString() ?? "reps"
         if actualReps >= 0{
-            str += " \(actualReps) reps"
+            str += " \(actualReps)"
             if actualKG > 0{
-                str += " with \(actualKG) kg"
+                str += " x \(actualKG) kg"
+            }else{
+                str += " \(repStr)"
             }
         }else{
             str += " not started"
         }
+                
+        str += " (\(partOfTest() ? "Goal:" : "Plan:") \(plannedReps)"
+        if plannedKG > 0{
+            str += " x \(plannedKG)kg"
+        }
+        str += ")"
+        
         return str
     }
 }

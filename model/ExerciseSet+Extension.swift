@@ -9,6 +9,10 @@
 import Foundation
 
 extension ExerciseSet: ExerciseSetProtocol{
+    func set(exercise: Exercise) {
+        print("shouldn't be called as ExerciseSet is abstract. Should call subclasses implementations")
+    }
+    
     // ExerciseSet is abstract in Core Data... these functions will need overriding in subclasses
     func setCompleted() -> Bool{ return false }
     func set(planned: Double) {
@@ -24,5 +28,10 @@ extension ExerciseSet: ExerciseSetProtocol{
     func summary() -> String{
         return "Shouldn't see this as subclass should have overridden"
     }
+    
+    func partOfTest() -> Bool{
+        return false
+    }
+    
 
 }

@@ -28,12 +28,19 @@ enum ExerciseType: Int16, CaseIterable{
         case .sittingRisingTest: return "Sitting Rising Test"        }
     }
     
-    func usesWeights() -> Bool{
+    func repString() -> String{
         switch self{
-        case .pushUp, .standingBroadJump, .plank, .deadHang, .squat, .sittingRisingTest: return false
-        default: return true
+        case .sittingRisingTest: return " contacts"
+        default: return "reps"
         }
     }
+//
+//    func usesWeights() -> Bool{
+//        switch self{
+//        case .pushUp, .standingBroadJump, .plank, .deadHang, .squat, .sittingRisingTest: return false
+//        default: return true
+//        }
+//    }
     
     func exerciseDescription() -> String{
         switch self{
@@ -49,6 +56,18 @@ enum ExerciseType: Int16, CaseIterable{
             return "This is how you do a push up"
         default:
             return "Need to sort out description for \(self)"
+        }
+    }
+}
+
+enum SetType: Int16{
+    case Reps, Distance, Time, Touches
+    func string() -> String{
+        switch self{
+        case .Reps: return "reps"
+        case .Distance: return "metres"
+        case .Time: return "seconds"
+        case .Touches: return "touches"
         }
     }
 }
@@ -108,9 +127,11 @@ class WorkoutManager{
             exerciseSet.order = 0
             exerciseSet.set(planned: fft.defaultPlan)
             exerciseSet.plannedKG = fft.defaultKG
+            exerciseSet.set(exercise: exercise)
             exercise.add(exerciseSet: exerciseSet)
             exercise.order = order
             exercise.type = fft.type.rawValue
+            exercise.isTest = true
             workout.addToExercises(exercise)
             order += 1
         }
@@ -119,13 +140,13 @@ class WorkoutManager{
     
     
     func nextWorkout() -> Workout{
-        let incompleteWorkouts: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts()
-        if incompleteWorkouts.count > 0{
-            let result = incompleteWorkouts[0]
-            // update date to today
-            result.date = Date()
-            return result
-        }
+//        let incompleteWorkouts: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts()
+//        if incompleteWorkouts.count > 0{
+//            let result = incompleteWorkouts[0]
+//            // update date to today
+//            result.date = Date()
+//            return result
+//        }
         return createWorkout()
     }
 
@@ -139,6 +160,7 @@ class WorkoutManager{
         for e in exerciseSet1{
             let exercise: Exercise = CoreDataStackSingleton.shared.newExercise(forEntity: e.exerciseType)
             exercise.order = order
+            exercise.type = e.type.rawValue
             workout.addToExercises(exercise)
             let maxReps: Int16 = Int16(e.defaultPlan)
             var setOrder: Int16 = 0

@@ -25,16 +25,36 @@ extension Distance{
     override func getPlanned() -> Double { return plannedMetres }
     override func getActual() -> Double { return actualMetres}
     
+    override func partOfTest() -> Bool {
+        print("calling partOfTest() in Distance")
+        print(exerciseDistance)
+        print(exerciseDistance?.isTest)
+        return exerciseDistance?.isTest ?? false
+    }
+    
+    override func set(exercise: Exercise){
+        if let d = exercise as? ExerciseDistance{
+            self.exerciseDistance = d
+        }
+    }
+    
     override func summary() -> String {
-        var str: String = exerciseDistance?.exerciseType()?.name() ?? ""
+        var str: String = ""
         if actualMetres >= 0{
-            str += " \(actualMetres) metres"
+            str += " \(actualMetres)m"
             if actualKG > 0{
                 str += " with \(actualKG) kg"
             }
         }else{
             str += " not started"
         }
+        
+        str += " (\(partOfTest() ? "Goal:" : "Plan:") \(plannedMetres)m"
+        if plannedKG > 0{
+            str += " with \(plannedKG)kg"
+        }
+        str += ")"
+        
         return str
     }
 }

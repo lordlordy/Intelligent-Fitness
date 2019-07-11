@@ -142,18 +142,50 @@ class HistoryViewController: UITableViewController, Collapsable {
                 workouts.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 CoreDataStackSingleton.shared.delete(workoutToDelete)
-
             }
+            CoreDataStackSingleton.shared.save()
         }else if editingStyle == .insert{
             print("Trying to insert")
         }
     }
     
-    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-//        super.tableView(tableView, accessoryButtonTappedForRowWith: indexPath)
-        print("detail TAPPED")
-    }
 
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("selected: \(indexPath)")
+        performSegue(withIdentifier: "ShowWorkoutDetail", sender: workout(atIndexPath: indexPath))
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowWorkoutDetail"{
+            print("about to show detail")
+            print("Source: \(segue.source)")
+            print("Destination: \(segue.destination)")
+            print("Sender: \(String(describing: sender))")
+            if let d = segue.destination as? WorkoutDetailTableViewController{
+                if let w = sender as? Workout{
+                    d.workout = w
+                }
+            }
+        }
+    }
+    
+    private func workout(atIndexPath indexPath: IndexPath) -> Workout?{
+        switch indexPath.section{
+        case HistorySection.Test.rawValue:
+            if indexPath.row < tests.count{
+                return tests[indexPath.row]
+            }
+        case HistorySection.Workout.rawValue:
+            if indexPath.row < workouts.count{
+                return workouts[indexPath.row]
+            }
+        default: return nil
+        }
+        return nil
+        
+    }
+    
 }
 
 class CustomHeader: UITableViewHeaderFooterView{

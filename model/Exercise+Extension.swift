@@ -37,7 +37,7 @@ extension Exercise: ExerciseProtocol{
     
     func summary() -> String{
         if numberOfSets() == 1{
-            return exerciseSet(atOrder: 0)?.summary() ?? "No summary"
+            return "\(exerciseType()?.name() ?? "type not set"): \(exerciseSet(atOrder: 0)?.summary() ?? "no summary")"
         }
         return "Summary of exercise still to be written"
     }

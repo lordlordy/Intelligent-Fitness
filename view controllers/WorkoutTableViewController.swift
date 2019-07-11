@@ -195,6 +195,8 @@ class ExerciseCell: UITableViewCell{
     
     private func setActualReps(to reps: Int){
         repsLabel.text = String(reps)
+        exercise?.actualKG = exercise?.plannedKG ?? 0.0
+        print(exercise)
         if let e  = exercise as? Reps{
             e.actualReps = Int16(reps)
         }
