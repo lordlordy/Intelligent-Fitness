@@ -26,7 +26,6 @@ class ProgressViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-//        createExerciseTSBGraph()
         graphView.setGraphs(graphs: createDummyData())
     }
     
@@ -84,49 +83,51 @@ class ProgressViewController: UIViewController {
     }
     
     private func createCalorieGraph(){
-        let havePermission: Bool = HealthKitAccess.shared.getCalorieSummary(dateRange: nil) { (data) in
-            let tsbData = self.createTSBData(from: data)
-            // just show last 90 days of data
-            let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
-            let filteredData = tsbData.filter({$0.date >= ninetyDaysAgo})
-            print(filteredData)
-            let ctlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.ctl) }), colour: .red)
-            let atlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.atl) }), colour: .green)
-            let tsbGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.tsb) }), colour: .yellow)
-            tsbGraph.fill = true
-            self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
+        HealthKitAccess.shared.getCalorieSummary(dateRange: nil) { (data) in
+            if data.count == 0{
+                self.requestPermissions()
+            }else{
+                let tsbData = self.createTSBData(from: data)
+                // just show last 90 days of data
+                let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
+                let filteredData = tsbData.filter({$0.date >= ninetyDaysAgo})
+                print(filteredData)
+                let ctlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.ctl) }), colour: .red)
+                let atlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.atl) }), colour: .green)
+                let tsbGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.tsb) }), colour: .yellow)
+                tsbGraph.fill = true
+                self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
+            }
         }
-        if !havePermission{
-            print("No permissions for calories. Ask user for permission")
-        }
+        
     }
 
     private func createExerciseTSBGraph(){
-        let havePermission: Bool = HealthKitAccess.shared.getExerciseTimeSummary(dateRange: nil) { (data) in
-            //this data is in hours. For now assume a RPE of 5 using 7 as benchmark for threshol. ie hour at RPE 7 is TSS 100
-            //This comes about as estimating TSS from time and rpe we have: TSS ~ (RPE * RPE) * hrs
-            //We want RPE 7 to give 100. Thus we have:
-            //TSS for 1 hour @ 7 = 100. Thus we want to find factor, f such (7*7)*1*f = 100 => f = 100/49
-            //Thus is we're assuming RPE 5 then TSS = Hrs * 5 * 5 * f = hrs * 25 * 100 /49 = hrs * 2500 / 49
-            let tssFactor: Double = 2500.0 / 49.0
-            var tssData: [(date: Date, value: Double)] = []
-            for d in data{
-                tssData.append((date:d.date, value: d.value * tssFactor))
+        HealthKitAccess.shared.getExerciseTimeSummary(dateRange: nil) { (data) in
+            if data.count == 0{
+                self.requestPermissions()
+            }else{
+                //this data is in hours. For now assume a RPE of 5 using 7 as benchmark for threshol. ie hour at RPE 7 is TSS 100
+                //This comes about as estimating TSS from time and rpe we have: TSS ~ (RPE * RPE) * hrs
+                //We want RPE 7 to give 100. Thus we have:
+                //TSS for 1 hour @ 7 = 100. Thus we want to find factor, f such (7*7)*1*f = 100 => f = 100/49
+                //Thus is we're assuming RPE 5 then TSS = Hrs * 5 * 5 * f = hrs * 25 * 100 /49 = hrs * 2500 / 49
+                let tssFactor: Double = 2500.0 / 49.0
+                var tssData: [(date: Date, value: Double)] = []
+                for d in data{
+                    tssData.append((date:d.date, value: d.value * tssFactor))
+                }
+                let tsbData = self.createTSBData(from: tssData)
+                // just show last 90 days of data
+                let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
+                let filteredData = tsbData.filter({$0.date >= ninetyDaysAgo})
+                print(filteredData)
+                let ctlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.ctl) }), colour: .red)
+                let atlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.atl) }), colour: .green)
+                let tsbGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.tsb) }), colour: .yellow)
+                tsbGraph.fill = true
+                self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
             }
-            let tsbData = self.createTSBData(from: tssData)
-//            tsbData[0] = (tsbData[0].date, 0,0,0,0)
-            // just show last 90 days of data
-            let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
-            let filteredData = tsbData.filter({$0.date >= ninetyDaysAgo})
-            print(filteredData)
-            let ctlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.ctl) }), colour: .red)
-            let atlGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.atl) }), colour: .green)
-            let tsbGraph = Graph(data: filteredData.map({ (date: $0.date, value: $0.tsb) }), colour: .yellow)
-            tsbGraph.fill = true
-            self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
-        }
-        if !havePermission{
-            print("No permissions for hours. Ask user for permission")
         }
     }
 
@@ -194,56 +195,23 @@ class ProgressViewController: UIViewController {
         return [tsbGraph, Graph(data: ctlData, colour: .red), Graph(data: atlData, colour: .green)]
     }
     
-//    private func getActiveCalories(){
-//        let calendar = Calendar.current
-//        var interval = DateComponents()
-//        let today = Date()
-//        interval.day = 1
-//
-//        var anchorComponents = calendar.dateComponents([.day, .month, .year, .hour, .minute, .second], from: today)
-//        print(anchorComponents)
-//        anchorComponents.hour = 2  // to account for change in summer time - don't want removal of an hour to take us to previous day
-//        anchorComponents.minute = 0
-//        anchorComponents.second = 0
-//        print(anchorComponents)
-//
-//        guard let anchorDate = calendar.date(from: anchorComponents) else{
-//            fatalError("!!! unable to create valid date from anchor components !!!")
-//        }
-//
-//        print(anchorDate)
-//
-//
-//        guard let quantityType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
-//            fatalError("!!! unable to create activeEnergyBurned type !!!")
-//        }
-//
-//        let query = HKStatisticsCollectionQuery(quantityType: quantityType, quantitySamplePredicate: nil, options: .cumulativeSum, anchorDate: anchorDate, intervalComponents: interval)
-//
-//        query.initialResultsHandler = {
-//            query, results, error in
-//
-//            guard let statsCollection = results else{
-//                print("!!! error occurred getting active daily calorie burn")
-//                return
-//            }
-//
-//            let tomorrow = calendar.date(byAdding: DateComponents(day: 1), to: today)
-//
-//            var cals: [Date: Double] = [:]
-//
-//            statsCollection.enumerateStatistics(from: Date.distantPast, to: tomorrow!, with: { (stats, stop) in
-//                if let quantity = stats.sumQuantity(){
-//                    let value = quantity.doubleValue(for: HKUnit.largeCalorie())
-//                    cals[stats.startDate] = value
-////                    print("\(stats.startDate): \(value) Cals")
-//                }
-//            })
-//            self.calories = cals.sorted(by: {$0.key < $1.key})
-//        }
-//
-//        HKHealthStore().execute(query)
-//    }
+    private func requestPermissions(){
+        let alert = UIAlertController(title: "HealthKit Access", message: "This graph requires access to your health kit data", preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Give Permission", style: .default, handler: { (action) in
+            HealthKitAccess.shared.authorizeHealthKit(completion: { (success, error) in
+                if let e = error{
+                    print(e)
+                }
+                let title: String = success ? "Success" : "Failed"
+                let msg: String = success ? "Thanks. Access given" : "Access failed"
+                let alert = UIAlertController(title: title, message: msg, preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            })
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
     
 
 }

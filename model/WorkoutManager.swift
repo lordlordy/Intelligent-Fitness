@@ -23,6 +23,13 @@ enum SetType: Int16{
         case .Touches: return "\(Int(d)) touches"
         }
     }
+    func moreIsBetter() -> Bool{
+        // indicates whether more reps is better. For instance where 'touches' are counted the goal is as few as possible
+        switch self{
+        case .Touches: return false
+        default: return true
+        }
+    }
 }
 
 enum WorkoutType: Int16{
@@ -53,7 +60,7 @@ class WorkoutManager{
     }
     
     private let functionalFitnessTest: [ExerciseDefaults] = [
-        ExerciseDefaults(type: .standingBroadJump, defaultPlan: 100.0, defaultKG: 0.0),
+        ExerciseDefaults(type: .standingBroadJump, defaultPlan: 1.0, defaultKG: 0.0),
         ExerciseDefaults(type: .deadHang , defaultPlan: 30.0, defaultKG: 0.0),
         ExerciseDefaults(type: .farmersCarry , defaultPlan: 100.0, defaultKG: 10.0),
         ExerciseDefaults(type: .plank, defaultPlan: 30.0, defaultKG: 0.0),
@@ -77,7 +84,7 @@ class WorkoutManager{
         }else{
             // really shouldn't get to this point as the next test should be created when the last one was saved
             print("Shouldn't really get here: WorkoutManager.nextFunctionFitnessTest as the next test should have been ")
-            let tests: [Workout] = CoreDataStackSingleton.shared.getTests().sorted(by: {$0.date! > $1.date!})
+            let tests: [Workout] = CoreDataStackSingleton.shared.getFunctionalFitnessTests().sorted(by: {$0.date! > $1.date!})
             if tests.count > 0{
                 createNextFunctionalFitnessTest(after: tests[0])
                 // have created next workout so call this method re-cursively
@@ -101,7 +108,7 @@ class WorkoutManager{
         CoreDataStackSingleton.shared.save()
     }
     
-    private func createFunctionalFitnessTest(forDate date: Date) -> Workout{
+    private func createFunctionalFitnessTest(forDate date: Date) ->  Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
         workout.date = date
         workout.isTest = true

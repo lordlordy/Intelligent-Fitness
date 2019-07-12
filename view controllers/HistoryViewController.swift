@@ -65,7 +65,7 @@ class HistoryViewController: UITableViewController, Collapsable {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //get history
-        tests = CoreDataStackSingleton.shared.getTests()
+        tests = CoreDataStackSingleton.shared.getFunctionalFitnessTests()
         workouts = CoreDataStackSingleton.shared.getWorkouts(ofType: nil, isTest: false)
         tableView.reloadData()
     }

@@ -14,13 +14,16 @@ class WorkoutViewController: UIViewController {
     
     @IBOutlet weak var dateTextField: UITextField!
     @IBOutlet weak var workoutTypeLabel: UILabel!
-    
+    @IBOutlet weak var descriptionLabel: UILabel!
+
     private var datePicker: UIDatePicker?
     private let df = DateFormatter()
-    
-    
+
+    private let descriptionText: String = "Your aim is to do three sessions per week with no more than two rest days between sessions. Consecutive weeks of consistency will be rewarded with power ups in the 'Fitness Invaders' game."
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        descriptionLabel.text = descriptionText
         df.dateFormat = "yyyy-MM-dd"
         let workoutDate: Date = WorkoutManager.shared.nextWorkout().date ?? Date()
         print(WorkoutManager.shared.nextWorkout())

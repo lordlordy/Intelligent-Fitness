@@ -50,15 +50,5 @@ class FunctionalFitnessTestViewController: UIViewController {
         view.endEditing(true)
     }
     
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "StartFFT"{
-//            if let vc = segue.destination as? FunctionalFitnessTestTableViewController{
-////                vc.testDate = datePicker?.date ?? Date()
-//                if let d = datePicker?.date{
-//                    WorkoutManager.shared.nextFunctionalFitnessTest().date = d
-//                }
-//            }
-//        }
-//    }
 
 }
