@@ -71,16 +71,9 @@ class CoreDataStackSingleton{
         }
         return []
     }
+
     
-    func getMostRecentTest() -> Workout?{
-        let tests = getTests()
-        if tests.count > 0{
-            return tests[0]
-        }
-        return nil
-    }
-    
-    func getTests() -> [Workout]{
+    func getFunctionalFitnessTests() -> [Workout]{
         return getAllEntities(ofType: .Workout, predicate: NSPredicate(format: "isTest == %@", argumentArray: [true])) as! [Workout]
     }
     

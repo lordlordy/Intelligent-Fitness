@@ -75,7 +75,6 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     var lastTestSeconds: Double = 10
     
     var fitnessTest: Workout = WorkoutManager.shared.nextFunctionalFitnessTest()
-//    var testDate: Date = Date()
     private var currentTest: Int16 = 0
     private var testCompleted: Bool = false
     
@@ -196,19 +195,25 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
                     result.isEnabled = true
 
                 }
-//                if let lastResult = test.mostRecentResult(){
-//                    lastTestSeconds = lastResult
-//                    previousResult.text = String(Int(lastTestSeconds))
-//                }else{
-//                    lastTestSeconds = 0.5
-//                    previousResult.text = "None"
-//                }
+                //defaults
+                lastTestSeconds = 0.5
+                previousResult.text = "None"
+                if let previousFitnessTest = fitnessTest.previousWorkout, let type = test.exercise?.exerciseType(){
+                    let previous: [Exercise] = previousFitnessTest.exercises(ofType: type)
+                    if previous.count > 0{
+                        let e: Exercise = previous[0]
+                        if let es = e.exerciseSet(atOrder: 0){
+                            lastTestSeconds = es.actual
+                            previousResult.text = e.exerciseDefinition().setType.string(forValue: es.actual)
+                        }
+                    }
+                }
                 result.text = ""
                 elapsedTimeLabel.text = ""
                 if test.plan < 0{
                     goalResult.text = ""
                 }else{
-                    goalResult.text = String(test.plan)
+                    goalResult.text = exercise.exerciseDefinition().setType.string(forValue: test.plan)
                 }
                 kgField.text = String(test.plannedKG)
 

@@ -24,6 +24,22 @@ class ProfileViewController: UITableViewController {
     @IBOutlet weak var weightTextField: UITextField!
     @IBOutlet weak var weightDateTextField: UITextField!
     
+    @IBAction func authorizeHealthKit(_ sender: Any) {
+        HealthKitAccess.shared.authorizeHealthKit { (success, error) in
+            if success{
+                print("Authorized")
+                let alert = UIAlertController(title: "Authorisation Success", message: "Thank you. Access to healthkit succesfully given", preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }else{
+                print("Authorization failed: \(error)")
+                let alert = UIAlertController(title: "Authorisation Failure", message: "Thank you. Access to healthkit failed", preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+    
     @IBAction func restingHRInfoTapped(_ sender: Any) {
         let alert = UIAlertController(title: "Resting Heart Rate Explantion", message: "This is a message", preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))

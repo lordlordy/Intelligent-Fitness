@@ -157,8 +157,8 @@ class HealthKitAccess {
         }
     }
     
-    func getCalorieSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([(date: Date, value: Double)]) -> Swift.Void) -> Bool{
-        let havePermission: Bool = getActivitySummary(dateRange: dateRange) { (summaryArray) in
+    func getCalorieSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([(date: Date, value: Double)]) -> Swift.Void){
+        getActivitySummary(dateRange: dateRange) { (summaryArray) in
             var result: [(date: Date, value: Double)] = []
             for s in summaryArray{
                 let dc = s.dateComponents(for: Calendar.current)
@@ -168,11 +168,10 @@ class HealthKitAccess {
             }
             completion(result)
         }
-        return havePermission
     }
 
-    func getExerciseTimeSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([(date: Date, value: Double)]) -> Swift.Void) -> Bool{
-        let havePermission: Bool = getActivitySummary(dateRange: dateRange) { (summaryArray) in
+    func getExerciseTimeSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([(date: Date, value: Double)]) -> Swift.Void){
+        getActivitySummary(dateRange: dateRange) { (summaryArray) in
             var result: [(date: Date, value: Double)] = []
             for s in summaryArray{
                 let dc = s.dateComponents(for: Calendar.current)
@@ -182,7 +181,6 @@ class HealthKitAccess {
             }
             completion(result)
         }
-        return havePermission
     }
     
     
@@ -240,13 +238,14 @@ class HealthKitAccess {
     
     }
 
-    private func getActivitySummary(dateRange: (from: Date, to: Date)?, completion: @escaping ([HKActivitySummary]) -> Swift.Void) -> Bool {
+    private func getActivitySummary(dateRange: (from: Date, to: Date)?, completion: @escaping ([HKActivitySummary]) -> Swift.Void) {
         if #available(iOS 9.3, *) {
             
-            // check for permissions
-            if healthStore.authorizationStatus(for: HKObjectType.activitySummaryType()) != .sharingAuthorized{
-                return false
-            }
+            // this only checks write permissions so no need here. If no read permissions then just no data returned
+//            // check for permissions
+//            if healthStore.authorizationStatus(for: HKObjectType.activitySummaryType()) != .{
+//                return false
+//            }
             
             var dateRangePredicate: NSPredicate? = nil
             
@@ -274,6 +273,5 @@ class HealthKitAccess {
             // TO DO - better handle earlier iOS version
             print("not implement for pre iOS 9.3")
         }
-        return true
     }
 }

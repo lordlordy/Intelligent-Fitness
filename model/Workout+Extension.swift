@@ -10,9 +10,26 @@ import Foundation
 
 extension Workout{
     
+    var totalKG: Double{ return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActualKG})}
+    var totalReps: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Reps)})}
+    var totalTime: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Time)})}
+    var totalDistance: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Distance)})}
+    var totalTouches: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Touches)})}
+
+    var percentageComplete: Double{
+        get{
+            if orderedExerciseArray().count > 0{
+                // note the minimum. This ensures that a score of great that 100% for a given test element does not contribute more the 100% to overall test result
+                return orderedExerciseArray().reduce(0, {$0 + min(1,$1.percentageComplete)}) / Double(orderedExerciseArray().count)
+            }else{
+                return 1.0
+            }
+        }
+    }
+    
     func summary() -> String{
         if complete{
-            return "Completed"
+            return createWorkoutSummary()
         }else{
             if isTest{
                 return "Next test"
@@ -25,6 +42,10 @@ extension Workout{
     
     func numberOfExercises() -> Int{
         return exercises?.count ?? 0
+    }
+    
+    func exercises(ofType type: ExerciseType) -> [Exercise]{
+        return orderedExerciseArray().filter({$0.type == type.rawValue})
     }
     
     func exercise(atOrder order: Int16) -> Exercise?{
@@ -78,4 +99,19 @@ extension Workout{
         return array
     }
     
+    private func createWorkoutSummary() -> String{
+        var strParts: [String] = []
+        let f: NumberFormatter = NumberFormatter()
+        f.numberStyle = .percent
+        if let s = f.string(from: NSNumber(value: percentageComplete)){
+            strParts.append(s)
+        }
+        if totalKG > 0 { strParts.append("\(Int(totalKG))kg") }
+        if totalReps > 0 { strParts.append(SetType.Reps.string(forValue: totalReps)) }
+        if totalTime > 0 { strParts.append(SetType.Time.string(forValue: totalTime)) }
+        if totalTouches > 0 { strParts.append(SetType.Touches.string(forValue: totalTouches)) }
+
+        return "Completed: " + strParts.joined(separator: " / ")
+        
+    }
 }

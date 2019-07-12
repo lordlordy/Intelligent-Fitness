@@ -10,6 +10,47 @@ import Foundation
 
 extension ExerciseSet{
   
+    var totalActualKG: Double {
+        get{
+            if exercise?.exerciseDefinition().setType == SetType.Reps{
+                return actual * actualKG
+            }
+            return actualKG
+        }
+    }
+    
+    var totalPlanKG: Double{
+        get{
+            if exercise?.exerciseDefinition().setType == SetType.Reps{
+                return plan * plannedKG
+            }
+            return plannedKG
+        }
+    }
+    
+    var percentageComplete: Double{
+        get{
+            if exercise?.exerciseDefinition().setType.moreIsBetter() ?? true{
+                if plan > 0{
+                    // This is to deal with non weight exercises
+                    return (actual * max(1.0, actualKG)) / ( plan * max(1.0, plannedKG))
+                }else{
+                    return 0
+                }
+            }else{
+                // so aiming for fewer reps than plan
+                let diff: Double = plan - actual
+                let absDiff: Double = abs(diff)
+                if diff >= 0{
+                    return (diff + plan) / plan
+                }else{
+                    return plan / (absDiff + plan)
+                }
+            }
+        }
+    }
+    
+    
     func setCompleted() -> Bool {
         return actual >= plan
     }

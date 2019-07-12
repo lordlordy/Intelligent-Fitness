@@ -10,6 +10,41 @@ import Foundation
 
 extension Exercise{
     
+    var totalPlanKG: Double{
+        get{
+            return exerciseSets().reduce(0.0, {$0 + $1.totalPlanKG})
+        }
+    }
+    
+    var totalActualKG: Double{
+        get{
+            return exerciseSets().reduce(0.0, {$0 + $1.totalActualKG})
+        }
+    }
+    
+    var percentageComplete: Double{
+        get{
+            if exerciseDefinition().setType.moreIsBetter(){
+                let aKG: Double = exerciseSets().reduce(0.0, {$0 + $1.actual * max(1.0, $1.actualKG)})
+                let pKG: Double = exerciseSets().reduce(0.0, {$0 + $1.plan * max(1.0, $1.plannedKG)})
+                if pKG > 0{
+                    return aKG / pKG
+                }
+            }else if exerciseSets().count > 0{
+                return exerciseSets().reduce(0.0, {$0 + $1.percentageComplete}) / Double(exerciseSets().count)
+            }
+            return 1.0
+        }
+    }
+    
+    func totalActual(forSetType st: SetType) -> Double{
+        if st == exerciseDefinition().setType{
+            return exerciseSets().reduce(0.0, {$0 + $1.actual})
+        }else{
+            return 0.0
+        }
+    }
+    
     func numberOfSets() -> Int{
         return sets?.count ?? 0
     }
@@ -52,7 +87,7 @@ extension Exercise{
         return "Summary of exercise still to be written"
     }
     
-    private func exerciseSets() -> [ExerciseSet]{
+    func exerciseSets() -> [ExerciseSet]{
         return sets?.allObjects as? [ExerciseSet] ?? []
     }
 
