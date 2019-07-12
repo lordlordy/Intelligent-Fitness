@@ -9,61 +9,138 @@
 import UIKit
 import HealthKit
 
-class ProgressViewController: UIViewController {
+enum GraphType: Int{
+    case Tests = 0
+    case Sets = 1
+    case HR = 2
+    case TSB = 3
+    case Cals = 4
+    case Ed = 5
+
+    func name() -> String{
+        switch self{
+        case .Tests: return "Test Graphs"
+        case .Sets: return "Workout Graphs"
+        case .HR: return "Heart Rate Graphs"
+        case .TSB: return "Training Stress Balance Graphs"
+        case .Cals: return "Calorie Graphs"
+        case .Ed: return "Eddington Numbers"
+        }
+    }
     
-    enum GraphType: Int{
-        case Tests = 0
-        case Sets = 1
-        case HR = 2
-        case TSB = 3
-        case Cals = 4
-        case Ed = 5
+    func explanation() -> String{
+        switch self{
+        case .Tests:
+            return "Shows progress in your Functional Fitness Tests. The 'Choose' button allows you to switch between the different tests"
+        case .Sets:
+            return "Shows progress in your workouts. The 'Choose' button allows you to switch between the different tests"
+        case .HR:
+            return "Shows your heart data as recorded in the Health App. This graphs shows your resting hears and you heart rate variability"
+        case .TSB:
+            return "Training Stress Balance graph. This models your fitness, fatigue and form. This currently uses your activity time from the health app. It assumes an RPE of 5 on average which gives a TSS of ~55 per hour"
+        case .Cals:
+            return "A training stress balance graph based on calories as a good proxie for training stress. It models fitness, fatigue and form using a Banister Training Impulse Model"
+        case .Ed:
+            return "A graph of your Eddington numbers. This is a good single number measure of your progress. It gives the maximum KG such that you've lifted that amount on at least that many days. For more info look at http://www.eddingtonnumbers.me.uk"
+        }
     }
 
-    private var calories: [(key: Date, value: Double)] = []
+}
+
+class ProgressViewController: UIViewController {
+    
+
+
     @IBOutlet weak var graphView: GraphView!
     @IBOutlet weak var graphSegmentedControl: UISegmentedControl!
-
+    @IBOutlet weak var chooseButton: UIButton!
+    @IBOutlet weak var titleLabel: UILabel!
+    
+    private var toolBar = UIToolbar()
+    private var picker = UIPickerView()
+    private var selectedGraph: GraphType = .TSB
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         graphView.setGraphs(graphs: createDummyData())
     }
     
+    @IBAction func chooseTapped(_ sender: Any) {
+        picker = UIPickerView()
+        picker.dataSource = self
+        picker.delegate = self
+        picker.backgroundColor = .white
+        picker.setValue(UIColor.black, forKey: "textColor")
+        picker.contentMode = .center
+        picker.frame = CGRect(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 300)
+        self.view.addSubview(picker)
+        
+        toolBar = UIToolbar.init(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 50))
+        toolBar.barStyle = .default
+        toolBar.backgroundColor = .white
+        toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
+        self.view.addSubview(toolBar)
+    }
+    
+    @objc func onDoneButtonTapped(){
+        toolBar.removeFromSuperview()
+        picker.removeFromSuperview()
+    }
+    
+    
     @IBAction func menuBarTapped(_ sender: UISegmentedControl) {
         if let type = GraphType(rawValue: graphSegmentedControl.selectedSegmentIndex){
+            selectedGraph = type
             switch type{
             case .Cals:
                 print("Cals")
+                chooseButton.isEnabled = false
+                chooseButton.isHidden = true
+                titleLabel.text = "Calorie Based TSB"
                 createCalorieGraph()
             case .Ed:
+                chooseButton.isEnabled = true
+                chooseButton.isHidden = false
+                titleLabel.text = "Eddington Numbers"
                 print("Ed")
             case .Sets:
+                chooseButton.isEnabled = true
+                chooseButton.isHidden = false
+                titleLabel.text = "Sets"
                 print("Sets")
             case .HR:
                 print("HR")
+                chooseButton.isEnabled = false
+                chooseButton.isHidden = true
+                titleLabel.text = "Heart Rate Variability"
                 // remove all graphs
                 graphView.removeAllGraphs()
                 // the following calls will add graphs
                 createHRGraph()
                 createHRVGraph()
             case .Tests:
+                chooseButton.isEnabled = true
+                chooseButton.isHidden = false
+                titleLabel.text = "Tests"
                 print("Tests")
             case .TSB:
                 print("TSB")
+                chooseButton.isEnabled = false
+                chooseButton.isHidden = true
+                titleLabel.text = "Training Stress Balance"
                 createExerciseTSBGraph()
             }
         }
     }
     
     @IBAction func showInfo(_ sender: Any) {
-        let alert = UIAlertController(title: "Chart Explantion", message: "This is a message", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "\(selectedGraph.name()) Explantion", message: selectedGraph.explanation(), preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
     
     private func createHRGraph(){
         //check healthkit access
-        
         
         let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
         HealthKitAccess.shared.getRestingHRData(dateRange: (from: ninetyDaysAgo, to:Date())) { (data) in
@@ -76,7 +153,9 @@ class ProgressViewController: UIViewController {
     private func createHRVGraph(){
         let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
         HealthKitAccess.shared.getHRVData(dateRange: (from: ninetyDaysAgo, to:Date())) { (data) in
-            if data.count > 0{
+            if data.count == 0{
+                self.requestPermissions()
+            }else{
                 self.graphView.addGraph(graph: Graph(data: data, colour: .magenta))
             }
         }
@@ -214,4 +293,52 @@ class ProgressViewController: UIViewController {
     }
     
 
+}
+
+extension ProgressViewController: UIPickerViewDataSource{
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        switch selectedGraph{
+        case .Cals, .HR, .TSB: return 0
+        case .Sets:
+            return WorkoutManager.shared.exerciseTypes.count
+        case .Tests:
+            return WorkoutManager.shared.fftTypes.count
+        case .Ed:
+            return 0
+        }
+    }
+    
+}
+
+extension ProgressViewController: UIPickerViewDelegate{
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        if let def = getSelectedExerciseDefinition(forRow: row){
+            return def.name
+        }
+        return nil
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        print("Selected: \(row)")
+        if let def = getSelectedExerciseDefinition(forRow: row){
+            titleLabel.text = def.name
+        }
+    }
+    
+    private func getSelectedExerciseDefinition(forRow row: Int) -> ExerciseDefinition?{
+        switch selectedGraph{
+        case .Cals, .HR, .TSB, .Ed:
+            return nil
+        case .Sets:
+            return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.exerciseTypes[row])
+        case .Tests:
+            return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.fftTypes[row])
+        }
+    }
+    
 }

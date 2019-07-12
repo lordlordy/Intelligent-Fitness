@@ -59,6 +59,9 @@ class WorkoutManager{
         var defaultKG: Double
     }
     
+    var fftTypes: [ExerciseType]{ return functionalFitnessTest.map({$0.type})}
+    var exerciseTypes: [ExerciseType]{ return exerciseSet1.map({$0.type})}
+    
     private let functionalFitnessTest: [ExerciseDefaults] = [
         ExerciseDefaults(type: .standingBroadJump, defaultPlan: 1.0, defaultKG: 0.0),
         ExerciseDefaults(type: .deadHang , defaultPlan: 30.0, defaultKG: 0.0),
