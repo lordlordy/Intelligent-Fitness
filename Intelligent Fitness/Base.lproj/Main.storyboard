@@ -971,18 +971,6 @@
                                     <action selector="menuBarTapped:" destination="KYx-5D-Yyf" eventType="valueChanged" id="hzz-Im-qfA"/>
                                 </connections>
                             </segmentedControl>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="za0-fb-EDh" customClass="GraphView" customModule="Intelligent_Fitness" customModuleProvider="target">
-                                <rect key="frame" x="5" y="104" width="404" height="689"/>
-                                <color key="backgroundColor" red="0.25262200340000002" green="0.5" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="startColour">
-                                        <color key="value" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                        <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="py9-Ju-UNo">
                                 <rect key="frame" x="63" y="77" width="288" height="22"/>
                                 <constraints>
@@ -1018,34 +1006,37 @@
                                     <action selector="chooseTapped:" destination="KYx-5D-Yyf" eventType="touchUpInside" id="AU4-Vg-s2i"/>
                                 </connections>
                             </button>
-                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="2" translatesAutoresizingMaskIntoConstraints="NO" id="745-NP-OA9">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" pagingEnabled="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gel-X0-ar5">
+                                <rect key="frame" x="2" y="101" width="410" height="692"/>
+                                <color key="backgroundColor" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
+                            </scrollView>
+                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="2" translatesAutoresizingMaskIntoConstraints="NO" id="j2t-Oc-8YZ">
                                 <rect key="frame" x="0.0" y="793" width="414" height="20"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="EI7-dh-9rL"/>
+                                    <constraint firstAttribute="height" constant="20" id="aDO-V8-e6f"/>
                                 </constraints>
-                                <connections>
-                                    <action selector="pageChanged:" destination="KYx-5D-Yyf" eventType="valueChanged" id="ELd-ZU-066"/>
-                                </connections>
+                                <color key="pageIndicatorTintColor" red="0.8980392157" green="0.1647058824" blue="0.46666666670000001" alpha="1" colorSpace="calibratedRGB"/>
                             </pageControl>
                         </subviews>
                         <color key="backgroundColor" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="FvT-bE-4U1" secondAttribute="trailing" constant="5" id="2Vd-qq-UFl"/>
-                            <constraint firstItem="745-NP-OA9" firstAttribute="bottom" secondItem="Nbf-30-0GD" secondAttribute="bottom" id="2em-J7-yVZ"/>
                             <constraint firstItem="py9-Ju-UNo" firstAttribute="top" secondItem="4Vg-CQ-um9" secondAttribute="bottom" constant="5" id="9bN-VX-84F"/>
+                            <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="Gel-X0-ar5" secondAttribute="trailing" constant="2" id="DQP-cI-ggK"/>
                             <constraint firstItem="4Vg-CQ-um9" firstAttribute="trailing" secondItem="Nbf-30-0GD" secondAttribute="trailing" id="JeC-dQ-cOo"/>
                             <constraint firstItem="ddb-Kk-gUT" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" constant="5" id="Jp8-aK-RW0"/>
                             <constraint firstItem="ddb-Kk-gUT" firstAttribute="top" secondItem="4Vg-CQ-um9" secondAttribute="bottom" constant="5" id="MQW-Qh-Cwp"/>
-                            <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="745-NP-OA9" secondAttribute="trailing" id="PuS-o6-aGx"/>
+                            <constraint firstItem="j2t-Oc-8YZ" firstAttribute="top" secondItem="Gel-X0-ar5" secondAttribute="bottom" id="R1d-7Q-gcE"/>
                             <constraint firstItem="FvT-bE-4U1" firstAttribute="top" secondItem="4Vg-CQ-um9" secondAttribute="bottom" constant="5" id="TJy-yd-RCm"/>
-                            <constraint firstItem="za0-fb-EDh" firstAttribute="top" secondItem="py9-Ju-UNo" secondAttribute="bottom" constant="5" id="aHA-GN-RDV"/>
-                            <constraint firstItem="745-NP-OA9" firstAttribute="top" secondItem="za0-fb-EDh" secondAttribute="bottom" id="bEf-OH-Dx1"/>
-                            <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="za0-fb-EDh" secondAttribute="trailing" constant="5" id="fQq-UQ-GTN"/>
-                            <constraint firstItem="745-NP-OA9" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" id="flw-gz-Hgt"/>
+                            <constraint firstItem="j2t-Oc-8YZ" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" id="Tx4-nL-ek0"/>
                             <constraint firstItem="FvT-bE-4U1" firstAttribute="leading" secondItem="py9-Ju-UNo" secondAttribute="trailing" constant="5" id="gWh-WN-Bw0"/>
-                            <constraint firstItem="za0-fb-EDh" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" constant="5" id="i6u-EM-8F6"/>
+                            <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="j2t-Oc-8YZ" secondAttribute="trailing" id="l1W-Z7-wv6"/>
+                            <constraint firstItem="Gel-X0-ar5" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" constant="2" id="lMc-2g-5cd"/>
                             <constraint firstItem="4Vg-CQ-um9" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" id="nEp-o6-Rbc"/>
+                            <constraint firstItem="Gel-X0-ar5" firstAttribute="top" secondItem="py9-Ju-UNo" secondAttribute="bottom" constant="2" id="nZ0-zd-MG5"/>
                             <constraint firstItem="4Vg-CQ-um9" firstAttribute="top" secondItem="Nbf-30-0GD" secondAttribute="top" id="pos-cH-IiL"/>
+                            <constraint firstItem="j2t-Oc-8YZ" firstAttribute="bottom" secondItem="Nbf-30-0GD" secondAttribute="bottom" id="xTn-LP-0qi"/>
                             <constraint firstItem="py9-Ju-UNo" firstAttribute="leading" secondItem="ddb-Kk-gUT" secondAttribute="trailing" constant="5" id="xfP-O8-9rM"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Nbf-30-0GD"/>
@@ -1054,14 +1045,14 @@
                     <connections>
                         <outlet property="chooseButton" destination="ddb-Kk-gUT" id="IFb-Li-DA5"/>
                         <outlet property="graphSegmentedControl" destination="4Vg-CQ-um9" id="kRn-4J-SWu"/>
-                        <outlet property="graphView" destination="za0-fb-EDh" id="ipa-Oy-p2k"/>
-                        <outlet property="pageControl" destination="745-NP-OA9" id="4iL-UP-GX8"/>
+                        <outlet property="pageControl" destination="j2t-Oc-8YZ" id="wIA-Bk-91l"/>
+                        <outlet property="scrollView" destination="Gel-X0-ar5" id="f0T-RR-NLw"/>
                         <outlet property="titleLabel" destination="py9-Ju-UNo" id="9eN-BA-htA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gwu-bT-Lvm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1347.8260869565217" y="-11.383928571428571"/>
+            <point key="canvasLocation" x="1346.376811594203" y="-11.383928571428571"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="k7T-GA-xkb">
