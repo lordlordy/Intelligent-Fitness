@@ -77,10 +77,10 @@ class Graph{
             graphs = createDummyData()
         }
         
-        let path = UIBezierPath(roundedRect: rect,
-                                byRoundingCorners: UIRectCorner.allCorners,
-                                cornerRadii: Constants.cornerRadiusSize)
-        path.addClip()
+//        let path = UIBezierPath(roundedRect: rect,
+//                                byRoundingCorners: UIRectCorner.allCorners,
+//                                cornerRadii: Constants.cornerRadiusSize)
+//        path.addClip()
         
         let context = UIGraphicsGetCurrentContext()!
         let colors = [startColour.cgColor, endColor.cgColor]

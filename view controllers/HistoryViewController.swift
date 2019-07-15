@@ -43,7 +43,6 @@ class HistoryViewController: UITableViewController, Collapsable {
         self.navigationItem.rightBarButtonItem = self.editButtonItem
 
         self.tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
         self.tableView.register(CustomHeader.self, forHeaderFooterViewReuseIdentifier: CustomHeader.reuseIdentifier)
 
     }
@@ -187,7 +186,7 @@ class CustomHeader: UITableViewHeaderFooterView{
     
     static let reuseIdentifier = "Custom"
     fileprivate var section: Collapsable?
-    let label = UILabel.init()
+//    let label = UILabel.init()
     
     override public init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
