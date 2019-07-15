@@ -30,7 +30,7 @@ class WorkoutDetailTableViewController: UITableViewController {
         if let e = workout?.exercise(atOrder: Int16(section)){
             let f: NumberFormatter = NumberFormatter()
             f.numberStyle = .percent
-            var str: String  = "\(e.exerciseDefinition().name) - "
+            var str: String  = "\(e.exerciseDefinition.name) - "
             if e.totalActualKG > 0{
                 str  += "\(Int(e.totalActualKG))kg"
             }

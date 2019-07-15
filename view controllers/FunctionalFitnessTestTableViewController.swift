@@ -35,7 +35,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let height = super.tableView(tableView, heightForRowAt: indexPath)
-        if indexPath.row == timerRow && !(fitnessTest.exercise(atOrder: currentTest)?.exerciseDefinition().setType == SetType.Time){
+        if indexPath.row == timerRow && !(fitnessTest.exercise(atOrder: currentTest)?.exerciseDefinition.setType == SetType.Time){
             return 0.0
         }
         return height
@@ -176,11 +176,11 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     private func updateTest(){
         if let exercise = fitnessTest.exercise(atOrder: currentTest){
             if let test = exercise.exerciseSet(atOrder: 0){
-                testName.text = exercise.exerciseDefinition().name
-                testDescription.text = exercise.exerciseDefinition().description
+                testName.text = exercise.exerciseDefinition.name
+                testDescription.text = exercise.exerciseDefinition.description
                 progressView.progress = 0.0
                 progressView.secondaryProgress = 0.0
-                if exercise.exerciseDefinition().setType == SetType.Time{
+                if exercise.exerciseDefinition.setType == SetType.Time{
                     targetSeconds = Double(test.plan)
                     timerStatus = .Initial
                     result.backgroundColor = nonEditableColour
@@ -204,7 +204,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
                         let e: Exercise = previous[0]
                         if let es = e.exerciseSet(atOrder: 0){
                             lastTestSeconds = es.actual
-                            previousResult.text = e.exerciseDefinition().setType.string(forValue: es.actual)
+                            previousResult.text = e.exerciseDefinition.setType.string(forValue: es.actual)
                         }
                     }
                 }
@@ -213,7 +213,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
                 if test.plan < 0{
                     goalResult.text = ""
                 }else{
-                    goalResult.text = exercise.exerciseDefinition().setType.string(forValue: test.plan)
+                    goalResult.text = exercise.exerciseDefinition.setType.string(forValue: test.plan)
                 }
                 kgField.text = String(test.plannedKG)
 

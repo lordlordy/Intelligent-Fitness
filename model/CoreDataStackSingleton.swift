@@ -77,6 +77,9 @@ class CoreDataStackSingleton{
         return getAllEntities(ofType: .Workout, predicate: NSPredicate(format: "isTest == %@", argumentArray: [true])) as! [Workout]
     }
     
+    func getExercises(ofType type: ExerciseType) -> [Exercise]{
+        return getAllEntities(ofType: .Exercise, predicate: NSPredicate(format: "type == %@", argumentArray: [type.rawValue])) as? [Exercise] ?? []
+    }
     
     func getWorkouts(ofType type: WorkoutType?, isTest test: Bool? ) -> [Workout]{
         var predicateStr: [String] = []

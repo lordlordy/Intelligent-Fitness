@@ -33,7 +33,7 @@ class Graph{
 }
 
 // TO DO - this class assumes the x axis points are equal distance apart. eg assumes we have y data for all days. Need to plot correctly even if days are missing
-
+// TO DO - ensure doesn't throw exception if not enough data points. Check if data has just one point
 @IBDesignable class GraphView: UIView {
 
     private struct Constants {
@@ -47,7 +47,7 @@ class Graph{
     }
 
     // colours for gradient.
-    @IBInspectable var startColour: UIColor = UIColor.init(red: 26.0, green: 120.0, blue: 184.0, alpha: 1.0)
+    @IBInspectable var startColour: UIColor = MAIN_BLUE
     @IBInspectable var endColor: UIColor = .white
     
     private var graphs: [Graph] = []

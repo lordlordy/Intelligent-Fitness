@@ -24,6 +24,7 @@
 		736CFC2F22B3B2E30071EA3B /* Intelligent_FitnessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC2E22B3B2E30071EA3B /* Intelligent_FitnessTests.swift */; };
 		736CFC3A22B3B2E30071EA3B /* Intelligent_FitnessUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC3922B3B2E30071EA3B /* Intelligent_FitnessUITests.swift */; };
 		736CFC8922B4F0AF0071EA3B /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC8722B4F0AF0071EA3B /* Model.xcdatamodeld */; };
+		736D6BAC22DC660C003C9056 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736D6BAB22DC660C003C9056 /* Constants.swift */; };
 		737373BC22B508F200698DD4 /* CoreDataStackSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737373BB22B508F200698DD4 /* CoreDataStackSingleton.swift */; };
 		73759DB922C24F6600757C29 /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73759DB822C24F6600757C29 /* ProgressViewController.swift */; };
 		73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73759DBA22C25A1C00757C29 /* GraphView.swift */; };
@@ -87,6 +88,7 @@
 		736CFC3922B3B2E30071EA3B /* Intelligent_FitnessUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intelligent_FitnessUITests.swift; sourceTree = "<group>"; };
 		736CFC3B22B3B2E30071EA3B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		736CFC8822B4F0AF0071EA3B /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		736D6BAB22DC660C003C9056 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		737373BB22B508F200698DD4 /* CoreDataStackSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStackSingleton.swift; sourceTree = "<group>"; };
 		73759DB822C24F6600757C29 /* ProgressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewController.swift; sourceTree = "<group>"; };
 		73759DBA22C25A1C00757C29 /* GraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
@@ -161,6 +163,7 @@
 				7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */,
 				7376663F22CCB7D9004324B5 /* ProgressView.swift */,
 				73759DBA22C25A1C00757C29 /* GraphView.swift */,
+				736D6BAB22DC660C003C9056 /* Constants.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -532,6 +535,7 @@
 				737373BC22B508F200698DD4 /* CoreDataStackSingleton.swift in Sources */,
 				738E445422CB58C500F7BEA6 /* Exercise+Extension.swift in Sources */,
 				7376664022CCB7D9004324B5 /* ProgressView.swift in Sources */,
+				736D6BAC22DC660C003C9056 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
