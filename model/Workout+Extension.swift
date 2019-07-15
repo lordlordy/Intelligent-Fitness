@@ -44,6 +44,8 @@ extension Workout{
         return exercises?.count ?? 0
     }
     
+
+    
     func exercises(ofType type: ExerciseType) -> [Exercise]{
         return orderedExerciseArray().filter({$0.type == type.rawValue})
     }

@@ -93,7 +93,7 @@ class WorkoutTableViewController: UITableViewController{
                 return UITableViewCell()
             }
             if let c = cell as? ExerciseDescriptionCell{
-                c.label.text = workout.exercise(atOrder: currentExerciseSet)?.exerciseDefinition().name ?? ""
+                c.label.text = workout.exercise(atOrder: currentExerciseSet)?.exerciseDefinition.name ?? ""
                 c.viewController = self
                 c.exercise = workout.exercise(atOrder: currentExerciseSet)
             }
@@ -198,7 +198,7 @@ class ExerciseCell: UITableViewCell{
     func updateLabel(){
         if let e = exercise{
             let kg: Double = e.actualKG > 0 ? e.actualKG : e.plannedKG
-            label.text = "\(e.exercise?.exerciseDefinition().name ?? "No name"): \(e.plan) x \(kg) KG"
+            label.text = "\(e.exercise?.exerciseDefinition.name ?? "No name"): \(e.plan) x \(kg) KG"
         }
     }
     
@@ -248,7 +248,7 @@ class ExerciseDescriptionCell: UITableViewCell{
     @IBAction func infoTapped(_ sender: Any) {
         if let vc = viewController{
             if let e = exercise{
-                let alert = UIAlertController(title: e.exerciseDefinition().name, message: e.exerciseDefinition().description, preferredStyle: .actionSheet)
+                let alert = UIAlertController(title: e.exerciseDefinition.name, message: e.exerciseDefinition.description, preferredStyle: .actionSheet)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 vc.present(alert, animated: true, completion: nil)
             }

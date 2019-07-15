@@ -794,6 +794,35 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Testing" id="GXQ-oj-AT6">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="FrN-6M-3LV">
+                                        <rect key="frame" x="0.0" y="575.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="FrN-6M-3LV" id="Q4B-Oc-bn0">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tMb-Vd-fCP">
+                                                    <rect key="frame" x="139.5" y="5" width="135" height="34"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                                    <state key="normal" title="Create Test Data">
+                                                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="createTestData:" destination="ytO-ta-4b3" eventType="touchUpInside" id="kpY-aK-mEd"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="tMb-Vd-fCP" firstAttribute="centerY" secondItem="Q4B-Oc-bn0" secondAttribute="centerY" id="Dnb-kV-FFp"/>
+                                                <constraint firstItem="tMb-Vd-fCP" firstAttribute="centerX" secondItem="Q4B-Oc-bn0" secondAttribute="centerX" id="TKC-ap-1DI"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="ytO-ta-4b3" id="R47-zg-fF2"/>
@@ -943,7 +972,7 @@
                                 </connections>
                             </segmentedControl>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="za0-fb-EDh" customClass="GraphView" customModule="Intelligent_Fitness" customModuleProvider="target">
-                                <rect key="frame" x="5" y="104" width="404" height="704"/>
+                                <rect key="frame" x="5" y="104" width="404" height="689"/>
                                 <color key="backgroundColor" red="0.25262200340000002" green="0.5" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="startColour">
@@ -989,22 +1018,34 @@
                                     <action selector="chooseTapped:" destination="KYx-5D-Yyf" eventType="touchUpInside" id="AU4-Vg-s2i"/>
                                 </connections>
                             </button>
+                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="2" translatesAutoresizingMaskIntoConstraints="NO" id="745-NP-OA9">
+                                <rect key="frame" x="0.0" y="793" width="414" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="EI7-dh-9rL"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="pageChanged:" destination="KYx-5D-Yyf" eventType="valueChanged" id="ELd-ZU-066"/>
+                                </connections>
+                            </pageControl>
                         </subviews>
                         <color key="backgroundColor" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="FvT-bE-4U1" secondAttribute="trailing" constant="5" id="2Vd-qq-UFl"/>
+                            <constraint firstItem="745-NP-OA9" firstAttribute="bottom" secondItem="Nbf-30-0GD" secondAttribute="bottom" id="2em-J7-yVZ"/>
                             <constraint firstItem="py9-Ju-UNo" firstAttribute="top" secondItem="4Vg-CQ-um9" secondAttribute="bottom" constant="5" id="9bN-VX-84F"/>
                             <constraint firstItem="4Vg-CQ-um9" firstAttribute="trailing" secondItem="Nbf-30-0GD" secondAttribute="trailing" id="JeC-dQ-cOo"/>
                             <constraint firstItem="ddb-Kk-gUT" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" constant="5" id="Jp8-aK-RW0"/>
                             <constraint firstItem="ddb-Kk-gUT" firstAttribute="top" secondItem="4Vg-CQ-um9" secondAttribute="bottom" constant="5" id="MQW-Qh-Cwp"/>
+                            <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="745-NP-OA9" secondAttribute="trailing" id="PuS-o6-aGx"/>
                             <constraint firstItem="FvT-bE-4U1" firstAttribute="top" secondItem="4Vg-CQ-um9" secondAttribute="bottom" constant="5" id="TJy-yd-RCm"/>
                             <constraint firstItem="za0-fb-EDh" firstAttribute="top" secondItem="py9-Ju-UNo" secondAttribute="bottom" constant="5" id="aHA-GN-RDV"/>
+                            <constraint firstItem="745-NP-OA9" firstAttribute="top" secondItem="za0-fb-EDh" secondAttribute="bottom" id="bEf-OH-Dx1"/>
                             <constraint firstItem="Nbf-30-0GD" firstAttribute="trailing" secondItem="za0-fb-EDh" secondAttribute="trailing" constant="5" id="fQq-UQ-GTN"/>
+                            <constraint firstItem="745-NP-OA9" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" id="flw-gz-Hgt"/>
                             <constraint firstItem="FvT-bE-4U1" firstAttribute="leading" secondItem="py9-Ju-UNo" secondAttribute="trailing" constant="5" id="gWh-WN-Bw0"/>
                             <constraint firstItem="za0-fb-EDh" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" constant="5" id="i6u-EM-8F6"/>
                             <constraint firstItem="4Vg-CQ-um9" firstAttribute="leading" secondItem="Nbf-30-0GD" secondAttribute="leading" id="nEp-o6-Rbc"/>
                             <constraint firstItem="4Vg-CQ-um9" firstAttribute="top" secondItem="Nbf-30-0GD" secondAttribute="top" id="pos-cH-IiL"/>
-                            <constraint firstItem="Nbf-30-0GD" firstAttribute="bottom" secondItem="za0-fb-EDh" secondAttribute="bottom" constant="5" id="wDw-7p-19R"/>
                             <constraint firstItem="py9-Ju-UNo" firstAttribute="leading" secondItem="ddb-Kk-gUT" secondAttribute="trailing" constant="5" id="xfP-O8-9rM"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Nbf-30-0GD"/>
@@ -1014,12 +1055,13 @@
                         <outlet property="chooseButton" destination="ddb-Kk-gUT" id="IFb-Li-DA5"/>
                         <outlet property="graphSegmentedControl" destination="4Vg-CQ-um9" id="kRn-4J-SWu"/>
                         <outlet property="graphView" destination="za0-fb-EDh" id="ipa-Oy-p2k"/>
+                        <outlet property="pageControl" destination="745-NP-OA9" id="4iL-UP-GX8"/>
                         <outlet property="titleLabel" destination="py9-Ju-UNo" id="9eN-BA-htA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gwu-bT-Lvm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1348" y="-11"/>
+            <point key="canvasLocation" x="1347.8260869565217" y="-11.383928571428571"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="k7T-GA-xkb">

@@ -24,7 +24,7 @@ extension Exercise{
     
     var percentageComplete: Double{
         get{
-            if exerciseDefinition().setType.moreIsBetter(){
+            if exerciseDefinition.setType.moreIsBetter(){
                 let aKG: Double = exerciseSets().reduce(0.0, {$0 + $1.actual * max(1.0, $1.actualKG)})
                 let pKG: Double = exerciseSets().reduce(0.0, {$0 + $1.plan * max(1.0, $1.plannedKG)})
                 if pKG > 0{
@@ -37,8 +37,44 @@ extension Exercise{
         }
     }
     
+    
+    var exerciseDefinition: ExerciseDefinition{
+        return ExerciseDefinitionManager.shared.exerciseDefinition(for: exerciseType())
+    }
+    
+    var date: Date?{ return workout?.date}
+    
+    func valueFor(exerciseMeasure measure: ExerciseMeasure) -> Double{
+        switch measure{
+        case .avKG:
+            let kgXrep: Double = exerciseSets().reduce(0.0, {$0 + $1.actualKG * $1.actual})
+            let totalRep: Double = exerciseSets().reduce(0.0, {$0 + $1.actual})
+            if totalRep > 0{
+                return kgXrep / totalRep
+            }else{
+                return 0.0
+            }
+        case .maxKG:
+            return exerciseSets().reduce(0.0,{ max($0, $1.actualKG)})
+        case .minKG:
+            return exerciseSets().reduce(0.0, {min($0, $1.actualKG)})
+        case .totalRepKG: return exerciseSets().reduce(0.0, {$0 + $1.actual * $1.actualKG})
+        case .totalReps:
+            return exerciseSets().reduce(0.0, {$0 + $1.actual})
+        case .avReps:
+            let count: Double = Double(exerciseSets().count)
+            if count > 0{
+                return valueFor(exerciseMeasure: .totalReps) / count
+            }else{
+                return 0.0
+            }
+        case .minReps: return exerciseSets().reduce(0.0, {min($0, $1.actual)})
+        case .maxReps: return exerciseSets().reduce(0.0, {max($0, $1.actual)})
+        }
+    }
+    
     func totalActual(forSetType st: SetType) -> Double{
-        if st == exerciseDefinition().setType{
+        if st == exerciseDefinition.setType{
             return exerciseSets().reduce(0.0, {$0 + $1.actual})
         }else{
             return 0.0
@@ -63,9 +99,7 @@ extension Exercise{
         return ExerciseType(rawValue: type)!
     }
     
-    func exerciseDefinition() -> ExerciseDefinition{
-        return ExerciseDefinitionManager.shared.exerciseDefinition(for: exerciseType())
-    }
+
     
     func exerciseFinished() -> Bool {
         return endedEarly || exerciseCompleted()
@@ -82,7 +116,7 @@ extension Exercise{
     
     func summary() -> String{
         if numberOfSets() == 1{
-            return "\(exerciseDefinition().name): \(exerciseSet(atOrder: 0)?.summary() ?? "no summary")"
+            return "\(exerciseDefinition.name): \(exerciseSet(atOrder: 0)?.summary() ?? "no summary")"
         }
         return "Summary of exercise still to be written"
     }

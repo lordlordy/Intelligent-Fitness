@@ -12,7 +12,7 @@ extension ExerciseSet{
   
     var totalActualKG: Double {
         get{
-            if exercise?.exerciseDefinition().setType == SetType.Reps{
+            if exercise?.exerciseDefinition.setType == SetType.Reps{
                 return actual * actualKG
             }
             return actualKG
@@ -21,7 +21,7 @@ extension ExerciseSet{
     
     var totalPlanKG: Double{
         get{
-            if exercise?.exerciseDefinition().setType == SetType.Reps{
+            if exercise?.exerciseDefinition.setType == SetType.Reps{
                 return plan * plannedKG
             }
             return plannedKG
@@ -30,7 +30,7 @@ extension ExerciseSet{
     
     var percentageComplete: Double{
         get{
-            if exercise?.exerciseDefinition().setType.moreIsBetter() ?? true{
+            if exercise?.exerciseDefinition.setType.moreIsBetter() ?? true{
                 if plan > 0{
                     // This is to deal with non weight exercises
                     return (actual * max(1.0, actualKG)) / ( plan * max(1.0, plannedKG))
@@ -56,7 +56,7 @@ extension ExerciseSet{
     }
     
     func summary() -> String {
-        if let type = exercise?.exerciseDefinition().setType{
+        if let type = exercise?.exerciseDefinition.setType{
             switch type{
             case .Distance: return distanceDescription()
             case .Reps: return repsDescription()

@@ -13,6 +13,22 @@ enum ExerciseType: Int16, CaseIterable{
     case standingBroadJump, plank, deadHang, farmersCarry, squat, sittingRisingTest
 }
 
+enum ExerciseMeasure: Int, CaseIterable{
+    case maxKG, minKG, avKG, totalReps, totalRepKG, avReps, minReps, maxReps
+    func string() -> String{
+        switch self{
+        case .maxKG: return "Max KG"
+        case .minKG: return "Min KG"
+        case .avKG: return "Average KG"
+        case .totalReps: return "Total Reps"
+        case .totalRepKG: return "Total KG x Reps"
+        case .avReps: return "Average Reps"
+        case .minReps: return "Min Reps"
+        case .maxReps: return "Max Reps"
+        }
+    }
+}
+
 enum SetType: Int16{
     case Reps, Distance, Time, Touches
     func string(forValue d: Double) -> String{
@@ -49,11 +65,12 @@ enum WorkoutType: Int16{
     }
 }
 
+
 class WorkoutManager{
     
     static var shared: WorkoutManager = WorkoutManager()
     
-    struct ExerciseDefaults{
+    private struct ExerciseDefaults{
         var type: ExerciseType
         var defaultPlan: Double
         var defaultKG: Double
@@ -86,7 +103,7 @@ class WorkoutManager{
             return incomplete[0]
         }else{
             // really shouldn't get to this point as the next test should be created when the last one was saved
-            print("Shouldn't really get here: WorkoutManager.nextFunctionFitnessTest as the next test should have been ")
+            print("Shouldn't really get here: WorkoutManager.nextFunctionFitnessTest as the next test should have been created")
             let tests: [Workout] = CoreDataStackSingleton.shared.getFunctionalFitnessTests().sorted(by: {$0.date! > $1.date!})
             if tests.count > 0{
                 createNextFunctionalFitnessTest(after: tests[0])
@@ -109,6 +126,87 @@ class WorkoutManager{
         after.nextWorkout = test
         test.previousWorkout = after
         CoreDataStackSingleton.shared.save()
+    }
+    
+    func getExercises(forType type: ExerciseType) -> [Exercise]{
+        return CoreDataStackSingleton.shared.getExercises(ofType: type)
+    }
+    
+    
+    func createTestWorkoutData(){
+        var d: Date = Calendar.current.date(byAdding: DateComponents(year: -1), to: Date())!
+        let interval: DateComponents = DateComponents(day: 28)
+        let workoutDaysOfWeek: [[Int]] = [[0,2,4], [1,2,4], [0,1,2], [1,3,5], [1,4,7]]
+        var previous: Workout?
+        let progression: [ExerciseType: [Double]] = [.gobletSquat: [5, 6, 7, 7, 8, 9, 10, 12, 14, 14, 15, 16, 17],
+                                                     .lunge: [5,7,10, 12, 12, 14, 15, 15, 16, 18, 20, 20, 22],
+                                                     .benchPress: [3, 4, 5, 6, 7, 8, 8, 10, 11, 12, 14, 15, 18],
+                                                     .pushUp: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                     .pullDown: [5, 6, 6, 5, 6, 7, 8, 8, 8, 9, 10, 12, 12]]
+
+        
+        for i in 0..<progression[.gobletSquat]!.count{
+            // create weekly
+            for w in 0...3{
+                let date: Date = Calendar.current.date(byAdding: DateComponents(day: w * 7), to: d)!
+                let weekly = workoutDaysOfWeek[Int.random(in: 0..<workoutDaysOfWeek.count)]
+                for dayOfWeek in weekly{
+                    let wkDate: Date = Calendar.current.date(byAdding: DateComponents(day: dayOfWeek), to: date)!
+                    let w: Workout = createWorkout(forDate: wkDate)
+                    if let p = previous{
+                        p.nextWorkout = w
+                        w.previousWorkout = p
+                    }
+                    for (key, value) in progression{
+                        // randomly move 10% down and 20% up
+                        let percentageMove: Double = Double.random(in: 0...0.3) + 0.9
+                        print(percentageMove)
+                        for s in w.exercises(ofType: key)[0].exerciseSets(){
+                            s.actual = s.plan
+                            s.actualKG = value[i] * percentageMove
+                        }
+                        
+                    }
+                    w.complete = true
+                    previous = w
+                }
+            }
+            d = Calendar.current.date(byAdding: interval, to: d)!
+        }
+        
+        CoreDataStackSingleton.shared.save()
+        
+    }
+    
+    func createTestFFTData(){
+        var d: Date = Calendar.current.date(byAdding: DateComponents(year: -1), to: Date())!
+        let interval: DateComponents = DateComponents(day: 28)
+        var previous: Workout?
+        let progression: [ExerciseType: [Double]] = [.standingBroadJump: [1, 1.1, 1.2, 1.3, 1.4, 1.45, 1.45, 1.5, 1.6, 1.6, 1.65, 1.65, 1.67],
+                                                     .deadHang: [20.0, 23.0, 28.0, 33.0, 33.0, 35.0, 38.0, 43.0, 45.0, 46.0, 48, 49, 50],
+                                                     .farmersCarry: [75.0, 80.0, 90.0, 93,0, 101.0, 102.0, 103.0, 107.0, 112.0, 115.0, 115, 125, 129],
+                                                     .plank: [15.0, 25.0, 35.0, 36.0, 37.0, 38.0, 40.0, 41.0, 45.0, 50.0, 53, 55, 57],
+                                                     .squat: [21.0, 22.0, 25.0, 27.0, 27.0, 30.0, 40.0, 41.0, 43.0, 45.0, 50, 60, 59],
+                                                     .sittingRisingTest: [4, 5, 3, 4, 3, 2, 2, 2, 1, 0, 0, 0, 0]]
+        
+        for i in 0..<progression[.standingBroadJump]!.count{
+            let fft: Workout = createFunctionalFitnessTest(forDate: d)
+            if let p = previous{
+                p.nextWorkout = fft
+                fft.previousWorkout = p
+            }
+            for (key, value) in progression{
+                if let s = fft.exercises(ofType: key)[0].exerciseSet(atOrder: 0){
+                    s.actual = value[i]
+                }
+            }
+            fft.complete = true
+            previous = fft
+            d = Calendar.current.date(byAdding: interval, to: d)!
+        }
+        
+        CoreDataStackSingleton.shared.save()
+        
     }
     
     private func createFunctionalFitnessTest(forDate date: Date) ->  Workout{

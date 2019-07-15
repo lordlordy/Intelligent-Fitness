@@ -114,4 +114,11 @@ class ProfileViewController: UITableViewController {
     }
 
 
+    @IBAction func createTestData(_ sender: Any) {
+        // create some data to allow testing of various features. For now aim to create a years worth of data
+        // test data first
+        WorkoutManager.shared.createTestFFTData()
+        WorkoutManager.shared.createTestWorkoutData()
+
+    }
 }
