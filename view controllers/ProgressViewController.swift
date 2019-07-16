@@ -14,7 +14,7 @@ enum GraphType: Int{
     case Sets = 1
     case HR = 2
     case TSB = 3
-    case Cals = 4
+    case Consistency = 4
     case Ed = 5
 
     func name() -> String{
@@ -23,7 +23,7 @@ enum GraphType: Int{
         case .Sets: return "Workout Graphs"
         case .HR: return "Heart Rate Graphs"
         case .TSB: return "Training Stress Balance Graphs"
-        case .Cals: return "Calorie Graphs"
+        case .Consistency: return "Weekly Consistency"
         case .Ed: return "Eddington Numbers"
         }
     }
@@ -37,9 +37,9 @@ enum GraphType: Int{
         case .HR:
             return "Shows your heart data as recorded in the Health App. This graphs shows your resting hears and you heart rate variability"
         case .TSB:
-            return "Training Stress Balance graph. This models your fitness, fatigue and form. This currently uses your activity time from the health app. It assumes an RPE of 5 on average which gives a TSS of ~55 per hour"
-        case .Cals:
-            return "A training stress balance graph based on calories as a good proxie for training stress. It models fitness, fatigue and form using a Banister Training Impulse Model"
+            return "Training Stress Balance graph. This models your fitness, fatigue and form. This currently uses your activity time from the health app. It assumes an RPE of 5 on average which gives a TSS of ~55 per hour. Can also see a similar graph using active calories as a proxie for TSS"
+        case .Consistency:
+            return "Shows how many weeks you've done on the trot with 3 sessions per week and no more than 2 rest days between each"
         case .Ed:
             return "A graph of your Eddington numbers. This is a good single number measure of your progress. It gives the maximum KG such that you've lifted that amount on at least that many days. For more info look at http://www.eddingtonnumbers.me.uk"
         }
@@ -60,6 +60,8 @@ class ProgressViewController: UIViewController {
     private var selectedGraph: GraphType = .Tests
     private var selectedExercise: Int = 0
     private var selectedMeasure: Int = 0
+    private var selectedTSB: Int = 0
+    
     private var graphView: GraphView!
     private var tableView: UITableView!
     
@@ -72,21 +74,26 @@ class ProgressViewController: UIViewController {
         super.viewDidLoad()
         
         df.dateFormat = "dd-MMM-YY"
+
+        scrollView.contentSize = CGSize(width: scrollView.frame.size.width * 2.0, height: scrollView.frame.size.height)
+        scrollView.delegate = self
         
-        graphView = GraphView(frame: CGRect(x: 0, y: 0, width: scrollView.frame.size.width, height: scrollView.frame.size.height))
+        graphView = GraphView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: scrollView.frame.size.height))
+        print(graphView.frame)
+        print(UIScreen.main.bounds)
+        graphView.translatesAutoresizingMaskIntoConstraints = false
+        graphView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         scrollView.addSubview(graphView)
         
         tableView = UITableView(frame: CGRect(x: scrollView.frame.size.width, y: 0, width: scrollView.frame.size.width, height: scrollView.frame.size.height))
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CELL_ID)
         tableView.register(DataHeader.self, forHeaderFooterViewReuseIdentifier: DataHeader.reuseIdentifier)
-
         scrollView.addSubview(tableView)
         
-        scrollView.contentSize = CGSize(width: scrollView.frame.size.width * 2.0, height: scrollView.frame.size.height)
-        scrollView.delegate = self
-
         graphSegmentedControl.selectedSegmentIndex = 0
         picker.backgroundColor = MAIN_BLUE
         picker.dataSource = self
@@ -99,6 +106,14 @@ class ProgressViewController: UIViewController {
         toolBar.backgroundColor = MAIN_BLUE
         toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
         updateGraph(forExercise: ExerciseType(rawValue: Int16(selectedExercise)) ?? ExerciseType.pushUp, andMeasure: ExerciseMeasure(rawValue: selectedMeasure) ?? ExerciseMeasure.avReps)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        scrollView.contentSize = CGSize(width: scrollView.frame.size.width * 2.0, height: scrollView.frame.size.height)
+        tableView.frame = CGRect(x: scrollView.frame.size.width, y: 0, width: scrollView.frame.size.width, height: scrollView.frame.size.height)
+        tableView.contentSize = CGSize(width: scrollView.frame.size.width, height: scrollView.frame.size.height)
+        graphView.frame.size = CGSize(width: scrollView.frame.size.width, height: scrollView.frame.size.height)
     }
     
     @IBAction func chooseTapped(_ sender: Any) {
@@ -116,23 +131,16 @@ class ProgressViewController: UIViewController {
         if let type = GraphType(rawValue: graphSegmentedControl.selectedSegmentIndex){
             selectedGraph = type
             switch type{
-            case .Cals:
-                createCalorieGraph()
-            case .Ed:
-                chooseButton.isEnabled = true
-                chooseButton.isHidden = false
-                titleLabel.text = "Eddington Numbers"
-                print("Ed")
-            case .Sets:
-                createSetsGraph()
-            case .HR:
-                createHRGraph()
-            case .Tests:
-                createTestsGraph()
-            case .TSB:
-                createExerciseTSBGraph()
+            case .Consistency: createConsistencyGraph()
+            case .Ed: createEdGraph()
+            case .Sets: createSetsGraph()
+            case .HR: createHRGraph()
+            case .Tests: createTestsGraph()
+            case .TSB: createTSBGraph()
             }
         }
+        picker.reloadAllComponents()
+        picker.setNeedsDisplay()
     }
     
     @IBAction func showInfo(_ sender: Any) {
@@ -146,6 +154,20 @@ class ProgressViewController: UIViewController {
             collapsed[section] = !collapsed[section]
             tableView.reloadData()
         }
+    }
+    
+    private func createConsistencyGraph(){
+        chooseButton.isEnabled = true
+        chooseButton.isHidden = false
+        titleLabel.text = "Consistency"
+        print("Consistency")
+    }
+    
+    private func createEdGraph(){
+        chooseButton.isEnabled = true
+        chooseButton.isHidden = false
+        titleLabel.text = "Eddington Numbers"
+        print("Ed")
     }
     
     private func createTestsGraph(){
@@ -195,7 +217,14 @@ class ProgressViewController: UIViewController {
         }
         HealthKitAccess.shared.getHRVData(dateRange: (from: ninetyDaysAgo, to:Date())) { (data) in
             if data.count == 0{
-                self.requestPermissions()
+                DispatchQueue.main.async {
+                    self.requestPermissions()
+                    self.titleLabel.text = "Dummy Data"
+                }
+                self.graphView.removeAllGraphs()
+                self.graphView.setGraphs(graphs: [])
+                self.graphData = [("CTL", self.graphView.dummyCTLData), ("ATL", self.graphView.dummyATLData), ("TSB", self.graphView.dummyTSBData)]
+                self.collapsed = [true, true, false]
             }else{
                 self.graphData = [(title, data)]
                 self.collapsed = [false]
@@ -204,14 +233,29 @@ class ProgressViewController: UIViewController {
         }
     }
     
+    private func createTSBGraph(){
+        chooseButton.isEnabled = true
+        chooseButton.isHidden = false
+        if selectedTSB == 0{
+            createExerciseTSBGraph()
+        }else{
+            createCalorieGraph()
+        }
+    }
+    
     
     private func createCalorieGraph(){
-        chooseButton.isEnabled = false
-        chooseButton.isHidden = true
         titleLabel.text = "Calorie Based TSB"
         HealthKitAccess.shared.getCalorieSummary(dateRange: nil) { (data) in
             if data.count == 0{
-                self.requestPermissions()
+                DispatchQueue.main.async {
+                    self.requestPermissions()
+                    self.titleLabel.text = "Dummy Data"
+                }
+                self.graphView.removeAllGraphs()
+                self.graphView.setGraphs(graphs: [])
+                self.graphData = [("CTL", self.graphView.dummyCTLData), ("ATL", self.graphView.dummyATLData), ("TSB", self.graphView.dummyTSBData)]
+                self.collapsed = [true, true, false]
             }else{
                 let trainingStressData = self.createTSBData(from: data)
                 // just show last 90 days of data
@@ -235,12 +279,19 @@ class ProgressViewController: UIViewController {
     }
 
     private func createExerciseTSBGraph(){
-        chooseButton.isEnabled = false
-        chooseButton.isHidden = true
-        titleLabel.text = "Training Stress Balance"
+        self.titleLabel.text = "Training Stress Balance"
         HealthKitAccess.shared.getExerciseTimeSummary(dateRange: nil) { (data) in
             if data.count == 0{
-                self.requestPermissions()
+                DispatchQueue.main.async {
+                    // needs to be set on main thread
+                    self.requestPermissions()
+                    self.graphView.removeAllGraphs()
+                    self.graphView.setGraphs(graphs: [])
+                    self.graphData = [("CTL", self.graphView.dummyCTLData), ("ATL", self.graphView.dummyATLData), ("TSB", self.graphView.dummyTSBData)]
+                    print(self.graphData)
+                    self.collapsed = [true, true, false]
+                    self.tableView.reloadData()
+                }
             }else{
                 //this data is in hours. For now assume a RPE of 5 using 7 as benchmark for threshol. ie hour at RPE 7 is TSS 100
                 //This comes about as estimating TSS from time and rpe we have: TSS ~ (RPE * RPE) * hrs
@@ -256,7 +307,6 @@ class ProgressViewController: UIViewController {
                 // just show last 90 days of data
                 let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
                 let filteredData = trainingStressData.filter({$0.date >= ninetyDaysAgo})
-                print(filteredData)
                 let ctlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.ctl) })
                 let atlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.atl) })
                 let tsbData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tsb) })
@@ -317,37 +367,6 @@ class ProgressViewController: UIViewController {
         graphView.addGraph(graph: graph)
     }
     
-//    private func createDummyData() -> [Graph]{
-//        var ctlData: [(Date, Double)] = []
-//        var atlData: [(Date, Double)] = []
-//        var tsbData: [(Date, Double)] = []
-//        var dayTss: Double = 50
-//        var dayCTL: Double = 25.0
-//        var dayATL: Double = 15.0
-//        let ctlFactor: Double = exp(-1/42.0)
-//        let atlFactor: Double = exp(-1/7.0)
-//        for i in 1...90{
-//            let random = Double.random(in: 0..<1)
-//            let factor = random * random
-//            dayTss = 110 * factor
-//            if Int.random(in: 1...10)<3{
-//                dayTss = 0.9
-//            }
-//            let d = Calendar.current.date(byAdding: DateComponents(day:i), to: Date())!
-//            dayCTL = dayTss * (1 - ctlFactor) + dayCTL * ctlFactor
-//            dayATL = dayTss * (1 - atlFactor) + dayATL * atlFactor
-//            ctlData.append((d, dayCTL))
-//            atlData.append((d, dayATL))
-//            tsbData.append((d, dayCTL - dayATL))
-//
-//        }
-//
-//        let tsbGraph = Graph(data: tsbData, colour: .yellow)
-//        tsbGraph.fill = true
-//
-//        return [tsbGraph, Graph(data: ctlData, colour: .red), Graph(data: atlData, colour: .green)]
-//    }
-    
     private func requestPermissions(){
         let alert = UIAlertController(title: "HealthKit Access", message: "This graph requires access to your health kit data", preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
@@ -366,17 +385,22 @@ class ProgressViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-
 }
+
 
 extension ProgressViewController: UIPickerViewDataSource{
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 2
+        switch selectedGraph{
+        case .Sets, .Tests: return 2
+        case .TSB: return 1
+        default: return 0
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         switch selectedGraph{
-        case .Cals, .HR, .TSB: return 0
+        case .Consistency, .HR:return 0
+        case .TSB: return 2
         case .Sets:
             if component == 0{
                 return WorkoutManager.shared.exerciseTypes.count
@@ -398,34 +422,57 @@ extension ProgressViewController: UIPickerViewDataSource{
 extension ProgressViewController: UIPickerViewDelegate{
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if component == 0{
-            if let def = getSelectedExerciseDefinition(forRow: row){
-                return def.name
+        switch selectedGraph {
+        case .TSB:
+            if row == 0{
+                return "Training Stress Balance"
+            }else{
+                return "Calorie Based TSB"
             }
-        }else{
-            return ExerciseMeasure(rawValue: row)?.string()
+        case .Tests, .Sets:
+            if component == 0{
+                if let def = getSelectedExerciseDefinition(forRow: row){
+                    return def.name
+                }
+            }else{
+                return ExerciseMeasure(rawValue: row)?.string()
+            }
+        default:
+            return nil
         }
         return nil
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        print("Selected: \(row) in component: \(component)")
-        if component == 0{
-            selectedExercise = row
-        }else{
-            selectedMeasure = row
-        }
-        if let exercise = ExerciseType(rawValue: Int16(selectedExercise)){
-            if let measure = ExerciseMeasure(rawValue: selectedMeasure){
-                updateGraph(forExercise: exercise, andMeasure: measure)
+        switch selectedGraph{
+        case .Sets, .Tests:
+            if component == 0{
+                selectedExercise = row
+            }else{
+                selectedMeasure = row
             }
+            if selectedGraph == .Tests{
+                if let measure = ExerciseMeasure(rawValue: selectedMeasure){
+                    updateGraph(forExercise: WorkoutManager.shared.fftTypes[selectedExercise], andMeasure: measure)
+                }
+            }else if selectedGraph == .Sets{
+                if let measure = ExerciseMeasure(rawValue: selectedMeasure){
+                    updateGraph(forExercise: WorkoutManager.shared.exerciseTypes[selectedExercise], andMeasure: measure)
+                }
+            }
+        case .TSB:
+            selectedTSB = row
+            createTSBGraph()
+        default:
+            print("shouldn't hit default clause in pickerView(_: didSelectRow: inComponent:)")
+            // do nothing
         }
         tableView.reloadData()
     }
     
     private func getSelectedExerciseDefinition(forRow row: Int) -> ExerciseDefinition?{
         switch selectedGraph{
-        case .Cals, .HR, .TSB, .Ed:
+        case .Consistency, .HR, .TSB, .Ed:
             return nil
         case .Sets:
             return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.exerciseTypes[row])
@@ -454,6 +501,11 @@ extension ProgressViewController: UITableViewDelegate{
 }
 
 extension ProgressViewController: UITableViewDataSource{
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return graphData.count
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section < collapsed.count{
             if collapsed[section]{

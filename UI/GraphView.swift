@@ -53,6 +53,20 @@ class Graph{
     private var graphs: [Graph] = []
     private var labels: [UITextField] = []
     
+    //    dummy data
+    var dummyCTLData: [(Date, Double)] = []
+    var dummyATLData: [(Date, Double)] = []
+    var dummyTSBData: [(Date, Double)] = []
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        createDummyData()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     func setGraphs(graphs: [Graph]){
         self.graphs = graphs
         DispatchQueue.main.async {
@@ -74,13 +88,8 @@ class Graph{
     override func draw(_ rect: CGRect) {
         
         if graphs.count == 0{
-            graphs = createDummyData()
+            graphs = getDummyGraphs()
         }
-        
-//        let path = UIBezierPath(roundedRect: rect,
-//                                byRoundingCorners: UIRectCorner.allCorners,
-//                                cornerRadii: Constants.cornerRadiusSize)
-//        path.addClip()
         
         let context = UIGraphicsGetCurrentContext()!
         let colors = [startColour.cgColor, endColor.cgColor]
@@ -193,9 +202,10 @@ class Graph{
         let graphHeight = height - topBorder - bottomBorder
         let maxValue = maxY()
         let minValue = minY()
+        let yRange = max(0.1, CGFloat(maxValue - minValue))
         // again this is a function
         let columnYPoint = { (graphPoint:Double) -> CGFloat in
-            var y:CGFloat = CGFloat(graphPoint - minValue) / CGFloat(maxValue - minValue) * graphHeight
+            var y:CGFloat = CGFloat(graphPoint - minValue) / yRange * graphHeight
             y = graphHeight + topBorder - y // Flip the graph
             return y
         }
@@ -252,9 +262,10 @@ class Graph{
     private func graphYToRectCoordinate(_ rect: CGRect, _ graphPoint: CGFloat) -> CGFloat{
         let minValue: CGFloat = CGFloat(minY())
         let maxValue: CGFloat = CGFloat(maxY())
+        let yRange = max(0.1, maxValue - minValue)
         let graphHeight = rect.height - Constants.topBorder - Constants.bottomBorder
-
-        var y:CGFloat = (graphPoint - minValue) / (maxValue - minValue) * graphHeight
+        
+        var y:CGFloat = (graphPoint - minValue) / yRange * graphHeight
         y = graphHeight + Constants.topBorder - y // Flip the graph
         return y
     }
@@ -286,11 +297,19 @@ class Graph{
     }
  
     
-    private func createDummyData() -> [Graph]{
-        //    dummy data
-        var ctlData: [(Date, Double)] = []
-        var atlData: [(Date, Double)] = []
-        var tsbData: [(Date, Double)] = []
+    private func getDummyGraphs() -> [Graph]{
+
+        if dummyTSBData.count == 0{
+            createDummyData()
+        }
+        
+        let tsbGraph = Graph(data: dummyTSBData, colour: .yellow)
+        tsbGraph.fill = true
+        
+        return [tsbGraph, Graph(data: dummyCTLData, colour: .red), Graph(data: dummyATLData, colour: .green)]
+    }
+
+    private func createDummyData(){
         var dayTss: Double = 50
         var dayCTL: Double = 25.0
         var dayATL: Double = 15.0
@@ -307,15 +326,10 @@ class Graph{
             //            let d = Calendar.current.date(from: DateComponents(year:2019, month:6, day:i))!
             dayCTL = dayTss * (1 - ctlFactor) + dayCTL * ctlFactor
             dayATL = dayTss * (1 - atlFactor) + dayATL * atlFactor
-            ctlData.append((d, dayCTL))
-            atlData.append((d, dayATL))
-            tsbData.append((d, dayCTL - dayATL))
+            dummyCTLData.append((d, dayCTL))
+            dummyATLData.append((d, dayATL))
+            dummyTSBData.append((d, dayCTL - dayATL))
             
         }
-        
-        let tsbGraph = Graph(data: tsbData, colour: .yellow)
-        tsbGraph.fill = true
-        
-        return [tsbGraph, Graph(data: ctlData, colour: .red), Graph(data: atlData, colour: .green)]
     }
 }

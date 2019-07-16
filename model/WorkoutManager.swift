@@ -141,7 +141,7 @@ class WorkoutManager{
         let progression: [ExerciseType: [Double]] = [.gobletSquat: [5, 6, 7, 7, 8, 9, 10, 12, 14, 14, 15, 16, 17],
                                                      .lunge: [5,7,10, 12, 12, 14, 15, 15, 16, 18, 20, 20, 22],
                                                      .benchPress: [3, 4, 5, 6, 7, 8, 8, 10, 11, 12, 14, 15, 18],
-                                                     .pushUp: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                     .pushUp: [5, 5, 6, 6, 7, 8, 9, 10, 10, 10, 11, 12, 15],
                                                      .pullDown: [5, 6, 6, 5, 6, 7, 8, 8, 8, 9, 10, 12, 12]]
 
         
@@ -152,7 +152,13 @@ class WorkoutManager{
                 let weekly = workoutDaysOfWeek[Int.random(in: 0..<workoutDaysOfWeek.count)]
                 for dayOfWeek in weekly{
                     let wkDate: Date = Calendar.current.date(byAdding: DateComponents(day: dayOfWeek), to: date)!
-                    let w: Workout = createWorkout(forDate: wkDate)
+                    let w: Workout = createWorkout(forDate: wkDate, exercises: [
+                        ExerciseDefaults(type: .gobletSquat, defaultPlan: 5, defaultKG: 5.0),
+                        ExerciseDefaults(type: .lunge, defaultPlan: 5, defaultKG: 10.0),
+                        ExerciseDefaults(type: .benchPress, defaultPlan: 5, defaultKG: 5.0),
+                        ExerciseDefaults(type: .pushUp, defaultPlan: progression[.pushUp]![i], defaultKG: 0.0),
+                        ExerciseDefaults(type: .pullDown, defaultPlan: 5, defaultKG: 5.0),
+                        ])
                     if let p = previous{
                         p.nextWorkout = w
                         w.previousWorkout = p
@@ -160,10 +166,13 @@ class WorkoutManager{
                     for (key, value) in progression{
                         // randomly move 10% down and 20% up
                         let percentageMove: Double = Double.random(in: 0...0.3) + 0.9
-                        print(percentageMove)
                         for s in w.exercises(ofType: key)[0].exerciseSets(){
                             s.actual = s.plan
-                            s.actualKG = value[i] * percentageMove
+                            if ExerciseDefinitionManager.shared.exerciseDefinition(for: key).usesWeight{
+                                s.actualKG = value[i] * percentageMove
+                            }else{
+                                s.actualKG = 0.0
+                            }
                         }
                         
                     }
@@ -184,7 +193,7 @@ class WorkoutManager{
         var previous: Workout?
         let progression: [ExerciseType: [Double]] = [.standingBroadJump: [1, 1.1, 1.2, 1.3, 1.4, 1.45, 1.45, 1.5, 1.6, 1.6, 1.65, 1.65, 1.67],
                                                      .deadHang: [20.0, 23.0, 28.0, 33.0, 33.0, 35.0, 38.0, 43.0, 45.0, 46.0, 48, 49, 50],
-                                                     .farmersCarry: [75.0, 80.0, 90.0, 93,0, 101.0, 102.0, 103.0, 107.0, 112.0, 115.0, 115, 125, 129],
+                                                     .farmersCarry: [75.0, 80.0, 90.0, 93.0, 101.0, 102.0, 103.0, 107.0, 112.0, 115.0, 115, 125, 129],
                                                      .plank: [15.0, 25.0, 35.0, 36.0, 37.0, 38.0, 40.0, 41.0, 45.0, 50.0, 53, 55, 57],
                                                      .squat: [21.0, 22.0, 25.0, 27.0, 27.0, 30.0, 40.0, 41.0, 43.0, 45.0, 50, 60, 59],
                                                      .sittingRisingTest: [4, 5, 3, 4, 3, 2, 2, 2, 1, 0, 0, 0, 0]]
@@ -246,7 +255,7 @@ class WorkoutManager{
                 return nextWorkout()
             }else{
                 
-                let newWorkout: Workout = createWorkout(forDate: Date())
+                let newWorkout: Workout = createWorkout(forDate: Date(), exercises: exerciseSet1)
                 //save it before returning
                 CoreDataStackSingleton.shared.save()
                 return newWorkout
@@ -257,20 +266,22 @@ class WorkoutManager{
     func createNextWorkout(after: Workout){
         // set for tomorrow
         let tomorrow: Date = Calendar.current.date(byAdding: DateComponents(day: 1), to: Date())!
-        let workout: Workout = createWorkout(forDate: tomorrow)
+        let workout: Workout = createWorkout(forDate: tomorrow, exercises: exerciseSet1)
         after.nextWorkout = workout
         workout.previousWorkout = after
         CoreDataStackSingleton.shared.save()
     }
-    
-    private func createWorkout(forDate date: Date) -> Workout{
+
+
+
+    private func createWorkout(forDate date: Date, exercises: [ExerciseDefaults]) -> Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
         workout.date = date
         workout.type = WorkoutType.DescendingReps.rawValue
         workout.explanation = "This is an explanation"
         // for now lets create one of each type
         var order: Int16 = 0
-        for e in exerciseSet1{
+        for e in exercises{
             let exercise: Exercise = CoreDataStackSingleton.shared.newExercise()
             exercise.order = order
             exercise.type = e.type.rawValue
