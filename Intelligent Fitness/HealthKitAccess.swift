@@ -259,12 +259,16 @@ class HealthKitAccess {
             
             let query = HKActivitySummaryQuery.init(predicate: dateRangePredicate) { (query, summaries, error) in
                 if let error = error{
-                    print(error)
+                    DispatchQueue.main.async {
+                        print(error)
+                    }
                 }
                 if let summary = summaries{
                     completion(summary)
                 }else{
-                    print("Nothing Returned")
+                    DispatchQueue.main.async {
+                        print("Nothing Returned")
+                    }
                     completion([])
                 }
             }
