@@ -42,43 +42,75 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "view controllers/ProgressViewController.swift"
-            timestampString = "584974518.174863"
+            timestampString = "585065398.516513"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "260"
-            endingLineNumber = "260"
+            startingLineNumber = "278"
+            endingLineNumber = "278"
             landmarkName = "createCalorieGraph()"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "view controllers/ProgressViewController.swift"
+            timestampString = "585065398.516591"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "224"
+            endingLineNumber = "224"
+            landmarkName = "createHRGraph()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "model/WorkoutManager.swift"
+            timestampString = "585065398.516664"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "135"
+            endingLineNumber = "135"
+            landmarkName = "functionalFitnessTest"
+            landmarkType = "24">
             <Locations>
                <Location
-                  shouldBeEnabled = "Yes"
+                  shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "Intelligent_Fitness.ProgressViewController.(createCalorieGraph in _3EC9180369C903E27924350D3FA8C982)() -&gt; ()"
+                  symbolName = "Intelligent_Fitness.WorkoutManager.getWeeks() -&gt; Swift.Array&lt;Intelligent_Fitness.Week&gt;"
                   moduleName = "Intelligent Fitness"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/stevenlord/Development/ibm/Intelligent%20Fitness/view%20controllers/ProgressViewController.swift"
-                  timestampString = "584813847.310817"
+                  urlString = "file:///Users/stevenlord/Development/ibm/Intelligent%20Fitness/model/WorkoutManager.swift"
+                  timestampString = "584993241.705429"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "178"
-                  endingLineNumber = "178"
-                  offsetFromSymbolStart = "842">
+                  startingLineNumber = "101"
+                  endingLineNumber = "101"
+                  offsetFromSymbolStart = "626">
                </Location>
                <Location
-                  shouldBeEnabled = "Yes"
+                  shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Array&lt;(date: Foundation.Date, value: Swift.Double)&gt;) -&gt; () in Intelligent_Fitness.ProgressViewController.(createCalorieGraph in _3EC9180369C903E27924350D3FA8C982)() -&gt; ()"
+                  symbolName = "closure #1 (Intelligent_Fitness.Workout, Intelligent_Fitness.Workout) -&gt; Swift.Bool in Intelligent_Fitness.WorkoutManager.getWeeks() -&gt; Swift.Array&lt;Intelligent_Fitness.Week&gt;"
                   moduleName = "Intelligent Fitness"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/stevenlord/Development/ibm/Intelligent%20Fitness/view%20controllers/ProgressViewController.swift"
-                  timestampString = "584813847.326398"
+                  urlString = "file:///Users/stevenlord/Development/ibm/Intelligent%20Fitness/model/WorkoutManager.swift"
+                  timestampString = "584993241.707559"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "179"
-                  endingLineNumber = "179"
-                  offsetFromSymbolStart = "506">
+                  startingLineNumber = "101"
+                  endingLineNumber = "101"
+                  offsetFromSymbolStart = "157">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -89,13 +121,45 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "view controllers/ProgressViewController.swift"
-            timestampString = "584974518.174953"
+            filePath = "model/WorkoutManager.swift"
+            timestampString = "585065398.5167249"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "206"
-            endingLineNumber = "206"
-            landmarkName = "createSetsGraph()"
+            startingLineNumber = "136"
+            endingLineNumber = "136"
+            landmarkName = "functionalFitnessTest"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "model/WorkoutManager.swift"
+            timestampString = "585065398.51678"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
+            landmarkName = "getWeeks()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "model/WorkoutManager.swift"
+            timestampString = "585065398.516832"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "163"
+            endingLineNumber = "163"
+            landmarkName = "nextFunctionalFitnessTest()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

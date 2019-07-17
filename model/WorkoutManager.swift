@@ -11,10 +11,15 @@ import Foundation
 enum ExerciseType: Int16, CaseIterable{
     case gobletSquat, lunge, benchPress, pushUp, pullDown
     case standingBroadJump, plank, deadHang, farmersCarry, squat, sittingRisingTest
+    case ALL
 }
 
 enum ExerciseMeasure: Int, CaseIterable{
-    case maxKG, minKG, avKG, totalReps, totalRepKG, avReps, minReps, maxReps
+    case maxKG, minKG, avKG
+    case totalReps, totalRepKG, avReps, minReps, maxReps
+    case totalDistance, totalDistanceKG, avDistance, minDistance, maxDistance
+    case totalTime, totalTimeKG, avTime, minTime, maxTime
+    case totalTouches, totalTouchKG, avTouch, minTouch, maxTouch
     func string() -> String{
         switch self{
         case .maxKG: return "Max KG"
@@ -25,20 +30,47 @@ enum ExerciseMeasure: Int, CaseIterable{
         case .avReps: return "Average Reps"
         case .minReps: return "Min Reps"
         case .maxReps: return "Max Reps"
+        case .totalDistance: return "Total m"
+        case .totalDistanceKG: return "Total KG x m"
+        case .avDistance: return "Average m"
+        case .minDistance: return "Min m"
+        case .maxDistance: return "Max m"
+        case .totalTime: return "Total secs"
+        case .totalTimeKG: return "Total KG x secs"
+        case .avTime: return "Average secs"
+        case .minTime: return "Min secs"
+        case .maxTime: return "Max secs"
+        case .totalTouches: return "Total Touches"
+        case .totalTouchKG: return "Total KG x Touches"
+        case .avTouch: return "Average Touches"
+        case .minTouch: return "Min Touches"
+        case .maxTouch: return "Max Touches"
         }
     }
 }
 
 enum SetType: Int16{
-    case Reps, Distance, Time, Touches
+    case Reps, Distance, Time, Touches, All
     func string(forValue d: Double) -> String{
         switch self{
         case .Reps: return "\(Int(d)) reps"
         case .Distance: return "\(d)m"
         case .Time: return "\(Int(d))s"
         case .Touches: return "\(Int(d)) touches"
+        case .All: return "\(Int(d))"
         }
     }
+    
+    func validMeasures() -> [ExerciseMeasure]{
+        switch self{
+        case .Reps: return [.maxKG, .minKG, .avKG, .totalReps, .totalRepKG, .avReps, .minReps, .maxReps]
+        case .Distance: return [.maxKG, .minKG, .avKG, .totalDistance, .totalDistanceKG, .avDistance, .minDistance, .maxDistance]
+        case .Time: return [.maxKG, .minKG, .avKG, .totalTime, .totalTimeKG, .avTime, .minTime, .maxTime]
+        case .Touches: return [.maxKG, .minKG, .avKG, .totalTouches, .totalTouchKG, .avTouch, .minTouch, .maxTouch]
+        case .All: return ExerciseMeasure.allCases
+        }
+    }
+    
     func moreIsBetter() -> Bool{
         // indicates whether more reps is better. For instance where 'touches' are counted the goal is as few as possible
         switch self{
@@ -76,8 +108,10 @@ class WorkoutManager{
         var defaultKG: Double
     }
     
-    var fftTypes: [ExerciseType]{ return functionalFitnessTest.map({$0.type})}
-    var exerciseTypes: [ExerciseType]{ return exerciseSet1.map({$0.type})}
+    var exerciseTypes: [ExerciseType]{ return ExerciseType.allCases}
+
+    
+    var calendar: Calendar{ return Calendar(identifier: .iso8601)}
     
     private let functionalFitnessTest: [ExerciseDefaults] = [
         ExerciseDefaults(type: .standingBroadJump, defaultPlan: 1.0, defaultKG: 0.0),
@@ -96,6 +130,38 @@ class WorkoutManager{
         ExerciseDefaults(type: .pullDown, defaultPlan: 5, defaultKG: 5.0),
     ]
     
+    
+    func getWeeks() -> [Week]{
+        let workouts: [Workout] = CoreDataStackSingleton.shared.getWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! < $1.date!})
+        if workouts.count == 0{
+            return []
+        }
+        
+        var startOfWeek: Date = workouts[0].date!.startOfWeek!
+        var weeks: [String:Week] = [:]
+        var previousWeek: Week?
+        
+        // create weeks
+        while startOfWeek < Date(){
+            let wk: Week = Week([], date: startOfWeek)
+            weeks[wk.weekStr] = wk
+            if let p = previousWeek{
+                p.nextWeek = wk
+                wk.previousWeek = p
+            }
+            previousWeek = wk
+            startOfWeek = Calendar(identifier: .iso8601).date(byAdding: DateComponents(day: 7), to: startOfWeek)!
+        }
+        
+        for w in workouts{
+            if let wk = weeks[w.weekStr]{
+                wk.workouts.append(w)
+            }
+        }
+
+        
+        return [Week](weeks.values)
+    }
     
     func nextFunctionalFitnessTest() -> Workout{
         let incomplete: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts().filter({$0.type == WorkoutType.FFT.rawValue})
@@ -121,7 +187,7 @@ class WorkoutManager{
     
     func createNextFunctionalFitnessTest(after: Workout){
         // aim for tests every 4 weeks
-        let oneMonthFromNow: Date = Calendar.current.date(byAdding: DateComponents(day: 28), to: Date())!
+        let oneMonthFromNow: Date = calendar.date(byAdding: DateComponents(day: 28), to: Date())!
         let test: Workout = createFunctionalFitnessTest(forDate: oneMonthFromNow)
         after.nextWorkout = test
         test.previousWorkout = after
@@ -134,9 +200,8 @@ class WorkoutManager{
     
     
     func createTestWorkoutData(){
-        var d: Date = Calendar.current.date(byAdding: DateComponents(year: -1), to: Date())!
+        var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!.startOfWeek!
         let interval: DateComponents = DateComponents(day: 28)
-        let workoutDaysOfWeek: [[Int]] = [[0,2,4], [1,2,4], [0,1,2], [1,3,5], [1,4,7]]
         var previous: Workout?
         let progression: [ExerciseType: [Double]] = [.gobletSquat: [5, 6, 7, 7, 8, 9, 10, 12, 14, 14, 15, 16, 17],
                                                      .lunge: [5,7,10, 12, 12, 14, 15, 15, 16, 18, 20, 20, 22],
@@ -144,14 +209,11 @@ class WorkoutManager{
                                                      .pushUp: [5, 5, 6, 6, 7, 8, 9, 10, 10, 10, 11, 12, 15],
                                                      .pullDown: [5, 6, 6, 5, 6, 7, 8, 8, 8, 9, 10, 12, 12]]
 
-        
         for i in 0..<progression[.gobletSquat]!.count{
             // create weekly
             for w in 0...3{
-                let date: Date = Calendar.current.date(byAdding: DateComponents(day: w * 7), to: d)!
-                let weekly = workoutDaysOfWeek[Int.random(in: 0..<workoutDaysOfWeek.count)]
-                for dayOfWeek in weekly{
-                    let wkDate: Date = Calendar.current.date(byAdding: DateComponents(day: dayOfWeek), to: date)!
+                let date: Date = calendar.date(byAdding: DateComponents(day: w * 7), to: d)!
+                for wkDate in createRandomDaysOfWeek(fromDate: date){
                     let w: Workout = createWorkout(forDate: wkDate, exercises: [
                         ExerciseDefaults(type: .gobletSquat, defaultPlan: 5, defaultKG: 5.0),
                         ExerciseDefaults(type: .lunge, defaultPlan: 5, defaultKG: 10.0),
@@ -180,15 +242,28 @@ class WorkoutManager{
                     previous = w
                 }
             }
-            d = Calendar.current.date(byAdding: interval, to: d)!
+            d = calendar.date(byAdding: interval, to: d)!
         }
         
         CoreDataStackSingleton.shared.save()
         
     }
     
+    private func createRandomDaysOfWeek(fromDate d: Date) -> [Date]{
+        let workoutDaysOfWeek: [[Int]] = [[0,2,4], [1,2,4], [0,1,2], [1,3,5], [1,4,6]]
+        let weekly = workoutDaysOfWeek[Int.random(in: 0..<workoutDaysOfWeek.count)]
+        var result: [Date] = []
+        for dayOfWeek in weekly{
+            result.append(calendar.date(byAdding: DateComponents(day: dayOfWeek), to: d.startOfWeek!)!)
+        }
+        let df: DateFormatter = DateFormatter()
+        df.dateFormat = "E dd-MMM-yyyy"
+        print(result.map({df.string(from: $0)}).joined(separator: " : "))
+        return result
+    }
+    
     func createTestFFTData(){
-        var d: Date = Calendar.current.date(byAdding: DateComponents(year: -1), to: Date())!
+        var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!
         let interval: DateComponents = DateComponents(day: 28)
         var previous: Workout?
         let progression: [ExerciseType: [Double]] = [.standingBroadJump: [1, 1.1, 1.2, 1.3, 1.4, 1.45, 1.45, 1.5, 1.6, 1.6, 1.65, 1.65, 1.67],
@@ -211,7 +286,7 @@ class WorkoutManager{
             }
             fft.complete = true
             previous = fft
-            d = Calendar.current.date(byAdding: interval, to: d)!
+            d = calendar.date(byAdding: interval, to: d)!
         }
         
         CoreDataStackSingleton.shared.save()
@@ -247,7 +322,7 @@ class WorkoutManager{
             return incomplete[0]
         }else{
             // really shouldn't get to this point as the next test should be created when the last one was saved
-            print("Shouldn't really get here: nextWorkout as the next workout should have been ")
+            print("Shouldn't really get here: nextWorkout as the next workout should have been created ")
             let workouts: [Workout] = CoreDataStackSingleton.shared.getWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! > $1.date!})
             if workouts.count > 0{
                 createNextWorkout(after: workouts[0])
@@ -265,7 +340,7 @@ class WorkoutManager{
 
     func createNextWorkout(after: Workout){
         // set for tomorrow
-        let tomorrow: Date = Calendar.current.date(byAdding: DateComponents(day: 1), to: Date())!
+        let tomorrow: Date = calendar.date(byAdding: DateComponents(day: 1), to: Date())!
         let workout: Workout = createWorkout(forDate: tomorrow, exercises: exerciseSet1)
         after.nextWorkout = workout
         workout.previousWorkout = after
@@ -302,6 +377,17 @@ class WorkoutManager{
         return workout
     }
 
-    private init(){}
+    private init(){
+        let df: DateFormatter = DateFormatter()
+        df.dateFormat = "E dd-MMM-YYY"
+        print("getting weeks")
+        for w in getWeeks().sorted(by: {$0.date < $1.date}){
+            let dateStr: [String] = w.workouts.map({df.string(from: $0.date!)})
+            print("\(w.weekStr) ~Streak: \(w.consistencyStreak()) ~ (Prev: \(w.previousWeek?.weekStr ?? "") Next: \(w.nextWeek?.weekStr ?? "") ) - \(dateStr.joined(separator: " : "))")
+        }
+        
+
+        
+    }
     
 }

@@ -62,6 +62,7 @@ extension ExerciseSet{
             case .Reps: return repsDescription()
             case .Time: return timeDescription()
             case .Touches: return touchesDescription()
+            case .All: return "This is the summary for ALL exercises"
             }
         }else{
             return "No type set"

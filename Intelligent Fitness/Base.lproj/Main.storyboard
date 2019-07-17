@@ -959,7 +959,6 @@
                                     <constraint firstAttribute="height" constant="28" id="FwT-fe-Ejg"/>
                                 </constraints>
                                 <segments>
-                                    <segment title="Tests"/>
                                     <segment title="Sets"/>
                                     <segment title="HR"/>
                                     <segment title="TSB"/>

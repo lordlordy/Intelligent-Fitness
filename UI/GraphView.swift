@@ -12,6 +12,7 @@ class Graph{
     var data: [(date: Date, value: Double)]
     var colour: UIColor
     var fill: Bool = false
+    var invertFill: Bool = false
     
     var max: Double {
         return data.map({ (datum) -> Double in
@@ -48,7 +49,7 @@ class Graph{
 
     // colours for gradient.
     @IBInspectable var startColour: UIColor = MAIN_BLUE
-    @IBInspectable var endColor: UIColor = .white
+    @IBInspectable var endColour: UIColor = .white
     
     private var graphs: [Graph] = []
     private var labels: [UITextField] = []
@@ -92,7 +93,7 @@ class Graph{
         }
         
         let context = UIGraphicsGetCurrentContext()!
-        let colors = [startColour.cgColor, endColor.cgColor]
+        let colors = [startColour.cgColor, endColour.cgColor]
         
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         
@@ -237,12 +238,20 @@ class Graph{
             cPath.addLine(to: CGPoint(x:columnXPoint(0), y:columnYPoint(0.0)))
             cPath.close()
             cPath.addClip()
+            
+            var sColour: CGColor = startColour.cgColor
+            var eColour: CGColor = endColour.cgColor
+            
+            if graph.invertFill{
+                sColour = endColour.cgColor
+                eColour = startColour.cgColor
+            }
 
-            var colours = (graph.max > 0) ? [startColour.cgColor, endColor.cgColor] : [endColor.cgColor, startColour.cgColor]
+            var colours = (graph.max > 0) ? [sColour, eColour] : [eColour, sColour]
             var colourLocations: [CGFloat] = [0.0, 1.0]
             let colourSpace = CGColorSpaceCreateDeviceRGB()
             if graph.min < 0 && graph.max > 0{
-                colours = [startColour.cgColor, endColor.cgColor, startColour.cgColor]
+                colours = [sColour, eColour, sColour]
                 colourLocations = [0.0, (columnYPoint(0)-columnYPoint(graph.max))/(columnYPoint(graph.min)-columnYPoint(graph.max)) , 1.0]
                 print(colourLocations)
             }
