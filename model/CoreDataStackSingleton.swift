@@ -11,7 +11,7 @@ import CoreData
 
 
 enum EntityType: String{
-    case Exercise, ExerciseSet, Workout
+    case Exercise, ExerciseSet, Workout, RepSet, TimeSet, DistanceSet, TouchSet
 }
 
 /*
@@ -50,10 +50,19 @@ class CoreDataStackSingleton{
     }
 
     //MARK: - New Entities
-    
+    //     case Reps, Distance, Time, Touches, All
+
     
     func newWorkout() -> Workout { return newEntity(ofType: .Workout) as! Workout}
-    func newExerciseSet() -> ExerciseSet {return newEntity(ofType: .ExerciseSet) as! ExerciseSet}
+    func newExerciseSet(forType type: SetType) -> ExerciseSet {
+        switch type{
+        case SetType.Reps: return newEntity(ofType: .RepSet) as! ExerciseSet
+        case SetType.Distance: return newEntity(ofType: .DistanceSet) as! ExerciseSet
+        case SetType.Time: return newEntity(ofType: .TimeSet) as! ExerciseSet
+        case SetType.Touches: return newEntity(ofType: .TouchSet) as! ExerciseSet
+        case SetType.All: return newEntity(ofType: .ExerciseSet) as! ExerciseSet
+        }
+    }
     func newExercise() -> Exercise {return newEntity(ofType: .Exercise) as! Exercise}
     
     func getAllSessions() -> [Workout]{
@@ -81,7 +90,7 @@ class CoreDataStackSingleton{
         return getAllEntities(ofType: .Exercise, predicate: NSPredicate(format: "type == %@", argumentArray: [type.rawValue])) as? [Exercise] ?? []
     }
     
-    func getWorkouts(ofType type: WorkoutType?, isTest test: Bool? ) -> [Workout]{
+    func getOrderedWorkouts(ofType type: WorkoutType?, isTest test: Bool? ) -> [Workout]{
         var predicateStr: [String] = []
         var variables: [Any] = []
         if let t = type{
@@ -97,7 +106,7 @@ class CoreDataStackSingleton{
             predicate = NSPredicate(format: predicateStr.joined(separator: " and "), argumentArray: variables)
         }
         let results = getAllEntities(ofType: .Workout, predicate: predicate) as! [Workout]
-        return results.sorted(by: {$0.date! > $1.date!})
+        return results.sorted(by: {$0.date! < $1.date!})
     }
     
     func delete(_ obj: NSManagedObject){
@@ -118,6 +127,7 @@ class CoreDataStackSingleton{
     }
     
     private func newEntity(ofType type: EntityType) -> NSManagedObject{
+        print("Creating \(type)")
         return NSEntityDescription.insertNewObject(forEntityName: type.rawValue, into: modelPC.viewContext)
     }
 

@@ -12,10 +12,24 @@ enum ExerciseType: Int16, CaseIterable{
     case gobletSquat, lunge, benchPress, pushUp, pullDown
     case standingBroadJump, plank, deadHang, farmersCarry, squat, sittingRisingTest
     case ALL
+    
+    func setType() -> SetType{
+        switch self{
+        case .gobletSquat, .lunge, .benchPress, .pushUp, .pullDown: return .Reps
+        case .plank, .deadHang, .squat: return .Time
+        case .standingBroadJump, .farmersCarry: return .Distance
+        case .sittingRisingTest: return .Touches
+        case .ALL: return .All
+        }
+    }
 }
 
-enum ExerciseMeasure: Int, CaseIterable{
-    case maxKG, minKG, avKG
+enum AggregatorType{
+    case Sum, Average, Max, Min
+}
+
+enum ExerciseMeasure: String, CaseIterable{
+    case maxKG, minKG, avKG, totalKG
     case totalReps, totalRepKG, avReps, minReps, maxReps
     case totalDistance, totalDistanceKG, avDistance, minDistance, maxDistance
     case totalTime, totalTimeKG, avTime, minTime, maxTime
@@ -25,6 +39,7 @@ enum ExerciseMeasure: Int, CaseIterable{
         case .maxKG: return "Max KG"
         case .minKG: return "Min KG"
         case .avKG: return "Average KG"
+        case .totalKG: return "Total KG"
         case .totalReps: return "Total Reps"
         case .totalRepKG: return "Total KG x Reps"
         case .avReps: return "Average Reps"
@@ -47,6 +62,16 @@ enum ExerciseMeasure: Int, CaseIterable{
         case .maxTouch: return "Max Touches"
         }
     }
+    func aggregator() -> AggregatorType{
+        switch self{
+        case .totalKG, .totalReps, .totalRepKG, .totalTime, .totalTimeKG, .totalTouches, .totalTouchKG, .totalDistance, .totalDistanceKG: return .Sum
+        case .avKG, .avReps, .avTime, .avTouch, .avDistance: return .Average
+        case .maxKG, .maxReps, .maxTime, .maxTouch, .maxDistance: return .Max
+        case .minKG, .minReps, .minTime, .minTouch, .minDistance: return .Min
+        }
+    }
+    
+    func weighted() -> Bool{ return self == ExerciseMeasure.avKG }
 }
 
 enum SetType: Int16{
@@ -98,7 +123,8 @@ enum WorkoutType: Int16{
 }
 
 
-class WorkoutManager{
+class WorkoutManager: Athlete{
+
     
     static var shared: WorkoutManager = WorkoutManager()
     
@@ -130,9 +156,34 @@ class WorkoutManager{
         ExerciseDefaults(type: .pullDown, defaultPlan: 5, defaultKG: 5.0),
     ]
     
+    // MARK: - Athlete Protocol
+    
+    func timeSeries(forExeciseType type: ExerciseType, andMeasure measure: ExerciseMeasure) -> [(date: Date, value: Double)] {
+        let workouts: [Workout] = CoreDataStackSingleton.shared.getOrderedWorkouts(ofType: nil, isTest: nil).filter({$0.complete})
+        var ts: [(date:Date, value: Double)] = []
+        for w in workouts{
+            if let v = w.getValue(forExerciseType: type, andMeasure: measure){
+                ts.append((w.date!, v))
+            }
+        }
+        if type == .ALL{
+            ts = ts.filter({$0.value > 0.0})
+        }
+
+        return ts
+    }
+    
+    // MARK: - Other
+    
+    func currentStreakData() -> (current: Int, best: Int){
+        let wks: [Week] = getWeeks().sorted(by: {$0.date < $1.date})
+        let current: Int = wks[wks.count-1].consistencyStreak()
+        let best: Int = wks.reduce(0, {max($0, $1.consistencyStreak())})
+        return (current, best)
+    }
     
     func getWeeks() -> [Week]{
-        let workouts: [Workout] = CoreDataStackSingleton.shared.getWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! < $1.date!})
+        let workouts: [Workout] = CoreDataStackSingleton.shared.getOrderedWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! < $1.date!})
         if workouts.count == 0{
             return []
         }
@@ -159,7 +210,6 @@ class WorkoutManager{
             }
         }
 
-        
         return [Week](weeks.values)
     }
     
@@ -301,7 +351,7 @@ class WorkoutManager{
         var order: Int16 = 0
         for fft in functionalFitnessTest{
             let exercise: Exercise = CoreDataStackSingleton.shared.newExercise()
-            let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExerciseSet()
+            let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExerciseSet(forType: fft.type.setType())
             exerciseSet.order = 0
             exerciseSet.plan = fft.defaultPlan
             exerciseSet.plannedKG = fft.defaultKG
@@ -323,7 +373,7 @@ class WorkoutManager{
         }else{
             // really shouldn't get to this point as the next test should be created when the last one was saved
             print("Shouldn't really get here: nextWorkout as the next workout should have been created ")
-            let workouts: [Workout] = CoreDataStackSingleton.shared.getWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! > $1.date!})
+            let workouts: [Workout] = CoreDataStackSingleton.shared.getOrderedWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! > $1.date!})
             if workouts.count > 0{
                 createNextWorkout(after: workouts[0])
                 // have created next workout so call this method re-cursively
@@ -364,7 +414,8 @@ class WorkoutManager{
             let maxReps: Int16 = Int16(e.defaultPlan)
             var setOrder: Int16 = 0
             for r in (1...maxReps).reversed(){
-                let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExerciseSet()
+                let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExerciseSet(forType: e.type.setType())
+                print(exerciseSet)
                 exerciseSet.order = setOrder
                 exerciseSet.plannedKG = e.defaultKG
                 exerciseSet.plan = Double(r)

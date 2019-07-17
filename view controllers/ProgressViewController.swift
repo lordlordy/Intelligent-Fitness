@@ -9,6 +9,8 @@
 import UIKit
 import HealthKit
 
+// TO DO - calculation of TSB should be moved from here
+
 enum GraphType: Int{
     case Sets = 0
     case HR = 1
@@ -54,9 +56,11 @@ class ProgressViewController: UIViewController {
     private var toolBar = UIToolbar()
     private var picker = UIPickerView()
     private var selectedGraph: GraphType = .Sets
-    private var selectedExercise: Int = 0
-    private var selectedMeasure: Int = 0
+    private var selectedExercise: ExerciseType = ExerciseType.gobletSquat
+    private var selectedMeasure: ExerciseMeasure = .totalKG
+    private var validMeasures: [ExerciseMeasure]{ return selectedExercise.setType().validMeasures() }
     private var selectedTSB: Int = 0
+    private var isLTDEd: Bool = true
     
     private var graphView: GraphView!
     private var tableView: UITableView!
@@ -101,7 +105,7 @@ class ProgressViewController: UIViewController {
         toolBar.barStyle = .default
         toolBar.backgroundColor = MAIN_BLUE
         toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
-        updateGraph(forExercise: ExerciseType(rawValue: Int16(selectedExercise)) ?? ExerciseType.pushUp, andMeasure: ExerciseMeasure(rawValue: selectedMeasure) ?? ExerciseMeasure.avReps)
+        updateGraph(forExercise: selectedExercise, andMeasure: selectedMeasure )
     }
     
     override func viewDidLayoutSubviews() {
@@ -171,47 +175,44 @@ class ProgressViewController: UIViewController {
         graph.fill = true
         graph.invertFill = true
         graphView.setGraphs(graphs: [graph, Graph(data: maxValues, colour: .red)])
-        print("Consistency")
     }
     
     private func createEdGraph(){
         chooseButton.isEnabled = true
         chooseButton.isHidden = false
-        titleLabel.text = "Eddington Numbers"
-        print("Ed")
-        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: .benchPress).map({(date: $0.date!, value: $0.valueFor(exerciseMeasure: .totalRepKG))}).sorted(by: {$0.date < $1.date})
-        
+        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: selectedExercise).map({(date: $0.date!, value: $0.getValue(forMeasure: selectedMeasure))}).sorted(by: {$0.date < $1.date})
         let eddNum: EddingtonCalculator.EddingtonHistory = EddingtonCalculator().eddingtonHistory(timeSeries: data)
+
+        var history = eddNum.annualHistory
+        var preStr = "Annual"
         
-        for i in eddNum.ltdHistory{
-            print("\(i.date) - Ed#: \(i.edNum) +1: \(i.plusOne) contributor: \(i.contributor)")
+        if isLTDEd{
+            history = eddNum.ltdHistory
+            preStr = "LTD"
         }
+        
+        titleLabel.text = "\(preStr) \(ExerciseDefinitionManager.shared.exerciseDefinition(for: selectedExercise).name) \(selectedMeasure.string()) Edd#"
+
+        let edData: [(Date, Double)] = history.map({($0.date, Double($0.edNum))})
+        let edContributors: [(Date, Double)] = history.map({($0.date, $0.contributor)})
+        let edPlusOne: [(Date, Double)] = history.map({($0.date, Double($0.edNum + $0.plusOne))})
+        let edGraph: Graph = Graph(data: edData, colour: .green)
+        let contribGraph: Graph = Graph(data: edContributors, colour: .red)
+        let plusOneGraph: Graph = Graph(data: edPlusOne, colour: .gray)
+        edGraph.fill = true
+        edGraph.invertFill = true
+        contribGraph.point = true
+        graphData = [("Ed Num", edData), ("Contributors", edContributors), ("Plus One", history.map({($0.date, Double($0.plusOne))}))]
+        collapsed = [true, true, false]
+        graphView.removeAllGraphs()
+        graphView.setGraphs(graphs: [edGraph, contribGraph, plusOneGraph])
+        
     }
-//
-//    private func createTestsGraph(){
-//        chooseButton.isEnabled = true
-//        chooseButton.isHidden = false
-//        let title: String  = "Functional Fitness Test"
-//        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: .sittingRisingTest).map({($0.date!, $0.valueFor(exerciseMeasure: .avReps))})
-//        graphData = [(title, data)]
-//        collapsed = [false]
-//        titleLabel.text = title
-//        graphView.removeAllGraphs()
-//        let graph: Graph = Graph(data: data, colour: .red)
-//        graphView.addGraph(graph: graph)
-//    }
-    
 
     private func createSetsGraph(){
         chooseButton.isEnabled = true
         chooseButton.isHidden = false
-        let title: String = "Bench Press"
-        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: .benchPress).map({(date: $0.date!, value: $0.valueFor(exerciseMeasure: .maxKG))}).sorted(by: {$0.date < $1.date})
-        titleLabel.text = title
-        graphData = [(title, data)]
-        collapsed = [false]
-        graphView.removeAllGraphs()
-        graphView.addGraph(graph: Graph(data: data, colour: .red))
+        updateGraph(forExercise: selectedExercise, andMeasure: selectedMeasure)
     }
 
     private func createHRGraph(){
@@ -279,18 +280,21 @@ class ProgressViewController: UIViewController {
                 // just show last 90 days of data
                 let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
                 let filteredData = trainingStressData.filter({$0.date >= ninetyDaysAgo})
-                print(filteredData)
+                
                 let ctlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.ctl) })
                 let atlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.atl) })
                 let tsbData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tsb) })
+                let tssData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.value)})
 
                 let ctlGraph = Graph(data: ctlData, colour: .red)
                 let atlGraph = Graph(data: atlData, colour: .green)
                 let tsbGraph = Graph(data: tsbData, colour: .yellow)
                 tsbGraph.fill = true
-                self.graphData = [("CTL", ctlData), ("ATL", atlData), ("TSB", tsbData)]
-                self.collapsed = [true, true, false]
-                self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
+                let tssGraph = Graph(data: tssData, colour: .black)
+                tssGraph.point = true
+                self.graphData = [("CTL", ctlData), ("ATL", atlData), ("TSB", tsbData), ("Calories", tssData)]
+                self.collapsed = [true, true, true, false]
+                self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph, tssGraph])
             }
         }
         
@@ -305,9 +309,8 @@ class ProgressViewController: UIViewController {
                     self.requestPermissions()
                     self.graphView.removeAllGraphs()
                     self.graphView.setGraphs(graphs: [])
-                    self.graphData = [("CTL", self.graphView.dummyCTLData), ("ATL", self.graphView.dummyATLData), ("TSB", self.graphView.dummyTSBData)]
-                    print(self.graphData)
-                    self.collapsed = [true, true, false]
+                    self.graphData = [("CTL", self.graphView.dummyCTLData), ("ATL", self.graphView.dummyATLData), ("TSB", self.graphView.dummyTSBData), ("TSS", self.graphView.dummyTSSData)]
+                    self.collapsed = [true, true, true, false]
                     self.tableView.reloadData()
                 }
             }else{
@@ -317,30 +320,33 @@ class ProgressViewController: UIViewController {
                 //TSS for 1 hour @ 7 = 100. Thus we want to find factor, f such (7*7)*1*f = 100 => f = 100/49
                 //Thus is we're assuming RPE 5 then TSS = Hrs * 5 * 5 * f = hrs * 25 * 100 /49 = hrs * 2500 / 49
                 let tssFactor: Double = 2500.0 / 49.0
-                var tssData: [(date: Date, value: Double)] = []
+                var baseTSSData: [(date: Date, value: Double)] = []
                 for d in data{
-                    tssData.append((date:d.date, value: d.value * tssFactor))
+                    baseTSSData.append((date:d.date, value: d.value * tssFactor))
                 }
-                let trainingStressData = self.createTSBData(from: tssData)
+                let trainingStressData = self.createTSBData(from: baseTSSData)
                 // just show last 90 days of data
                 let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
                 let filteredData = trainingStressData.filter({$0.date >= ninetyDaysAgo})
                 let ctlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.ctl) })
                 let atlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.atl) })
                 let tsbData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tsb) })
+                let tssData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tss) })
 
                 let ctlGraph = Graph(data: ctlData, colour: .red)
                 let atlGraph = Graph(data: atlData, colour: .green)
                 let tsbGraph = Graph(data: tsbData, colour: .yellow)
+                let tssGraph = Graph(data: tssData, colour: .black)
                 tsbGraph.fill = true
-                self.graphData = [("CTL", ctlData), ("ATL", atlData), ("TSB", tsbData)]
-                self.collapsed = [true, true, false]
-                self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph])
+                tssGraph.point = true
+                self.graphData = [("CTL", ctlData), ("ATL", atlData), ("TSB", tsbData), ("TSS", tssData)]
+                self.collapsed = [true, true, true, false]
+                self.graphView.setGraphs(graphs: [ctlGraph, atlGraph, tsbGraph, tssGraph])
             }
         }
     }
 
-    private func createTSBData(from: [(date: Date, value: Double)]) -> [(date: Date, value: Double, ctl: Double, atl: Double, tsb: Double)]{
+    private func createTSBData(from: [(date: Date, value: Double)]) -> [(date: Date, value: Double, ctl: Double, atl: Double, tsb: Double, tss: Double)]{
         // need to have an ordered series of dates without any gaps
         let orderedInput = from.sorted { $0.date < $1.date}
         var gaplessData: [(date: Date, value: Double)] = []
@@ -362,13 +368,13 @@ class ProgressViewController: UIViewController {
         }
         var atl: Double = 0.0
         var ctl: Double = 0.0
-        var result: [(date: Date, value: Double, ctl: Double, atl: Double, tsb: Double)] = []
+        var result: [(date: Date, value: Double, ctl: Double, atl: Double, tsb: Double, tss: Double)] = []
         let ctlFactor: Double = exp(-1/42.0)
         let atlFactor: Double = exp(-1/7.0)
         for d in gaplessData{
             ctl = d.value * (1 - ctlFactor) + ctl * ctlFactor
             atl = d.value * (1 - atlFactor) + atl * atlFactor
-            result.append((date: d.date , value: d.value, ctl: ctl, atl: atl, tsb: ctl-atl))
+            result.append((date: d.date , value: d.value, ctl: ctl, atl: atl, tsb: ctl-atl, tss: d.value))
         }
         return result
     }
@@ -376,7 +382,7 @@ class ProgressViewController: UIViewController {
     private func updateGraph(forExercise exercise: ExerciseType, andMeasure measure: ExerciseMeasure){
         print("Updating graph for \(exercise) and \(measure)")
         let title: String  = "\(ExerciseDefinitionManager.shared.exerciseDefinition(for: exercise).name) - \(measure.string())"
-        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: exercise).map({($0.date!, $0.valueFor(exerciseMeasure: measure))}).sorted(by: {$0.0 < $1.0})
+        let data: [(Date, Double)] = WorkoutManager.shared.timeSeries(forExeciseType: exercise, andMeasure: measure)
         titleLabel.text = title
         graphView.removeAllGraphs()
         let graph: Graph = Graph(data: data , colour: .red)
@@ -409,6 +415,7 @@ class ProgressViewController: UIViewController {
 extension ProgressViewController: UIPickerViewDataSource{
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         switch selectedGraph{
+        case .Ed: return 3
         case .Sets: return 2
         case .TSB: return 1
         default: return 0
@@ -423,22 +430,23 @@ extension ProgressViewController: UIPickerViewDataSource{
             if component == 0{
                 return WorkoutManager.shared.exerciseTypes.count
             }else{
-                return ExerciseMeasure.allCases.count
+                return validMeasures.count
             }
-//        case .Tests:
-//            if component == 0{
-//                return WorkoutManager.shared.fftTypes.count
-//            }else{
-//                return ExerciseMeasure.allCases.count
-//            }
         case .Ed:
-            return 0
+            if component == 0{
+                return WorkoutManager.shared.exerciseTypes.count
+            }else if component == 1{
+                return validMeasures.count
+            }else{
+                return 2
+            }
         }
     }
 }
 
 extension ProgressViewController: UIPickerViewDelegate{
     
+
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         switch selectedGraph {
         case .TSB:
@@ -453,7 +461,21 @@ extension ProgressViewController: UIPickerViewDelegate{
                     return def.name
                 }
             }else{
-                return ExerciseMeasure(rawValue: row)?.string()
+                return validMeasures[row].string()
+            }
+        case .Ed:
+            if component == 0{
+                if let def = getSelectedExerciseDefinition(forRow: row){
+                    return def.name
+                }
+            }else if component == 1{
+                return validMeasures[row].string()
+            }else{
+                if row == 0{
+                    return "LTD"
+                }else{
+                    return "Year"
+                }
             }
         default:
             return nil
@@ -465,15 +487,30 @@ extension ProgressViewController: UIPickerViewDelegate{
         switch selectedGraph{
         case .Sets:
             if component == 0{
-                selectedExercise = row
+                selectedExercise = ExerciseType(rawValue: Int16(row)) ?? ExerciseType.gobletSquat
+                pickerView.reloadComponent(1)
             }else{
-                selectedMeasure = row
-            }
-            if selectedGraph == .Sets{
-                if let measure = ExerciseMeasure(rawValue: selectedMeasure){
-                    updateGraph(forExercise: WorkoutManager.shared.exerciseTypes[selectedExercise], andMeasure: measure)
+                if row < validMeasures.count{
+                    selectedMeasure = validMeasures[row]
+                }else{
+                    selectedMeasure = .totalReps
                 }
             }
+            updateGraph(forExercise: selectedExercise, andMeasure: selectedMeasure)
+        case .Ed:
+            if component == 0{
+                selectedExercise = ExerciseType(rawValue: Int16(row)) ?? ExerciseType.gobletSquat
+                pickerView.reloadComponent(1)
+            }else if component == 1{
+                if row < validMeasures.count{
+                    selectedMeasure = validMeasures[row]
+                }else{
+                    selectedMeasure = .totalReps
+                }
+            }else{
+                isLTDEd = row == 0
+            }
+            createEdGraph()
         case .TSB:
             selectedTSB = row
             createTSBGraph()
@@ -486,12 +523,10 @@ extension ProgressViewController: UIPickerViewDelegate{
     
     private func getSelectedExerciseDefinition(forRow row: Int) -> ExerciseDefinition?{
         switch selectedGraph{
-        case .Consistency, .HR, .TSB, .Ed:
+        case .Consistency, .HR, .TSB:
             return nil
-        case .Sets:
+        case .Sets, .Ed:
             return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.exerciseTypes[row])
-//        case .Tests:
-//            return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.fftTypes[row])
         }
     }
 }
@@ -571,7 +606,6 @@ extension ProgressViewController: UITableViewDataSource{
         }
         return "No Data"
     }
-    
     
     
 }
