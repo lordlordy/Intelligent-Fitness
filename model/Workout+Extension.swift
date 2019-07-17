@@ -16,6 +16,12 @@ extension Workout{
     var totalDistance: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Distance)})}
     var totalTouches: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Touches)})}
 
+    var weekOfYear: Int { return calendar.dateComponents([Calendar.Component.weekOfYear], from: date!).weekOfYear!}
+    var year: Int { return calendar.dateComponents([Calendar.Component.yearForWeekOfYear], from: date!).yearForWeekOfYear!}
+    var weekStr: String { return "\(year)-\(String(format: "%02d", weekOfYear))"}
+    
+    private var calendar: Calendar{ return Calendar.init(identifier: .iso8601) }
+    
     var percentageComplete: Double{
         get{
             if orderedExerciseArray().count > 0{

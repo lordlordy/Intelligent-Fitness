@@ -70,6 +70,7 @@ extension Exercise{
             }
         case .minReps: return exerciseSets().reduce(0.0, {min($0, $1.actual)})
         case .maxReps: return exerciseSets().reduce(0.0, {max($0, $1.actual)})
+        default: return 0.0 // temp implementation
         }
     }
     

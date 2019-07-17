@@ -34,6 +34,10 @@
 		738E445422CB58C500F7BEA6 /* Exercise+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E445322CB58C500F7BEA6 /* Exercise+Extension.swift */; };
 		73B5B10222BBE9DA00B238ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B5B10122BBE9DA00B238ED /* HealthKit.framework */; };
 		73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73B5B10322BBEB8700B238ED /* HealthKitAccess.swift */; };
+		73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EA722DE09F400AFFF21 /* Week.swift */; };
+		73CD5EAB22DE472700AFFF21 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EAA22DE472700AFFF21 /* Date+Extension.swift */; };
+		73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EAC22DF417D00AFFF21 /* EddingtonCalculator.swift */; };
+		73CD5EAF22DF52DF00AFFF21 /* Athlete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EAE22DF52DF00AFFF21 /* Athlete.swift */; };
 		73D9BE2222C7911900879CF1 /* WorkoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2122C7911900879CF1 /* WorkoutManager.swift */; };
 		73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */; };
 		73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */; };
@@ -99,6 +103,10 @@
 		73B5B10122BBE9DA00B238ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		73B5B10322BBEB8700B238ED /* HealthKitAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitAccess.swift; sourceTree = "<group>"; };
 		73BB343822BA932E001AAED7 /* Intelligent Fitness.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Intelligent Fitness.entitlements"; sourceTree = "<group>"; };
+		73CD5EA722DE09F400AFFF21 /* Week.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Week.swift; sourceTree = "<group>"; };
+		73CD5EAA22DE472700AFFF21 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
+		73CD5EAC22DF417D00AFFF21 /* EddingtonCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EddingtonCalculator.swift; sourceTree = "<group>"; };
+		73CD5EAE22DF52DF00AFFF21 /* Athlete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Athlete.swift; sourceTree = "<group>"; };
 		73D9BE2122C7911900879CF1 /* WorkoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutManager.swift; sourceTree = "<group>"; };
 		73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseSet+Extension.swift"; sourceTree = "<group>"; };
 		73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workout+Extension.swift"; sourceTree = "<group>"; };
@@ -171,6 +179,7 @@
 		736CFC0B22B3B2E20071EA3B = {
 			isa = PBXGroup;
 			children = (
+				73CD5EA922DE471100AFFF21 /* Type Extensions */,
 				730E643222CE45EF00A6A5F3 /* view controllers */,
 				7342CB9222C51F1F000A6FB6 /* UI */,
 				737373BA22B508D400698DD4 /* model */,
@@ -236,8 +245,19 @@
 				73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */,
 				73D9BE2122C7911900879CF1 /* WorkoutManager.swift */,
 				73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */,
+				73CD5EA722DE09F400AFFF21 /* Week.swift */,
+				73CD5EAC22DF417D00AFFF21 /* EddingtonCalculator.swift */,
+				73CD5EAE22DF52DF00AFFF21 /* Athlete.swift */,
 			);
 			path = model;
+			sourceTree = "<group>";
+		};
+		73CD5EA922DE471100AFFF21 /* Type Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				73CD5EAA22DE472700AFFF21 /* Date+Extension.swift */,
+			);
+			path = "Type Extensions";
 			sourceTree = "<group>";
 		};
 		7B7E0AA4692A0B5ED40E6DDA /* Frameworks */ = {
@@ -512,6 +532,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */,
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
 				7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */,
@@ -519,13 +540,16 @@
 				73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */,
 				73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
+				73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */,
 				73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */,
 				73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */,
 				7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */,
 				73759DBD22C3B82600757C29 /* ProfileViewController.swift in Sources */,
+				73CD5EAF22DF52DF00AFFF21 /* Athlete.swift in Sources */,
 				738E445222CA544400F7BEA6 /* WorkoutTableViewController.swift in Sources */,
 				736CFC1A22B3B2E20071EA3B /* TestViewController.swift in Sources */,
 				73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */,
+				73CD5EAB22DE472700AFFF21 /* Date+Extension.swift in Sources */,
 				73759DB922C24F6600757C29 /* ProgressViewController.swift in Sources */,
 				7342CB9422C51F36000A6FB6 /* UITextField+Extension.swift in Sources */,
 				736CFC8922B4F0AF0071EA3B /* Model.xcdatamodeld in Sources */,

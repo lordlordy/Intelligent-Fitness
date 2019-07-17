@@ -58,7 +58,8 @@ class ExerciseDefinitionManager{
                 dict[e] = ExerciseDefinitionImpl(name: "Squat", setType: .Time, usesWeight: false, description: "a exercise description")
             case .standingBroadJump:
                 dict[e] = ExerciseDefinitionImpl(name: "Standing Broad Jump", setType: .Distance, usesWeight: false, description: "a exercise description")
-
+            case .ALL:
+                dict[e] = ExerciseDefinitionImpl(name: "All Exercises", setType: .All, usesWeight: true, description: "Aggregation across all exercise types")
             }
         }
         

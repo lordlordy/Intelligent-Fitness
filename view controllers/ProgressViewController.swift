@@ -10,16 +10,14 @@ import UIKit
 import HealthKit
 
 enum GraphType: Int{
-    case Tests = 0
-    case Sets = 1
-    case HR = 2
-    case TSB = 3
-    case Consistency = 4
-    case Ed = 5
+    case Sets = 0
+    case HR = 1
+    case TSB = 2
+    case Consistency = 3
+    case Ed = 4
 
     func name() -> String{
         switch self{
-        case .Tests: return "Test Graphs"
         case .Sets: return "Workout Graphs"
         case .HR: return "Heart Rate Graphs"
         case .TSB: return "Training Stress Balance Graphs"
@@ -30,16 +28,14 @@ enum GraphType: Int{
     
     func explanation() -> String{
         switch self{
-        case .Tests:
-            return "Shows progress in your Functional Fitness Tests. The 'Choose' button allows you to switch between the different tests"
         case .Sets:
-            return "Shows progress in your workouts. The 'Choose' button allows you to switch between the different tests"
+            return "Shows progress in your workouts. The 'Choose' button allows you to switch between the different workouts and measures"
         case .HR:
             return "Shows your heart data as recorded in the Health App. This graphs shows your resting hears and you heart rate variability"
         case .TSB:
             return "Training Stress Balance graph. This models your fitness, fatigue and form. This currently uses your activity time from the health app. It assumes an RPE of 5 on average which gives a TSS of ~55 per hour. Can also see a similar graph using active calories as a proxie for TSS"
         case .Consistency:
-            return "Shows how many weeks you've done on the trot with 3 sessions per week and no more than 2 rest days between each"
+            return "Show a measure of how many weeks you've done on the trot with 3 sessions per week and no more than 2 rest days between each. If you have a week that does meet this criteria the current streak number is halved"
         case .Ed:
             return "A graph of your Eddington numbers. This is a good single number measure of your progress. It gives the maximum KG such that you've lifted that amount on at least that many days. For more info look at http://www.eddingtonnumbers.me.uk"
         }
@@ -57,7 +53,7 @@ class ProgressViewController: UIViewController {
     
     private var toolBar = UIToolbar()
     private var picker = UIPickerView()
-    private var selectedGraph: GraphType = .Tests
+    private var selectedGraph: GraphType = .Sets
     private var selectedExercise: Int = 0
     private var selectedMeasure: Int = 0
     private var selectedTSB: Int = 0
@@ -135,7 +131,6 @@ class ProgressViewController: UIViewController {
             case .Ed: createEdGraph()
             case .Sets: createSetsGraph()
             case .HR: createHRGraph()
-            case .Tests: createTestsGraph()
             case .TSB: createTSBGraph()
             }
         }
@@ -159,7 +154,23 @@ class ProgressViewController: UIViewController {
     private func createConsistencyGraph(){
         chooseButton.isEnabled = true
         chooseButton.isHidden = false
-        titleLabel.text = "Consistency"
+        let title: String = "Consistency Streak"
+        titleLabel.text = title
+        let data: [(Date, Double)] = WorkoutManager.shared.getWeeks().sorted(by: {$0.date < $1.date}).map({($0.date, Double($0.consistencyStreak()))})
+        var maxValues: [(Date, Double)] = []
+        var previousVal: Double = 0.0
+        for d in data{
+            let value: Double = max(previousVal, d.1)
+            maxValues.append((d.0, value))
+            previousVal = value
+        }
+        graphData = [(title, data), ("Max streak", maxValues)]
+        collapsed = [false, false]
+        graphView.removeAllGraphs()
+        let graph: Graph = Graph(data: data, colour: MAIN_BLUE)
+        graph.fill = true
+        graph.invertFill = true
+        graphView.setGraphs(graphs: [graph, Graph(data: maxValues, colour: .red)])
         print("Consistency")
     }
     
@@ -168,20 +179,27 @@ class ProgressViewController: UIViewController {
         chooseButton.isHidden = false
         titleLabel.text = "Eddington Numbers"
         print("Ed")
+        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: .benchPress).map({(date: $0.date!, value: $0.valueFor(exerciseMeasure: .totalRepKG))}).sorted(by: {$0.date < $1.date})
+        
+        let eddNum: EddingtonCalculator.EddingtonHistory = EddingtonCalculator().eddingtonHistory(timeSeries: data)
+        
+        for i in eddNum.ltdHistory{
+            print("\(i.date) - Ed#: \(i.edNum) +1: \(i.plusOne) contributor: \(i.contributor)")
+        }
     }
-    
-    private func createTestsGraph(){
-        chooseButton.isEnabled = true
-        chooseButton.isHidden = false
-        let title: String  = "Functional Fitness Test"
-        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: .sittingRisingTest).map({($0.date!, $0.valueFor(exerciseMeasure: .avReps))})
-        graphData = [(title, data)]
-        collapsed = [false]
-        titleLabel.text = title
-        graphView.removeAllGraphs()
-        let graph: Graph = Graph(data: data, colour: .red)
-        graphView.addGraph(graph: graph)
-    }
+//
+//    private func createTestsGraph(){
+//        chooseButton.isEnabled = true
+//        chooseButton.isHidden = false
+//        let title: String  = "Functional Fitness Test"
+//        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: .sittingRisingTest).map({($0.date!, $0.valueFor(exerciseMeasure: .avReps))})
+//        graphData = [(title, data)]
+//        collapsed = [false]
+//        titleLabel.text = title
+//        graphView.removeAllGraphs()
+//        let graph: Graph = Graph(data: data, colour: .red)
+//        graphView.addGraph(graph: graph)
+//    }
     
 
     private func createSetsGraph(){
@@ -391,7 +409,7 @@ class ProgressViewController: UIViewController {
 extension ProgressViewController: UIPickerViewDataSource{
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         switch selectedGraph{
-        case .Sets, .Tests: return 2
+        case .Sets: return 2
         case .TSB: return 1
         default: return 0
         }
@@ -407,12 +425,12 @@ extension ProgressViewController: UIPickerViewDataSource{
             }else{
                 return ExerciseMeasure.allCases.count
             }
-        case .Tests:
-            if component == 0{
-                return WorkoutManager.shared.fftTypes.count
-            }else{
-                return ExerciseMeasure.allCases.count
-            }
+//        case .Tests:
+//            if component == 0{
+//                return WorkoutManager.shared.fftTypes.count
+//            }else{
+//                return ExerciseMeasure.allCases.count
+//            }
         case .Ed:
             return 0
         }
@@ -429,7 +447,7 @@ extension ProgressViewController: UIPickerViewDelegate{
             }else{
                 return "Calorie Based TSB"
             }
-        case .Tests, .Sets:
+        case .Sets:
             if component == 0{
                 if let def = getSelectedExerciseDefinition(forRow: row){
                     return def.name
@@ -445,17 +463,13 @@ extension ProgressViewController: UIPickerViewDelegate{
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         switch selectedGraph{
-        case .Sets, .Tests:
+        case .Sets:
             if component == 0{
                 selectedExercise = row
             }else{
                 selectedMeasure = row
             }
-            if selectedGraph == .Tests{
-                if let measure = ExerciseMeasure(rawValue: selectedMeasure){
-                    updateGraph(forExercise: WorkoutManager.shared.fftTypes[selectedExercise], andMeasure: measure)
-                }
-            }else if selectedGraph == .Sets{
+            if selectedGraph == .Sets{
                 if let measure = ExerciseMeasure(rawValue: selectedMeasure){
                     updateGraph(forExercise: WorkoutManager.shared.exerciseTypes[selectedExercise], andMeasure: measure)
                 }
@@ -476,8 +490,8 @@ extension ProgressViewController: UIPickerViewDelegate{
             return nil
         case .Sets:
             return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.exerciseTypes[row])
-        case .Tests:
-            return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.fftTypes[row])
+//        case .Tests:
+//            return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.fftTypes[row])
         }
     }
 }
@@ -487,6 +501,7 @@ extension ProgressViewController: UIScrollViewDelegate{
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let pageNumber = scrollView.contentOffset.x / scrollView.frame.size.width
         pageControl.currentPage = Int(pageNumber)
+        tableView.reloadData()
     }
 }
 
