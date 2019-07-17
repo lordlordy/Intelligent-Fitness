@@ -10,6 +10,5 @@ import Foundation
 
 // Setting this up to make future move to athletes on a central DB easier. At the moment each insstance of this app only has one athlete
 protocol Athlete {
-    func getWorkouts() -> [Workout]
-    
+    func timeSeries(forExeciseType type: ExerciseType, andMeasure measure: ExerciseMeasure) -> [(date: Date, value: Double)]
 }

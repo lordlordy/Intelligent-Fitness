@@ -9,12 +9,6 @@
 import Foundation
 
 extension Workout{
-    
-    var totalKG: Double{ return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActualKG})}
-    var totalReps: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Reps)})}
-    var totalTime: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Time)})}
-    var totalDistance: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Distance)})}
-    var totalTouches: Double { return orderedExerciseArray().reduce(0.0, {$0 + $1.totalActual(forSetType: .Touches)})}
 
     var weekOfYear: Int { return calendar.dateComponents([Calendar.Component.weekOfYear], from: date!).weekOfYear!}
     var year: Int { return calendar.dateComponents([Calendar.Component.yearForWeekOfYear], from: date!).yearForWeekOfYear!}
@@ -25,11 +19,43 @@ extension Workout{
     var percentageComplete: Double{
         get{
             if orderedExerciseArray().count > 0{
-                // note the minimum. This ensures that a score of great that 100% for a given test element does not contribute more the 100% to overall test result
+                // note the minimum. This ensures that a score of greater than 100% for a given test element does not contribute more the 100% to overall test result
                 return orderedExerciseArray().reduce(0, {$0 + min(1,$1.percentageComplete)}) / Double(orderedExerciseArray().count)
             }else{
                 return 1.0
             }
+        }
+    }
+    
+    // returns nil if no exercises of the requested type
+    func getValue(forExerciseType type: ExerciseType, andMeasure measure: ExerciseMeasure) -> Double?{
+        if type == .ALL{
+            return getValue(forMeasure: measure, andExercises: orderedExerciseArray())
+        }else if includes(exerciseType: type){
+            let exercises: [Exercise] = orderedExerciseArray().filter({$0.exerciseType() == type})
+            return getValue(forMeasure: measure, andExercises: exercises)
+        }else{
+            return nil
+        }
+    }
+
+    func getValue(forMeasure measure: ExerciseMeasure) -> Double{
+        return getValue(forMeasure: measure, andExercises: orderedExerciseArray())
+    }
+    
+    private func getValue(forMeasure measure: ExerciseMeasure, andExercises exercises: [Exercise]) -> Double{
+        if exercises.count == 0{
+            return 0.0
+        }
+        switch measure.aggregator() {
+        case .Sum:
+            return exercises.reduce(0.0, {$0 + $1.getValue(forMeasure: measure)})
+        case .Max:
+            return exercises.reduce(0.0, {max($0, $1.getValue(forMeasure: measure))})
+        case .Min:
+            return exercises.reduce(Double.greatestFiniteMagnitude, {min($0, $1.getValue(forMeasure: measure))})
+        case .Average:
+            return exercises.reduce(0.0, {$0 + $1.getValue(forMeasure: measure)}) / Double(exercises.count)
         }
     }
     
@@ -88,7 +114,6 @@ extension Workout{
             }
         }
         return true
-//        return false
     }
     
     //return nil if workout completed
@@ -107,6 +132,10 @@ extension Workout{
         return array
     }
     
+    private func includes(exerciseType type: ExerciseType) -> Bool{
+        return exercises(ofType: type).count > 0
+    }
+    
     private func createWorkoutSummary() -> String{
         var strParts: [String] = []
         let f: NumberFormatter = NumberFormatter()
@@ -114,10 +143,11 @@ extension Workout{
         if let s = f.string(from: NSNumber(value: percentageComplete)){
             strParts.append(s)
         }
-        if totalKG > 0 { strParts.append("\(Int(totalKG))kg") }
-        if totalReps > 0 { strParts.append(SetType.Reps.string(forValue: totalReps)) }
-        if totalTime > 0 { strParts.append(SetType.Time.string(forValue: totalTime)) }
-        if totalTouches > 0 { strParts.append(SetType.Touches.string(forValue: totalTouches)) }
+        if getValue(forMeasure: .totalKG) > 0 { strParts.append("\(Int(getValue(forMeasure: .totalKG)))kg") }
+        if getValue(forMeasure: .totalReps) > 0 { strParts.append(SetType.Reps.string(forValue: getValue(forMeasure: .totalReps))) }
+        if getValue(forMeasure: .totalTime) > 0 { strParts.append(SetType.Time.string(forValue: getValue(forMeasure: .totalTime))) }
+        if getValue(forMeasure: .totalDistance) > 0 { strParts.append(SetType.Distance.string(forValue: getValue(forMeasure: .totalDistance))) }
+        if getValue(forMeasure: .totalTouches) > 0 { strParts.append(SetType.Touches.string(forValue: getValue(forMeasure: .totalTouches))) }
 
         return "Completed: " + strParts.joined(separator: " / ")
         

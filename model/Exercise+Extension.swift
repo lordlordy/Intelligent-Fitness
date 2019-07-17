@@ -8,33 +8,12 @@
 
 import Foundation
 
-extension Exercise{
-    
-    var totalPlanKG: Double{
-        get{
-            return exerciseSets().reduce(0.0, {$0 + $1.totalPlanKG})
-        }
-    }
-    
-    var totalActualKG: Double{
-        get{
-            return exerciseSets().reduce(0.0, {$0 + $1.totalActualKG})
-        }
-    }
+extension Exercise{    
     
     var percentageComplete: Double{
-        get{
-            if exerciseDefinition.setType.moreIsBetter(){
-                let aKG: Double = exerciseSets().reduce(0.0, {$0 + $1.actual * max(1.0, $1.actualKG)})
-                let pKG: Double = exerciseSets().reduce(0.0, {$0 + $1.plan * max(1.0, $1.plannedKG)})
-                if pKG > 0{
-                    return aKG / pKG
-                }
-            }else if exerciseSets().count > 0{
-                return exerciseSets().reduce(0.0, {$0 + $1.percentageComplete}) / Double(exerciseSets().count)
-            }
-            return 1.0
-        }
+        let numerator: Double = exerciseSets().reduce(0.0, {$0 + $1.percentageComplete * $1.actual})
+        let denominator: Double = exerciseSets().reduce(0.0, {$0 + $1.actual})
+        return numerator / denominator
     }
     
     
@@ -44,33 +23,29 @@ extension Exercise{
     
     var date: Date?{ return workout?.date}
     
-    func valueFor(exerciseMeasure measure: ExerciseMeasure) -> Double{
-        switch measure{
-        case .avKG:
-            let kgXrep: Double = exerciseSets().reduce(0.0, {$0 + $1.actualKG * $1.actual})
-            let totalRep: Double = exerciseSets().reduce(0.0, {$0 + $1.actual})
-            if totalRep > 0{
-                return kgXrep / totalRep
+    func getValue(forMeasure measure: ExerciseMeasure) -> Double{
+        if exerciseSets().count == 0{
+            return 0.0
+        }
+        switch measure.aggregator() {
+        case .Sum:
+            return exerciseSets().reduce(0.0, {$0 + $1.getValue(forMeasure: measure)})
+        case .Max:
+            return exerciseSets().reduce(0.0, {max($0, $1.getValue(forMeasure: measure))})
+        case .Min:
+            return exerciseSets().reduce(Double.greatestFiniteMagnitude, {min($0, $1.getValue(forMeasure: measure))})
+        case .Average:
+            if measure.weighted(){
+                let numerator: Double = exerciseSets().reduce(0.0, {$0 + $1.getValue(forMeasure: measure) * $1.actual})
+                let denominator: Double = exerciseSets().reduce(0.0, {$0 + $1.actual})
+                if denominator == 0.0{
+                    return 0.0
+                }else{
+                    return numerator / denominator
+                }
             }else{
-                return 0.0
+                return exerciseSets().reduce(0.0, {$0 + $1.getValue(forMeasure: measure)}) / Double(exerciseSets().count)
             }
-        case .maxKG:
-            return exerciseSets().reduce(0.0,{ max($0, $1.actualKG)})
-        case .minKG:
-            return exerciseSets().reduce(0.0, {min($0, $1.actualKG)})
-        case .totalRepKG: return exerciseSets().reduce(0.0, {$0 + $1.actual * $1.actualKG})
-        case .totalReps:
-            return exerciseSets().reduce(0.0, {$0 + $1.actual})
-        case .avReps:
-            let count: Double = Double(exerciseSets().count)
-            if count > 0{
-                return valueFor(exerciseMeasure: .totalReps) / count
-            }else{
-                return 0.0
-            }
-        case .minReps: return exerciseSets().reduce(0.0, {min($0, $1.actual)})
-        case .maxReps: return exerciseSets().reduce(0.0, {max($0, $1.actual)})
-        default: return 0.0 // temp implementation
         }
     }
     
@@ -89,6 +64,7 @@ extension Exercise{
     func exerciseSet(atOrder order: Int16) -> ExerciseSet?{
         for set in exerciseSets(){
             if set.order == order{
+                print(set)
                 return set
             }
         }

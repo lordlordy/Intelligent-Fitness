@@ -38,6 +38,10 @@
 		73CD5EAB22DE472700AFFF21 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EAA22DE472700AFFF21 /* Date+Extension.swift */; };
 		73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EAC22DF417D00AFFF21 /* EddingtonCalculator.swift */; };
 		73CD5EAF22DF52DF00AFFF21 /* Athlete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EAE22DF52DF00AFFF21 /* Athlete.swift */; };
+		73CD5EB122DF67E300AFFF21 /* RepSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EB022DF67E300AFFF21 /* RepSet+Extension.swift */; };
+		73CD5EB322DF6CBE00AFFF21 /* TimeSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EB222DF6CBE00AFFF21 /* TimeSet+Extension.swift */; };
+		73CD5EB522DF6EAC00AFFF21 /* DistanceSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EB422DF6EAC00AFFF21 /* DistanceSet+Extension.swift */; };
+		73CD5EB722DF6EDF00AFFF21 /* TouchSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EB622DF6EDF00AFFF21 /* TouchSet+Extension.swift */; };
 		73D9BE2222C7911900879CF1 /* WorkoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2122C7911900879CF1 /* WorkoutManager.swift */; };
 		73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */; };
 		73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */; };
@@ -107,6 +111,10 @@
 		73CD5EAA22DE472700AFFF21 /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		73CD5EAC22DF417D00AFFF21 /* EddingtonCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EddingtonCalculator.swift; sourceTree = "<group>"; };
 		73CD5EAE22DF52DF00AFFF21 /* Athlete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Athlete.swift; sourceTree = "<group>"; };
+		73CD5EB022DF67E300AFFF21 /* RepSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RepSet+Extension.swift"; sourceTree = "<group>"; };
+		73CD5EB222DF6CBE00AFFF21 /* TimeSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeSet+Extension.swift"; sourceTree = "<group>"; };
+		73CD5EB422DF6EAC00AFFF21 /* DistanceSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DistanceSet+Extension.swift"; sourceTree = "<group>"; };
+		73CD5EB622DF6EDF00AFFF21 /* TouchSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TouchSet+Extension.swift"; sourceTree = "<group>"; };
 		73D9BE2122C7911900879CF1 /* WorkoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutManager.swift; sourceTree = "<group>"; };
 		73D9BE2322C7B2C100879CF1 /* ExerciseSet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExerciseSet+Extension.swift"; sourceTree = "<group>"; };
 		73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workout+Extension.swift"; sourceTree = "<group>"; };
@@ -248,6 +256,10 @@
 				73CD5EA722DE09F400AFFF21 /* Week.swift */,
 				73CD5EAC22DF417D00AFFF21 /* EddingtonCalculator.swift */,
 				73CD5EAE22DF52DF00AFFF21 /* Athlete.swift */,
+				73CD5EB022DF67E300AFFF21 /* RepSet+Extension.swift */,
+				73CD5EB222DF6CBE00AFFF21 /* TimeSet+Extension.swift */,
+				73CD5EB422DF6EAC00AFFF21 /* DistanceSet+Extension.swift */,
+				73CD5EB622DF6EDF00AFFF21 /* TouchSet+Extension.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -537,13 +549,17 @@
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
 				7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */,
 				73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */,
+				73CD5EB122DF67E300AFFF21 /* RepSet+Extension.swift in Sources */,
 				73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */,
 				73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
 				73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */,
+				73CD5EB722DF6EDF00AFFF21 /* TouchSet+Extension.swift in Sources */,
 				73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */,
+				73CD5EB522DF6EAC00AFFF21 /* DistanceSet+Extension.swift in Sources */,
 				73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */,
 				7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */,
+				73CD5EB322DF6CBE00AFFF21 /* TimeSet+Extension.swift in Sources */,
 				73759DBD22C3B82600757C29 /* ProfileViewController.swift in Sources */,
 				73CD5EAF22DF52DF00AFFF21 /* Athlete.swift in Sources */,
 				738E445222CA544400F7BEA6 /* WorkoutTableViewController.swift in Sources */,

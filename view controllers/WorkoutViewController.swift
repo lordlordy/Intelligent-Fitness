@@ -15,7 +15,9 @@ class WorkoutViewController: UIViewController {
     @IBOutlet weak var dateTextField: UITextField!
     @IBOutlet weak var workoutTypeLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
-
+    @IBOutlet weak var currentStreakTextField: UITextField!
+    @IBOutlet weak var bestStreakTextField: UITextField!
+    
     private var datePicker: UIDatePicker?
     private let df = DateFormatter()
 
@@ -63,7 +65,9 @@ class WorkoutViewController: UIViewController {
         super.viewWillAppear(animated)
         let type: WorkoutType? = WorkoutType(rawValue: WorkoutManager.shared.nextWorkout().type)
         workoutTypeLabel.text = type?.string() ?? "Workout Type Unknown"
-        
+        let streak = WorkoutManager.shared.currentStreakData()
+        currentStreakTextField.text = "\(streak.current) weeks"
+        bestStreakTextField.text = "\(streak.best) weeks"
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

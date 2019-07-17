@@ -13,6 +13,7 @@ class Graph{
     var colour: UIColor
     var fill: Bool = false
     var invertFill: Bool = false
+    var point: Bool = false
     
     var max: Double {
         return data.map({ (datum) -> Double in
@@ -45,6 +46,7 @@ class Graph{
         static let colorAlpha: CGFloat = 0.3
         static let circleDiameter: CGFloat = 5.0
         static let labelFontSize: CGFloat = 12.0
+        static let pointSize: CGFloat = 2.0
     }
 
     // colours for gradient.
@@ -58,7 +60,8 @@ class Graph{
     var dummyCTLData: [(Date, Double)] = []
     var dummyATLData: [(Date, Double)] = []
     var dummyTSBData: [(Date, Double)] = []
-    
+    var dummyTSSData: [(Date, Double)] = []
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         createDummyData()
@@ -125,9 +128,10 @@ class Graph{
         }
         labels = []
         
-        let min = minY()
+        let minimum = minY()
         let max = maxY()
-        let middle = (min<0.0) ? (max / 2.0) : ((max-min)/2.0)
+     
+        let middle = (minimum<0.0) ? (max / 2.0) : ((max-minimum)/2.0)
    
         var line = UIBezierPath()
         // max
@@ -150,17 +154,17 @@ class Graph{
         
         //min
         line = UIBezierPath()
-        yCoord = graphYToRectCoordinate(rect, CGFloat(min))
+        yCoord = graphYToRectCoordinate(rect, CGFloat(minimum))
         line.move(to: CGPoint(x: Constants.margin, y: yCoord))
         line.addLine(to: CGPoint(x: rect.width - Constants.margin, y: yCoord))
-        let minLabel = createLabel(value: String(Int(min)), origin: CGPoint(x: 0.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
+        let minLabel = createLabel(value: String(Int(minimum)), origin: CGPoint(x: 0.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
         addSubview(minLabel)
         labels.append(minLabel)
         startColour.setStroke()
         line.lineWidth = 1.0
         line.stroke()
         
-        if min < 0.0{
+        if minimum < 0.0{
             // put in zero line
             let xAxis = UIBezierPath()
             let y = graphYToRectCoordinate(rect, 0.0)
@@ -215,55 +219,66 @@ class Graph{
         graph.colour.setFill()
         graph.colour.setStroke()
         
-        //set up the points line
-        let graphPath = UIBezierPath()
-        //go to start of line
-        graphPath.move(to: CGPoint(x:columnXPoint(0), y:columnYPoint(graph.data[0].value)))
-
-        //add points for each item in the graphPoints array
-        //at the correct (x, y) for the point
-        for i in 1..<graph.data.count {
-            let nextPoint = CGPoint(x:columnXPoint(i), y:columnYPoint(graph.data[i].value))
-            graphPath.addLine(to: nextPoint)
-        }
-        
-        //draw the line on top of the clipped gradient
-        graphPath.lineWidth = 2.0
-        graphPath.stroke()
-
-        if graph.fill{
-            UIGraphicsGetCurrentContext()?.saveGState()
-            let cPath = graphPath.copy() as! UIBezierPath
-            cPath.addLine(to: CGPoint(x:columnXPoint(graph.data.count-1), y:columnYPoint(0.0)))
-            cPath.addLine(to: CGPoint(x:columnXPoint(0), y:columnYPoint(0.0)))
-            cPath.close()
-            cPath.addClip()
+        if graph.point{
+            // draw points
+            for i in 0..<graph.data.count{
+                let x = columnXPoint(i)
+                let y = columnYPoint(graph.data[i].value)
+                let path = UIBezierPath(ovalIn: CGRect(x: x - Constants.pointSize/2, y: y - Constants.pointSize/2, width: Constants.pointSize, height: Constants.pointSize))
+                path.stroke()
+            }
+        }else{
+            //draw lines
+            //set up the points line
+            let graphPath = UIBezierPath()
+            //go to start of line
+            graphPath.move(to: CGPoint(x:columnXPoint(0), y:columnYPoint(graph.data[0].value)))
             
-            var sColour: CGColor = startColour.cgColor
-            var eColour: CGColor = endColour.cgColor
+            //add points for each item in the graphPoints array
+            //at the correct (x, y) for the point
+            for i in 1..<graph.data.count {
+                let nextPoint = CGPoint(x:columnXPoint(i), y:columnYPoint(graph.data[i].value))
+                graphPath.addLine(to: nextPoint)
+            }
             
-            if graph.invertFill{
-                sColour = endColour.cgColor
-                eColour = startColour.cgColor
+            //draw the line on top of the clipped gradient
+            graphPath.lineWidth = 2.0
+            graphPath.stroke()
+            
+            if graph.fill{
+                UIGraphicsGetCurrentContext()?.saveGState()
+                let cPath = graphPath.copy() as! UIBezierPath
+                cPath.addLine(to: CGPoint(x:columnXPoint(graph.data.count-1), y:columnYPoint(0.0)))
+                cPath.addLine(to: CGPoint(x:columnXPoint(0), y:columnYPoint(0.0)))
+                cPath.close()
+                cPath.addClip()
+                
+                var sColour: CGColor = startColour.cgColor
+                var eColour: CGColor = endColour.cgColor
+                
+                if graph.invertFill{
+                    sColour = endColour.cgColor
+                    eColour = startColour.cgColor
+                }
+                
+                var colours = (graph.max > 0) ? [sColour, eColour] : [eColour, sColour]
+                var colourLocations: [CGFloat] = [0.0, 1.0]
+                let colourSpace = CGColorSpaceCreateDeviceRGB()
+                if graph.min < 0 && graph.max > 0{
+                    colours = [sColour, eColour, sColour]
+                    colourLocations = [0.0, (columnYPoint(0)-columnYPoint(graph.max))/(columnYPoint(graph.min)-columnYPoint(graph.max)) , 1.0]
+                    print(colourLocations)
+                }
+                if let gradient = CGGradient(colorsSpace: colourSpace,
+                                             colors: colours as CFArray,
+                                             locations: colourLocations){
+                    let context = UIGraphicsGetCurrentContext()!
+                    let max = (graph.max < 0) ? 0.0 : graph.max
+                    context.drawLinearGradient(gradient, start: CGPoint(x: margin, y: columnYPoint(max)), end: CGPoint(x: margin, y: columnYPoint(graph.min)), options: [])
+                    
+                }
+                UIGraphicsGetCurrentContext()?.restoreGState()
             }
-
-            var colours = (graph.max > 0) ? [sColour, eColour] : [eColour, sColour]
-            var colourLocations: [CGFloat] = [0.0, 1.0]
-            let colourSpace = CGColorSpaceCreateDeviceRGB()
-            if graph.min < 0 && graph.max > 0{
-                colours = [sColour, eColour, sColour]
-                colourLocations = [0.0, (columnYPoint(0)-columnYPoint(graph.max))/(columnYPoint(graph.min)-columnYPoint(graph.max)) , 1.0]
-                print(colourLocations)
-            }
-            if let gradient = CGGradient(colorsSpace: colourSpace,
-                                         colors: colours as CFArray,
-                                         locations: colourLocations){
-                let context = UIGraphicsGetCurrentContext()!
-                let max = (graph.max < 0) ? 0.0 : graph.max
-                context.drawLinearGradient(gradient, start: CGPoint(x: margin, y: columnYPoint(max)), end: CGPoint(x: margin, y: columnYPoint(graph.min)), options: [])
-
-            }
-            UIGraphicsGetCurrentContext()?.restoreGState()
         }
         
     }
@@ -314,8 +329,9 @@ class Graph{
         
         let tsbGraph = Graph(data: dummyTSBData, colour: .yellow)
         tsbGraph.fill = true
-        
-        return [tsbGraph, Graph(data: dummyCTLData, colour: .red), Graph(data: dummyATLData, colour: .green)]
+        let tssGraph = Graph(data: dummyTSSData, colour: .black)
+        tssGraph.point = true
+        return [tsbGraph, Graph(data: dummyCTLData, colour: .red), Graph(data: dummyATLData, colour: .green), tssGraph]
     }
 
     private func createDummyData(){
@@ -332,12 +348,12 @@ class Graph{
                 dayTss = 0.9
             }
             let d = Calendar.current.date(byAdding: DateComponents(day:i), to: Date())!
-            //            let d = Calendar.current.date(from: DateComponents(year:2019, month:6, day:i))!
             dayCTL = dayTss * (1 - ctlFactor) + dayCTL * ctlFactor
             dayATL = dayTss * (1 - atlFactor) + dayATL * atlFactor
             dummyCTLData.append((d, dayCTL))
             dummyATLData.append((d, dayATL))
             dummyTSBData.append((d, dayCTL - dayATL))
+            dummyTSSData.append((d, dayTss))
             
         }
     }

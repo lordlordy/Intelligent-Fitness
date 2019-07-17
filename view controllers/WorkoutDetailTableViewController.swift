@@ -31,8 +31,8 @@ class WorkoutDetailTableViewController: UITableViewController {
             let f: NumberFormatter = NumberFormatter()
             f.numberStyle = .percent
             var str: String  = "\(e.exerciseDefinition.name) - "
-            if e.totalActualKG > 0{
-                str  += "\(Int(e.totalActualKG))kg"
+            if e.getValue(forMeasure: .totalRepKG) > 0{
+                str  += "\(Int(e.getValue(forMeasure: .totalRepKG)))kg"
             }
             str += " \(f.string(from: NSNumber(value: e.percentageComplete)) ?? "") "
             return str
