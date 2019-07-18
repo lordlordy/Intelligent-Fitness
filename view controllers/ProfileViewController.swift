@@ -9,6 +9,8 @@
 import UIKit
 import HealthKit
 import Firebase
+import AVKit
+import WebKit
 
 class ProfileViewController: UITableViewController {
     
@@ -32,12 +34,29 @@ class ProfileViewController: UITableViewController {
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
             }else{
-                print("Authorization failed: \(error)")
+                print("Authorization failed: \(String(describing: error))")
                 let alert = UIAlertController(title: "Authorisation Failure", message: "Thank you. Access to healthkit failed", preferredStyle: .actionSheet)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
             }
         }
+    }
+    
+    @IBAction func playVideo(_ sender: Any) {
+//        let player = AVPlayer(url: URL(string: "https://www.youtube.com/embed/gXjNTLSVvGM")!)
+//        let playerViewController = AVPlayerViewController()
+//        playerViewController.player = player
+//        present(playerViewController, animated: true) {
+//            player.play()
+//        }
+//        let webView: WKWebView = WKWebView()
+//        webView.loadHTMLString("<iframe width=\"951\" height=\"535\" src=\"https://www.youtube.com/embed/gXjNTLSVvGM\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>", baseURL: nil)
+        
+        let pw = WebViewController()
+        
+        present(pw, animated: true, completion: nil)
+        
+    
     }
     
     @IBAction func restingHRInfoTapped(_ sender: Any) {
@@ -117,7 +136,7 @@ class ProfileViewController: UITableViewController {
     @IBAction func createTestData(_ sender: Any) {
         // create some data to allow testing of various features. For now aim to create a years worth of data
         // test data first
-        WorkoutManager.shared.createTestFFTData()
+//        WorkoutManager.shared.createTestFFTData()
         WorkoutManager.shared.createTestWorkoutData()
 
     }

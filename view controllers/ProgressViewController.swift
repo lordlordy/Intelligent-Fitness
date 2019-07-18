@@ -17,7 +17,8 @@ enum GraphType: Int{
     case TSB = 2
     case Consistency = 3
     case Ed = 4
-
+    case PowerUp = 5
+    
     func name() -> String{
         switch self{
         case .Sets: return "Workout Graphs"
@@ -25,6 +26,7 @@ enum GraphType: Int{
         case .TSB: return "Training Stress Balance Graphs"
         case .Consistency: return "Weekly Consistency"
         case .Ed: return "Eddington Numbers"
+        case .PowerUp: return "PowerUps"
         }
     }
     
@@ -37,9 +39,11 @@ enum GraphType: Int{
         case .TSB:
             return "Training Stress Balance graph. This models your fitness, fatigue and form. This currently uses your activity time from the health app. It assumes an RPE of 5 on average which gives a TSS of ~55 per hour. Can also see a similar graph using active calories as a proxie for TSS"
         case .Consistency:
-            return "Show a measure of how many weeks you've done on the trot with 3 sessions per week and no more than 2 rest days between each. If you have a week that does meet this criteria the current streak number is halved"
+            return "Show a measure of how many weeks you've done on the trot with 3 sessions per week and no more than 2 rest days between each. If you have a week that does not meet this criteria the current streak number is halved"
         case .Ed:
             return "A graph of your Eddington numbers. This is a good single number measure of your progress. It gives the maximum KG such that you've lifted that amount on at least that many days. For more info look at http://www.eddingtonnumbers.me.uk"
+        case .PowerUp:
+            return "This graph shows the progression of your power ups for attack and defence. Defence power-ups are given for consistency. Defence power-ups are currently being given for progression in your Max Rep X KG Eddington Number"
         }
     }
 
@@ -136,6 +140,7 @@ class ProgressViewController: UIViewController {
             case .Sets: createSetsGraph()
             case .HR: createHRGraph()
             case .TSB: createTSBGraph()
+            case .PowerUp: createPowerUpGraph()
             }
         }
         picker.reloadAllComponents()
@@ -155,12 +160,36 @@ class ProgressViewController: UIViewController {
         }
     }
     
+    private func createPowerUpGraph(){
+        chooseButton.isEnabled = true
+        chooseButton.isHidden = false
+        let title: String  = "Power-Ups"
+        titleLabel.text = title
+        let pUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps()
+        let defence: [(Date, Double)] = pUps.map({($0.date!, Double($0.defense))})
+        let attack: [(Date, Double)] = pUps.map({($0.date!, Double($0.attack))})
+        graphData = [("Defence", defence), ("Attack", attack)]
+        collapsed = [true, false]
+        graphView.removeAllGraphs()
+        let defenceLine: Graph = Graph(data: defence, colour: .red)
+        let defencePoints: Graph = Graph(data: defence, colour: .green)
+        defencePoints.point = true
+        defencePoints.fill = true
+        defencePoints.pointSize = 10.0
+        let attackLine: Graph = Graph(data: attack, colour: .blue)
+        let attackPoints: Graph  = Graph(data: attack, colour: .cyan)
+        attackPoints.point = true
+        attackPoints.fill = true
+        attackPoints.pointSize = 10.0
+        graphView.setGraphs(graphs: [defencePoints, defenceLine, attackPoints, attackLine])
+    }
+    
     private func createConsistencyGraph(){
         chooseButton.isEnabled = true
         chooseButton.isHidden = false
         let title: String = "Consistency Streak"
         titleLabel.text = title
-        let data: [(Date, Double)] = WorkoutManager.shared.getWeeks().sorted(by: {$0.date < $1.date}).map({($0.date, Double($0.consistencyStreak()))})
+        let data: [(Date, Double)] = WorkoutManager.shared.getWeeks().sorted(by: {$0.startOfWeek < $1.startOfWeek}).map({($0.startOfWeek, Double($0.recursivelyCalculateConsistencyStreak()))})
         var maxValues: [(Date, Double)] = []
         var previousVal: Double = 0.0
         for d in data{
@@ -180,7 +209,8 @@ class ProgressViewController: UIViewController {
     private func createEdGraph(){
         chooseButton.isEnabled = true
         chooseButton.isHidden = false
-        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: selectedExercise).map({(date: $0.date!, value: $0.getValue(forMeasure: selectedMeasure))}).sorted(by: {$0.date < $1.date})
+        let data: [(Date, Double)] = WorkoutManager.shared.timeSeries(forExeciseType: selectedExercise, andMeasure: selectedMeasure)
+//        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: selectedExercise).map({(date: $0.date!, value: $0.getValue(forMeasure: selectedMeasure))}).sorted(by: {$0.date < $1.date})
         let eddNum: EddingtonCalculator.EddingtonHistory = EddingtonCalculator().eddingtonHistory(timeSeries: data)
 
         var history = eddNum.annualHistory
@@ -196,12 +226,13 @@ class ProgressViewController: UIViewController {
         let edData: [(Date, Double)] = history.map({($0.date, Double($0.edNum))})
         let edContributors: [(Date, Double)] = history.map({($0.date, $0.contributor)})
         let edPlusOne: [(Date, Double)] = history.map({($0.date, Double($0.edNum + $0.plusOne))})
-        let edGraph: Graph = Graph(data: edData, colour: .green)
-        let contribGraph: Graph = Graph(data: edContributors, colour: .red)
-        let plusOneGraph: Graph = Graph(data: edPlusOne, colour: .gray)
+        let edGraph: Graph = Graph(data: edData, colour: .red)
+        let contribGraph: Graph = Graph(data: edContributors, colour: .cyan)
+        let plusOneGraph: Graph = Graph(data: edPlusOne, colour: .green)
         edGraph.fill = true
         edGraph.invertFill = true
         contribGraph.point = true
+        contribGraph.fill = true
         graphData = [("Ed Num", edData), ("Contributors", edContributors), ("Plus One", history.map({($0.date, Double($0.plusOne))}))]
         collapsed = [true, true, false]
         graphView.removeAllGraphs()
@@ -386,6 +417,7 @@ class ProgressViewController: UIViewController {
         titleLabel.text = title
         graphView.removeAllGraphs()
         let graph: Graph = Graph(data: data , colour: .red)
+        graph.point = true
         graphData = [(title, data)]
         collapsed = [false]
         graphView.addGraph(graph: graph)
@@ -424,7 +456,7 @@ extension ProgressViewController: UIPickerViewDataSource{
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         switch selectedGraph{
-        case .Consistency, .HR:return 0
+        case .Consistency, .HR, .PowerUp:return 0
         case .TSB: return 2
         case .Sets:
             if component == 0{
@@ -523,7 +555,7 @@ extension ProgressViewController: UIPickerViewDelegate{
     
     private func getSelectedExerciseDefinition(forRow row: Int) -> ExerciseDefinition?{
         switch selectedGraph{
-        case .Consistency, .HR, .TSB:
+        case .Consistency, .HR, .TSB, .PowerUp:
             return nil
         case .Sets, .Ed:
             return ExerciseDefinitionManager.shared.exerciseDefinition(for: WorkoutManager.shared.exerciseTypes[row])

@@ -21,7 +21,7 @@ class WorkoutTableViewController: UITableViewController{
     private let EXERCISE_SETS_SECTION: Int = 2
     private let EXERCISE_END_EARLY_SECTION: Int = 3
     fileprivate var currentExerciseSet: Int16 = 0
-    
+        
     func updateLabels(){
         for cell in tableView.visibleCells{
             if let c = cell as? ExerciseCell{
@@ -93,7 +93,18 @@ class WorkoutTableViewController: UITableViewController{
                 return UITableViewCell()
             }
             if let c = cell as? ExerciseDescriptionCell{
-                c.label.text = workout.exercise(atOrder: currentExerciseSet)?.exerciseDefinition.name ?? ""
+                if let def = workout.exercise(atOrder: currentExerciseSet)?.exerciseDefinition{
+                    c.label.text = def.name
+                    if let _ = def.embedVideoHTML{
+                        c.videoButton.isEnabled = true
+                        c.videoButton.isHidden = false
+                    }else{
+                        c.videoButton.isEnabled = false
+                        c.videoButton.isHidden = true
+                    }
+                }else{
+                    c.label.text = "No exercise definition"
+                }
                 c.viewController = self
                 c.exercise = workout.exercise(atOrder: currentExerciseSet)
             }
@@ -149,6 +160,13 @@ class WorkoutTableViewController: UITableViewController{
             if let tabVC = segue.destination as? UITabBarController{
                 tabVC.selectedIndex = 3
             }
+            currentExerciseSet = 0
+        } else if segue.identifier == "ShowWorkoutVideo"{
+            if let webVC = segue.destination as? WebViewController{
+                if let html = workout.exercise(atOrder: currentExerciseSet)?.exerciseDefinition.embedVideoHTML{
+                    webVC.htmlString = html
+                }
+            }
         }
     }
 
@@ -198,7 +216,7 @@ class ExerciseCell: UITableViewCell{
     func updateLabel(){
         if let e = exercise{
             let kg: Double = e.actualKG > 0 ? e.actualKG : e.plannedKG
-            label.text = "\(e.exercise?.exerciseDefinition.name ?? "No name"): \(e.plan) x \(kg) KG"
+            label.text = "\(e.exercise?.exerciseDefinition.name ?? "No name"): \(Int(e.plan)) x \(Int(kg)) KG"
         }
     }
     
@@ -242,6 +260,7 @@ class ExerciseCell: UITableViewCell{
 class ExerciseDescriptionCell: UITableViewCell{
     
     @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var videoButton: UIButton!
     var exercise: Exercise?
     var viewController: UIViewController?
     

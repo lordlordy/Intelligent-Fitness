@@ -14,6 +14,7 @@ class Graph{
     var fill: Bool = false
     var invertFill: Bool = false
     var point: Bool = false
+    var pointSize: CGFloat = 5.0
     
     var max: Double {
         return data.map({ (datum) -> Double in
@@ -46,7 +47,7 @@ class Graph{
         static let colorAlpha: CGFloat = 0.3
         static let circleDiameter: CGFloat = 5.0
         static let labelFontSize: CGFloat = 12.0
-        static let pointSize: CGFloat = 2.0
+        static let pointSize: CGFloat = 5.0
     }
 
     // colours for gradient.
@@ -224,7 +225,14 @@ class Graph{
             for i in 0..<graph.data.count{
                 let x = columnXPoint(i)
                 let y = columnYPoint(graph.data[i].value)
-                let path = UIBezierPath(ovalIn: CGRect(x: x - Constants.pointSize/2, y: y - Constants.pointSize/2, width: Constants.pointSize, height: Constants.pointSize))
+                let path = UIBezierPath(ovalIn: CGRect(x: x - graph.pointSize/2, y: y - graph.pointSize/2, width: graph.pointSize, height: graph.pointSize))
+                if graph.fill{
+                    UIColor.white.setFill()
+                    UIColor.white.setStroke()
+                    path.fill()
+                }
+                graph.colour.setFill()
+                graph.colour.setStroke()
                 path.stroke()
             }
         }else{

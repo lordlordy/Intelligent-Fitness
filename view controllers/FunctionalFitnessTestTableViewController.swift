@@ -53,6 +53,8 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
     @IBOutlet weak var kgField: UITextField!
     @IBOutlet weak var minusButton: UIButton!
     @IBOutlet weak var plusButton: UIButton!
+    @IBOutlet weak var videoButton: UIButton!
+    
     
     
     @IBAction func minusKG(_ sender: Any) {
@@ -170,11 +172,25 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
             if let tabVC = segue.destination as? UITabBarController{
                 tabVC.selectedIndex = 3
             }
+        }else if segue.identifier == "TestShowVideo"{
+            if let webVC = segue.destination as? WebViewController{
+                if let html = fitnessTest.exercise(atOrder: currentTest)?.exerciseDefinition.embedVideoHTML{
+                    webVC.htmlString = html
+                }
+            }
         }
     }
     
     private func updateTest(){
         if let exercise = fitnessTest.exercise(atOrder: currentTest){
+            if exercise.exerciseDefinition.embedVideoHTML == nil{
+                videoButton.isHidden = true
+                videoButton.isEnabled = false
+            }else{
+                videoButton.isHidden = false
+                videoButton.isEnabled = true
+            }
+            
             if let test = exercise.exerciseSet(atOrder: 0){
                 testName.text = exercise.exerciseDefinition.name
                 testDescription.text = exercise.exerciseDefinition.description
