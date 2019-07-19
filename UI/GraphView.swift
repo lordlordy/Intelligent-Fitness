@@ -15,7 +15,6 @@ import UIKit
 @IBDesignable class GraphView: UIView {
 
     private struct Constants {
-        static let cornerRadiusSize = CGSize(width: 8.0, height: 8.0)
         static let margin: CGFloat = 20.0
         static let topBorder: CGFloat = 20.0
         static let bottomBorder: CGFloat = 30.0
@@ -26,8 +25,13 @@ import UIKit
     }
 
     // colours for gradient.
-    @IBInspectable var startColour: UIColor = MAIN_BLUE
-    @IBInspectable var endColour: UIColor = .white
+    var startColour: UIColor = MAIN_BLUE
+    var endColour: UIColor = .white
+    
+    private var colors: [CGColor]!
+    private var colorSpace:CGColorSpace!
+    private var colorLocations: [CGFloat]!
+    private var gradient: CGGradient!
     
     private var graphs: [Graph] = []
     private var labels: [UITextField] = []
@@ -40,6 +44,10 @@ import UIKit
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        colors = [startColour.cgColor, endColour.cgColor]
+        colorSpace = CGColorSpaceCreateDeviceRGB()
+        colorLocations = [0.0, 1.0]
+        gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: colorLocations)!
         createDummyData()
     }
     
@@ -70,13 +78,10 @@ import UIKit
         if graphs.count == 0{ graphs = getDummyGraphs() }
         
         let context = UIGraphicsGetCurrentContext()!
-        let colors = [startColour.cgColor, endColour.cgColor]
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let colorLocations: [CGFloat] = [0.0, 1.0]
-        let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: colorLocations)!
+
         let startPoint = CGPoint.zero
         let endPoint = CGPoint(x: 0, y: self.bounds.height)
-        
+        // draw background
         context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(rawValue: 0))
         
         for graph in graphs{
@@ -117,7 +122,8 @@ import UIKit
     
     private func addHorizontalLine(atY y: Double, inRect rect: CGRect, withColour colour: UIColor){
         let line = UIBezierPath()
-        let yCoord: CGFloat = graphYToRectCoordinate(rect, CGFloat(y))
+        let coordinates = getCoordinateFunction(rect)
+        let yCoord: CGFloat = coordinates((0, y)).y
         line.move(to: CGPoint(x: Constants.margin, y: yCoord))
         line.addLine(to: CGPoint(x: rect.width - Constants.margin, y: yCoord))
         let maxLabel = createLabel(value: String(Int(y)), origin: CGPoint(x: 0.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
@@ -128,51 +134,48 @@ import UIKit
         line.stroke()
     }
     
-
-    fileprivate func addGraph(_ rect: CGRect, graph: LineGraph) {
-    
+    private func getCoordinateFunction(_ rect: CGRect) -> ((Int, Double)) -> CGPoint{
         let width = rect.width
         let height = rect.height
-        //calculate the x point
         let margin = Constants.margin
-        // nb this is a function
-        let columnXPoint = { (column:Int) -> CGFloat in
-            //Calculate gap between points
-            let spacer = (width - margin * 2 - 4) / CGFloat((graph.data.count - 1))
-            var x: CGFloat = CGFloat(column) * spacer
-            x += margin + 2
-            return x
-        }
-        
-        // calculate the y point
+        let pointCount: Int = graphs.count>0 ? graphs[0].data.count : 0
         let topBorder: CGFloat = Constants.topBorder
         let bottomBorder: CGFloat = Constants.bottomBorder
         let graphHeight = height - topBorder - bottomBorder
         let maxValue = maxY()
         let minValue = minY()
         let yRange = max(0.1, CGFloat(maxValue - minValue))
-        // again this is a function
-        let columnYPoint = { (graphPoint:Double) -> CGFloat in
-            var y:CGFloat = CGFloat(graphPoint - minValue) / yRange * graphHeight
+
+        let f = { (item: (date: Int, value: Double)) -> CGPoint in
+            let spacer = (width - margin * 2 - 4) / CGFloat((pointCount - 1))
+            var x: CGFloat = CGFloat(item.date) * spacer
+            x += margin + 2
+            var y:CGFloat = CGFloat(item.value - minValue) / yRange * graphHeight
             y = graphHeight + topBorder - y // Flip the graph
-            return y
+            return CGPoint(x:x,y:y)
         }
         
+        return f
+    }
+    
+
+    fileprivate func addGraph(_ rect: CGRect, graph: LineGraph) {
+    
         // draw the line graph
         graph.colour.setFill()
         graph.colour.setStroke()
         
 
         //draw lines
-        //set up the points line
         let graphPath = UIBezierPath()
+        // this is function to convert a time series point in to the co-ordinates in our graph within the given rect
+        let coordinates = getCoordinateFunction(rect)
         //go to start of line
-        graphPath.move(to: CGPoint(x:columnXPoint(0), y:columnYPoint(graph.data[0].value)))
+        graphPath.move(to: coordinates((0, graph.data[0].value)))
         
         //add points for each item in the graphPoints array
-        //at the correct (x, y) for the point
         for i in 1..<graph.data.count {
-            let nextPoint = CGPoint(x:columnXPoint(i), y:columnYPoint(graph.data[i].value))
+            let nextPoint = coordinates((i, graph.data[i].value))
             graphPath.addLine(to: nextPoint)
         }
         
@@ -183,8 +186,8 @@ import UIKit
         if graph.fill{
             UIGraphicsGetCurrentContext()?.saveGState()
             let cPath = graphPath.copy() as! UIBezierPath
-            cPath.addLine(to: CGPoint(x:columnXPoint(graph.data.count-1), y:columnYPoint(0.0)))
-            cPath.addLine(to: CGPoint(x:columnXPoint(0), y:columnYPoint(0.0)))
+            cPath.addLine(to: coordinates((graph.data.count-1, 0.0)))
+            cPath.addLine(to: coordinates((0, 0.0)))
             cPath.close()
             cPath.addClip()
             
@@ -201,16 +204,19 @@ import UIKit
             let colourSpace = CGColorSpaceCreateDeviceRGB()
             if graph.min < 0 && graph.max > 0{
                 colours = [sColour, eColour, sColour]
-                colourLocations = [0.0, (columnYPoint(0)-columnYPoint(graph.max))/(columnYPoint(graph.min)-columnYPoint(graph.max)) , 1.0]
-                print(colourLocations)
+                let y0 = coordinates((0, 0)).y
+                let yMax = coordinates((0, graph.max)).y
+                let yMin = coordinates((0, graph.min)).y
+                colourLocations = [0.0, (y0-yMax)/(yMin-yMax) , 1.0]
             }
             if let gradient = CGGradient(colorsSpace: colourSpace,
                                          colors: colours as CFArray,
                                          locations: colourLocations){
                 let context = UIGraphicsGetCurrentContext()!
                 let max = (graph.max < 0) ? 0.0 : graph.max
-                context.drawLinearGradient(gradient, start: CGPoint(x: margin, y: columnYPoint(max)), end: CGPoint(x: margin, y: columnYPoint(graph.min)), options: [])
-                
+                let yMax = coordinates((0, max)).y
+                let yMin = coordinates((0, graph.min)).y
+                context.drawLinearGradient(gradient, start: CGPoint(x: Constants.margin, y: yMax), end: CGPoint(x: Constants.margin, y: yMin), options: [])
             }
             UIGraphicsGetCurrentContext()?.restoreGState()
         }
@@ -218,41 +224,15 @@ import UIKit
     
     fileprivate func addGraph(_ rect: CGRect, graph: PointGraph) {
         
-        let width = rect.width
-        let height = rect.height
-        //calculate the x point
-        let margin = Constants.margin
-        // nb this is a function
-        let columnXPoint = { (column:Int) -> CGFloat in
-            //Calculate gap between points
-            let spacer = (width - margin * 2 - 4) / CGFloat((graph.data.count - 1))
-            var x: CGFloat = CGFloat(column) * spacer
-            x += margin + 2
-            return x
-        }
-        
-        // calculate the y point
-        let topBorder: CGFloat = Constants.topBorder
-        let bottomBorder: CGFloat = Constants.bottomBorder
-        let graphHeight = height - topBorder - bottomBorder
-        let maxValue = maxY()
-        let minValue = minY()
-        let yRange = max(0.1, CGFloat(maxValue - minValue))
-        // again this is a function
-        let columnYPoint = { (graphPoint:Double) -> CGFloat in
-            var y:CGFloat = CGFloat(graphPoint - minValue) / yRange * graphHeight
-            y = graphHeight + topBorder - y // Flip the graph
-            return y
-        }
-        
+        let coordinates = getCoordinateFunction(rect)
         graph.colour.setFill()
         graph.colour.setStroke()
         
         // draw points
         for i in 0..<graph.data.count{
-            let x = columnXPoint(i)
-            let y = columnYPoint(graph.data[i].value)
-            let path = UIBezierPath(ovalIn: CGRect(x: x - graph.pointSize/2, y: y - graph.pointSize/2, width: graph.pointSize, height: graph.pointSize))
+            let p = coordinates((i, graph.data[i].value))
+            let path = UIBezierPath(ovalIn: CGRect(x: p.x - graph.pointSize/2, y: p.y - graph.pointSize/2, width: graph.pointSize, height: graph.pointSize))
+
             if graph.fill{
                 UIColor.white.setFill()
                 UIColor.white.setStroke()
@@ -263,17 +243,7 @@ import UIKit
             path.stroke()
         }
     }
-    
-    private func graphYToRectCoordinate(_ rect: CGRect, _ graphPoint: CGFloat) -> CGFloat{
-        let minValue: CGFloat = CGFloat(minY())
-        let maxValue: CGFloat = CGFloat(maxY())
-        let yRange = max(0.1, maxValue - minValue)
-        let graphHeight = rect.height - Constants.topBorder - Constants.bottomBorder
-        
-        var y:CGFloat = (graphPoint - minValue) / yRange * graphHeight
-        y = graphHeight + Constants.topBorder - y // Flip the graph
-        return y
-    }
+
     
     
     private func maxY() -> Double{
