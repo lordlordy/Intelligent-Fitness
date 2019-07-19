@@ -64,7 +64,6 @@ extension Exercise{
     func exerciseSet(atOrder order: Int16) -> ExerciseSet?{
         for set in exerciseSets(){
             if set.order == order{
-                print(set)
                 return set
             }
         }

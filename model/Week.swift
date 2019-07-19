@@ -13,57 +13,77 @@ class Week{
     static let numberOfWorkoutsPerWeek: Int = 3
     static let maximumRestInARow: Int = 2
     
-    var workouts: [Workout]
+    var workouts: [Workout] { return CoreDataStackSingleton.shared.getWorkouts(inWeekContaining: startOfWeek)}
+    var completeWorkouts: [Workout]{ return workouts.filter({$0.complete})}
+    var incompleteWorkouts: [Workout] { return workouts.filter({!$0.complete})}
     var previousWeek: Week?
     var nextWeek: Week?
-    var date: Date
+    var startOfWeek: Date
+    var endOfWeek: Date { return startOfWeek.endOfWeek}
     
-    var weekOfYear: Int { return calendar.dateComponents([Calendar.Component.weekOfYear], from: date).weekOfYear!}
-    var year: Int { return calendar.dateComponents([Calendar.Component.yearForWeekOfYear], from: date).yearForWeekOfYear!}
+    var weekOfYear: Int { return startOfWeek.weekOfYear}
+    var year: Int { return startOfWeek.year}
     var weekStr: String { return "\(year)-\(String(format: "%02d", weekOfYear))"}
     
-    var correctNumberOfWorkouts: Bool { return workouts.count == Week.numberOfWorkoutsPerWeek}
+    var correctNumberOfWorkouts: Bool { return completeWorkouts.count == Week.numberOfWorkoutsPerWeek}
     var correctRestDays: Bool { return daysBetweenWorkouts().max() ?? 0 <= Week.maximumRestInARow}
     var consistent: Bool { return correctNumberOfWorkouts && correctRestDays}
     
-    private var calendar: Calendar{ return Calendar.init(identifier: .iso8601) }
+    private var consistencyStreak: Int?
+    
     private let streakDecay: Double = 0.5
 
     
-    init(_ workouts: [Workout], date: Date) {
-        self.workouts = workouts
-        self.date = date
+    init(date: Date) {
+        self.startOfWeek = date.startOfWeek
     }
     
-    func consistencyStreak() -> Int{
+    func weekContains(thisDate d: Date) -> Bool{
+        return d.year == year && d.weekOfYear == weekOfYear
+    }
+    
+    func recursivelyCalculateConsistencyStreak() -> Int{
+        
+        //check whether can used cached value
+        if let cs = consistencyStreak{
+            if !weekContains(thisDate: Date()){
+                // use cached value for all weeks except the current week. Recalc that one each time
+                return cs
+            }
+        }
+
         if consistent{
             if let p = previousWeek{
-                return p.consistencyStreak() + 1
+                consistencyStreak = p.recursivelyCalculateConsistencyStreak() + 1
+                return consistencyStreak!
             }else{
+                consistencyStreak = 1
                 return 1
             }
         }else{
 //            return 0
             if let p = previousWeek{
-                return Int(Double(p.consistencyStreak()) * streakDecay)
+                consistencyStreak = Int(Double(p.recursivelyCalculateConsistencyStreak()) * streakDecay)
+                return consistencyStreak!
             }else{
+                consistencyStreak = 0
                 return 0
             }
         }
     }
     
     private func daysBetweenWorkouts() -> [Int]{
-        if workouts.count == 0{
+        if completeWorkouts.count == 0{
             return []
         }
         
         let calendar: Calendar = Calendar(identifier: .iso8601)
         var previousWorkout: Workout?
         var result: [Int] = []
-        let sWorkouts: [Workout] = workouts.sorted(by: {$0.date! < $1.date!})
+        let sWorkouts: [Workout] = completeWorkouts.sorted(by: {$0.date! < $1.date!})
         
         //calc gap to first
-        var diff: Int = calendar.dateComponents([.day], from: calendar.startOfDay(for: sWorkouts[0].date!.startOfWeek!), to: calendar.startOfDay(for: sWorkouts[0].date!)).day!
+        var diff: Int = calendar.dateComponents([.day], from: calendar.startOfDay(for: sWorkouts[0].date!.startOfWeek), to: calendar.startOfDay(for: sWorkouts[0].date!)).day!
         result.append(diff)
         
         for w in sWorkouts{
@@ -75,7 +95,7 @@ class Week{
             previousWorkout = w
         }
         //calc end of week
-        let endW: Date = calendar.date(byAdding: DateComponents(day:6), to: sWorkouts[0].date!.startOfWeek!)!
+        let endW: Date = calendar.date(byAdding: DateComponents(day:6), to: sWorkouts[0].date!.startOfWeek)!
         diff = calendar.dateComponents([.day], from: sWorkouts[sWorkouts.count-1].date!, to: endW).day!
         result.append(diff)
         return result

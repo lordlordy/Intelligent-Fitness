@@ -16,6 +16,7 @@ extension RepSet{
     @objc var avReps: Double { return actual }
     @objc var minReps: Double { return actual }
     @objc var maxReps: Double { return actual }
+    @objc var maxRepKG: Double { return totalRepKG}
     
     override func summary() -> String {
         var str: String = ""

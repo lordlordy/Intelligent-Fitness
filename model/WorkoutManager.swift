@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import Firebase
+import FirebaseDatabase
+import FirebaseAuth
 
 enum ExerciseType: Int16, CaseIterable{
     case gobletSquat, lunge, benchPress, pushUp, pullDown
@@ -30,7 +33,7 @@ enum AggregatorType{
 
 enum ExerciseMeasure: String, CaseIterable{
     case maxKG, minKG, avKG, totalKG
-    case totalReps, totalRepKG, avReps, minReps, maxReps
+    case totalReps, totalRepKG, avReps, minReps, maxReps, maxRepKG
     case totalDistance, totalDistanceKG, avDistance, minDistance, maxDistance
     case totalTime, totalTimeKG, avTime, minTime, maxTime
     case totalTouches, totalTouchKG, avTouch, minTouch, maxTouch
@@ -42,6 +45,7 @@ enum ExerciseMeasure: String, CaseIterable{
         case .totalKG: return "Total KG"
         case .totalReps: return "Total Reps"
         case .totalRepKG: return "Total KG x Reps"
+        case .maxRepKG: return "Max KG x Reps"
         case .avReps: return "Average Reps"
         case .minReps: return "Min Reps"
         case .maxReps: return "Max Reps"
@@ -66,7 +70,7 @@ enum ExerciseMeasure: String, CaseIterable{
         switch self{
         case .totalKG, .totalReps, .totalRepKG, .totalTime, .totalTimeKG, .totalTouches, .totalTouchKG, .totalDistance, .totalDistanceKG: return .Sum
         case .avKG, .avReps, .avTime, .avTouch, .avDistance: return .Average
-        case .maxKG, .maxReps, .maxTime, .maxTouch, .maxDistance: return .Max
+        case .maxKG, .maxReps, .maxTime, .maxTouch, .maxDistance, .maxRepKG: return .Max
         case .minKG, .minReps, .minTime, .minTouch, .minDistance: return .Min
         }
     }
@@ -88,7 +92,7 @@ enum SetType: Int16{
     
     func validMeasures() -> [ExerciseMeasure]{
         switch self{
-        case .Reps: return [.maxKG, .minKG, .avKG, .totalReps, .totalRepKG, .avReps, .minReps, .maxReps]
+        case .Reps: return [.maxRepKG, .maxKG, .minKG, .avKG, .totalReps, .totalRepKG, .avReps, .minReps, .maxReps]
         case .Distance: return [.maxKG, .minKG, .avKG, .totalDistance, .totalDistanceKG, .avDistance, .minDistance, .maxDistance]
         case .Time: return [.maxKG, .minKG, .avKG, .totalTime, .totalTimeKG, .avTime, .minTime, .maxTime]
         case .Touches: return [.maxKG, .minKG, .avKG, .totalTouches, .totalTouchKG, .avTouch, .minTouch, .maxTouch]
@@ -127,6 +131,8 @@ class WorkoutManager: Athlete{
 
     
     static var shared: WorkoutManager = WorkoutManager()
+    var firebaseRef: DatabaseReference?
+    
     
     private struct ExerciseDefaults{
         var type: ExerciseType
@@ -135,7 +141,7 @@ class WorkoutManager: Athlete{
     }
     
     var exerciseTypes: [ExerciseType]{ return ExerciseType.allCases}
-
+    private var weekCache: [Week] = []
     
     var calendar: Calendar{ return Calendar(identifier: .iso8601)}
     
@@ -159,7 +165,7 @@ class WorkoutManager: Athlete{
     // MARK: - Athlete Protocol
     
     func timeSeries(forExeciseType type: ExerciseType, andMeasure measure: ExerciseMeasure) -> [(date: Date, value: Double)] {
-        let workouts: [Workout] = CoreDataStackSingleton.shared.getOrderedWorkouts(ofType: nil, isTest: nil).filter({$0.complete})
+        let workouts: [Workout] = CoreDataStackSingleton.shared.getChronologicalOrderedWorkouts(ofType: nil, isTest: nil).filter({$0.complete})
         var ts: [(date:Date, value: Double)] = []
         for w in workouts{
             if let v = w.getValue(forExerciseType: type, andMeasure: measure){
@@ -176,53 +182,89 @@ class WorkoutManager: Athlete{
     // MARK: - Other
     
     func currentStreakData() -> (current: Int, best: Int){
-        let wks: [Week] = getWeeks().sorted(by: {$0.date < $1.date})
-        let current: Int = wks[wks.count-1].consistencyStreak()
-        let best: Int = wks.reduce(0, {max($0, $1.consistencyStreak())})
+        let wks: [Week] = getWeeks().sorted(by: {$0.startOfWeek < $1.startOfWeek})
+        if wks.count == 0{
+            return (0,0)
+        }
+        let current: Int = wks[wks.count-1].recursivelyCalculateConsistencyStreak()
+        let best: Int = wks.reduce(0, {max($0, $1.recursivelyCalculateConsistencyStreak())})
         return (current, best)
     }
     
+    func currentWeek() -> Week?{
+        let weeks = getWeeks()
+        if weeks.count > 0{
+            if weeks[weeks.count-1].weekContains(thisDate: Date()){
+                return weeks[weeks.count - 1]
+            }else{
+                let filtered: [Week] = weeks.filter({$0.weekContains(thisDate: Date())})
+                if filtered.count > 0{
+                    return filtered[0]
+                }
+            }
+        }
+        return nil
+    }
+    
     func getWeeks() -> [Week]{
-        let workouts: [Workout] = CoreDataStackSingleton.shared.getOrderedWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! < $1.date!})
-        if workouts.count == 0{
-            return []
+        return getWeeks(toDate: Date())
+    }
+    
+    func getWeeks(toDate date: Date) -> [Week]{
+        
+        var startOfWeek: Date
+        var previousWeek: Week?
+
+        print("Cache contains: \(weekCache.count) weeks")
+        
+        // see if can use cache
+        if weekCache.count > 0{
+            //we have a cache. Just need to see if we need to add more weeks
+            if weekCache[weekCache.count-1].endOfWeek >= date{
+                // it's upto date
+                return weekCache.filter({$0.startOfWeek <= date})
+            }else{
+                // add missing weeks
+                startOfWeek = Calendar.current.date(byAdding: DateComponents(day: 7), to: weekCache[weekCache.count-1].startOfWeek)!
+                previousWeek = weekCache[weekCache.count-1]
+            }
+        }else{
+            // no weeks at all. So start from the earilest week
+            if let d =  CoreDataStackSingleton.shared.earliestCompletedWorkoutDate()?.startOfWeek{
+                startOfWeek = d
+            }else{
+                return []
+            }
         }
         
-        var startOfWeek: Date = workouts[0].date!.startOfWeek!
-        var weeks: [String:Week] = [:]
-        var previousWeek: Week?
-        
         // create weeks
-        while startOfWeek < Date(){
-            let wk: Week = Week([], date: startOfWeek)
-            weeks[wk.weekStr] = wk
+        while startOfWeek <= date{
+            let wk: Week = Week(date: startOfWeek)
+            weekCache.append(wk)
             if let p = previousWeek{
                 p.nextWeek = wk
                 wk.previousWeek = p
             }
             previousWeek = wk
-            startOfWeek = Calendar(identifier: .iso8601).date(byAdding: DateComponents(day: 7), to: startOfWeek)!
+            startOfWeek = Calendar.current.date(byAdding: DateComponents(day: 7), to: startOfWeek)!
         }
         
-        for w in workouts{
-            if let wk = weeks[w.weekStr]{
-                wk.workouts.append(w)
-            }
-        }
-
-        return [Week](weeks.values)
+        return weekCache
     }
     
     func nextFunctionalFitnessTest() -> Workout{
         let incomplete: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts().filter({$0.type == WorkoutType.FFT.rawValue})
         if incomplete.count > 0{
-            return incomplete[0]
+            let w: Workout = incomplete[0]
+            w.date = max(Date(), w.date ?? Date())
+            CoreDataStackSingleton.shared.save()
+            return w
         }else{
             // really shouldn't get to this point as the next test should be created when the last one was saved
             print("Shouldn't really get here: WorkoutManager.nextFunctionFitnessTest as the next test should have been created")
             let tests: [Workout] = CoreDataStackSingleton.shared.getFunctionalFitnessTests().sorted(by: {$0.date! > $1.date!})
             if tests.count > 0{
-                createNextFunctionalFitnessTest(after: tests[0])
+                let _: Bool = createNextFunctionalFitnessTest(after: tests[0])
                 // have created next workout so call this method re-cursively
                 return nextFunctionalFitnessTest()
             }else{
@@ -235,13 +277,15 @@ class WorkoutManager: Athlete{
         }
     }
     
-    func createNextFunctionalFitnessTest(after: Workout){
+    func createNextFunctionalFitnessTest(after: Workout) -> Bool{
         // aim for tests every 4 weeks
         let oneMonthFromNow: Date = calendar.date(byAdding: DateComponents(day: 28), to: Date())!
         let test: Workout = createFunctionalFitnessTest(forDate: oneMonthFromNow)
         after.nextWorkout = test
         test.previousWorkout = after
+        let newPowerUp: Bool = checkforPowerups()
         CoreDataStackSingleton.shared.save()
+        return newPowerUp
     }
     
     func getExercises(forType type: ExerciseType) -> [Exercise]{
@@ -250,20 +294,49 @@ class WorkoutManager: Athlete{
     
     
     func createTestWorkoutData(){
-        var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!.startOfWeek!
+        var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!.startOfWeek
         let interval: DateComponents = DateComponents(day: 28)
         var previous: Workout?
-        let progression: [ExerciseType: [Double]] = [.gobletSquat: [5, 6, 7, 7, 8, 9, 10, 12, 14, 14, 15, 16, 17],
-                                                     .lunge: [5,7,10, 12, 12, 14, 15, 15, 16, 18, 20, 20, 22],
-                                                     .benchPress: [3, 4, 5, 6, 7, 8, 8, 10, 11, 12, 14, 15, 18],
-                                                     .pushUp: [5, 5, 6, 6, 7, 8, 9, 10, 10, 10, 11, 12, 15],
-                                                     .pullDown: [5, 6, 6, 5, 6, 7, 8, 8, 8, 9, 10, 12, 12]]
+        var previousFFT: Workout?
+        let progression: [ExerciseType: [Double]] = [.gobletSquat: [5, 6, 7, 7, 8, 9, 10, 12, 14, 14, 15, 16, 17, 20],
+                                                     .lunge: [5,7,10, 12, 12, 14, 15, 15, 16, 18, 20, 20, 22, 22],
+                                                     .benchPress: [3, 4, 5, 6, 7, 8, 8, 10, 11, 12, 14, 15, 18, 20],
+                                                     .pushUp: [5, 5, 6, 6, 7, 8, 9, 10, 10, 10, 11, 12, 15, 16],
+                                                     .pullDown: [5, 6, 6, 5, 6, 7, 8, 8, 8, 9, 10, 12, 12, 15]]
+        
+        let testProgression: [ExerciseType: [Double]] = [.standingBroadJump: [1, 1.1, 1.2, 1.3, 1.4, 1.45, 1.45, 1.5, 1.6, 1.6, 1.65, 1.65, 1.67, 1.7],
+                                                     .deadHang: [20.0, 23.0, 28.0, 33.0, 33.0, 35.0, 38.0, 43.0, 45.0, 46.0, 48, 49, 50, 55],
+                                                     .farmersCarry: [75.0, 80.0, 90.0, 93.0, 101.0, 102.0, 103.0, 107.0, 112.0, 115.0, 115, 125, 129, 130],
+                                                     .plank: [15.0, 25.0, 35.0, 36.0, 37.0, 38.0, 40.0, 41.0, 45.0, 50.0, 53, 55, 57, 60],
+                                                     .squat: [21.0, 22.0, 25.0, 27.0, 27.0, 30.0, 40.0, 41.0, 43.0, 45.0, 50, 60, 59, 65],
+                                                     .sittingRisingTest: [4, 5, 3, 4, 3, 2, 2, 2, 1, 0, 0, 0, 0, 0]]
 
         for i in 0..<progression[.gobletSquat]!.count{
-            // create weekly
+            // create tests
+            if d <= Date(){
+                // only create if on or before today
+                let fft: Workout = createFunctionalFitnessTest(forDate: d)
+                if let p = previousFFT{
+                    p.nextWorkout = fft
+                    fft.previousWorkout = p
+                }
+                for (key, value) in testProgression{
+                    if let s = fft.exercises(ofType: key)[0].exerciseSet(atOrder: 0){
+                        s.actual = value[i]
+                    }
+                }
+                fft.complete = true
+                previousFFT = fft
+            }
+            
+            // create weekly workouts
             for w in 0...3{
                 let date: Date = calendar.date(byAdding: DateComponents(day: w * 7), to: d)!
+        
                 for wkDate in createRandomDaysOfWeek(fromDate: date){
+                    if wkDate > Date(){
+                        break
+                    }
                     let w: Workout = createWorkout(forDate: wkDate, exercises: [
                         ExerciseDefaults(type: .gobletSquat, defaultPlan: 5, defaultKG: 5.0),
                         ExerciseDefaults(type: .lunge, defaultPlan: 5, defaultKG: 10.0),
@@ -290,12 +363,13 @@ class WorkoutManager: Athlete{
                     }
                     w.complete = true
                     previous = w
+                    CoreDataStackSingleton.shared.save()
                 }
+                let _: Bool = checkforPowerups(toDate: date)
             }
             d = calendar.date(byAdding: interval, to: d)!
         }
         
-        CoreDataStackSingleton.shared.save()
         
     }
     
@@ -304,44 +378,41 @@ class WorkoutManager: Athlete{
         let weekly = workoutDaysOfWeek[Int.random(in: 0..<workoutDaysOfWeek.count)]
         var result: [Date] = []
         for dayOfWeek in weekly{
-            result.append(calendar.date(byAdding: DateComponents(day: dayOfWeek), to: d.startOfWeek!)!)
+            result.append(calendar.date(byAdding: DateComponents(day: dayOfWeek), to: d.startOfWeek)!)
         }
-        let df: DateFormatter = DateFormatter()
-        df.dateFormat = "E dd-MMM-yyyy"
-        print(result.map({df.string(from: $0)}).joined(separator: " : "))
         return result
     }
     
-    func createTestFFTData(){
-        var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!
-        let interval: DateComponents = DateComponents(day: 28)
-        var previous: Workout?
-        let progression: [ExerciseType: [Double]] = [.standingBroadJump: [1, 1.1, 1.2, 1.3, 1.4, 1.45, 1.45, 1.5, 1.6, 1.6, 1.65, 1.65, 1.67],
-                                                     .deadHang: [20.0, 23.0, 28.0, 33.0, 33.0, 35.0, 38.0, 43.0, 45.0, 46.0, 48, 49, 50],
-                                                     .farmersCarry: [75.0, 80.0, 90.0, 93.0, 101.0, 102.0, 103.0, 107.0, 112.0, 115.0, 115, 125, 129],
-                                                     .plank: [15.0, 25.0, 35.0, 36.0, 37.0, 38.0, 40.0, 41.0, 45.0, 50.0, 53, 55, 57],
-                                                     .squat: [21.0, 22.0, 25.0, 27.0, 27.0, 30.0, 40.0, 41.0, 43.0, 45.0, 50, 60, 59],
-                                                     .sittingRisingTest: [4, 5, 3, 4, 3, 2, 2, 2, 1, 0, 0, 0, 0]]
-        
-        for i in 0..<progression[.standingBroadJump]!.count{
-            let fft: Workout = createFunctionalFitnessTest(forDate: d)
-            if let p = previous{
-                p.nextWorkout = fft
-                fft.previousWorkout = p
-            }
-            for (key, value) in progression{
-                if let s = fft.exercises(ofType: key)[0].exerciseSet(atOrder: 0){
-                    s.actual = value[i]
-                }
-            }
-            fft.complete = true
-            previous = fft
-            d = calendar.date(byAdding: interval, to: d)!
-        }
-        
-        CoreDataStackSingleton.shared.save()
-        
-    }
+//    func createTestFFTData(){
+//        var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!
+//        let interval: DateComponents = DateComponents(day: 28)
+//        var previous: Workout?
+//        let progression: [ExerciseType: [Double]] = [.standingBroadJump: [1, 1.1, 1.2, 1.3, 1.4, 1.45, 1.45, 1.5, 1.6, 1.6, 1.65, 1.65, 1.67, 1.7],
+//                                                     .deadHang: [20.0, 23.0, 28.0, 33.0, 33.0, 35.0, 38.0, 43.0, 45.0, 46.0, 48, 49, 50, 55],
+//                                                     .farmersCarry: [75.0, 80.0, 90.0, 93.0, 101.0, 102.0, 103.0, 107.0, 112.0, 115.0, 115, 125, 129, 130],
+//                                                     .plank: [15.0, 25.0, 35.0, 36.0, 37.0, 38.0, 40.0, 41.0, 45.0, 50.0, 53, 55, 57, 60],
+//                                                     .squat: [21.0, 22.0, 25.0, 27.0, 27.0, 30.0, 40.0, 41.0, 43.0, 45.0, 50, 60, 59, 65],
+//                                                     .sittingRisingTest: [4, 5, 3, 4, 3, 2, 2, 2, 1, 0, 0, 0, 0, 0]]
+//
+//        for i in 0..<progression[.standingBroadJump]!.count{
+//            let fft: Workout = createFunctionalFitnessTest(forDate: d)
+//            if let p = previous{
+//                p.nextWorkout = fft
+//                fft.previousWorkout = p
+//            }
+//            for (key, value) in progression{
+//                if let s = fft.exercises(ofType: key)[0].exerciseSet(atOrder: 0){
+//                    s.actual = value[i]
+//                }
+//            }
+//            fft.complete = true
+//            previous = fft
+//            d = calendar.date(byAdding: interval, to: d)!
+//        }
+//
+//        CoreDataStackSingleton.shared.save()
+//
+//    }
     
     private func createFunctionalFitnessTest(forDate date: Date) ->  Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
@@ -355,6 +426,7 @@ class WorkoutManager: Athlete{
             exerciseSet.order = 0
             exerciseSet.plan = fft.defaultPlan
             exerciseSet.plannedKG = fft.defaultKG
+            exerciseSet.actualKG = exerciseSet.plannedKG
             exerciseSet.exercise = exercise
             exercise.addToSets(exerciseSet)
             exercise.order = order
@@ -367,15 +439,18 @@ class WorkoutManager: Athlete{
     }
     
     func nextWorkout() -> Workout{
-        let incomplete: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts().filter({$0.type == WorkoutType.DescendingReps.rawValue})
+        let incomplete: [Workout] = CoreDataStackSingleton.shared.incompleteWorkouts().filter({!$0.isTest})
         if incomplete.count > 0{
-            return incomplete[0]
+            let w: Workout = incomplete[0]
+            w.date = max(Date(), w.date ?? Date())
+            CoreDataStackSingleton.shared.save()
+            return w
         }else{
             // really shouldn't get to this point as the next test should be created when the last one was saved
             print("Shouldn't really get here: nextWorkout as the next workout should have been created ")
-            let workouts: [Workout] = CoreDataStackSingleton.shared.getOrderedWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! > $1.date!})
+            let workouts: [Workout] = CoreDataStackSingleton.shared.getChronologicalOrderedWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! > $1.date!})
             if workouts.count > 0{
-                createNextWorkout(after: workouts[0])
+                let _: Bool = createNextWorkout(after: workouts[0])
                 // have created next workout so call this method re-cursively
                 return nextWorkout()
             }else{
@@ -388,16 +463,93 @@ class WorkoutManager: Athlete{
         }
     }
 
-    func createNextWorkout(after: Workout){
+    func createNextWorkout(after: Workout) -> Bool{
         // set for tomorrow
         let tomorrow: Date = calendar.date(byAdding: DateComponents(day: 1), to: Date())!
         let workout: Workout = createWorkout(forDate: tomorrow, exercises: exerciseSet1)
         after.nextWorkout = workout
         workout.previousWorkout = after
+        let newPowerUp: Bool = checkforPowerups()
         CoreDataStackSingleton.shared.save()
+        return newPowerUp
+    }
+    
+    private func checkforPowerups() -> Bool{
+        return checkforPowerups(toDate: Date())
+    }
+    
+    private func checkforPowerups(toDate date: Date) -> Bool{
+        print("Checking whether to update power ups to \(date)")
+        let orderWeeks: [Week] = getWeeks(toDate: date).sorted(by: {$0.startOfWeek < $1.startOfWeek})
+        let maxStreak: Int16 = Int16(orderWeeks.reduce(0, {max($0, $1.recursivelyCalculateConsistencyStreak())}))
+        let maxRepKGEdNum: Int16 = Int16(EddingtonCalculator().eddingtonHistory(timeSeries: timeSeries(forExeciseType: .ALL, andMeasure: .maxRepKG)).eddingtonNumber)
+        let orderedPowerUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps().sorted(by: {$0.date! < $1.date!})
+        
+        var newDefence: Int16?
+        var newAttack: Int16?
+        var date: Date?
+        
+        if orderedPowerUps.count == 0{
+            if maxStreak + maxRepKGEdNum > 0{
+                newDefence = maxStreak
+                newAttack = Int16(Double(maxRepKGEdNum).squareRoot())
+                if orderWeeks.count > 0{
+                    date = orderWeeks[orderWeeks.count - 1].startOfWeek
+                }else{
+                    date = Date()
+                }
+            }
+        }else{
+            let cPUp = orderedPowerUps[orderedPowerUps.count - 1]
+            newAttack = Int16(Double(maxRepKGEdNum).squareRoot())
+            if maxStreak > cPUp.defense || newAttack! > cPUp.attack{
+                newDefence = max(maxStreak, cPUp.defense)
+                newAttack = max(newAttack!, cPUp.attack)
+                if orderWeeks.count > 0{
+                    date = orderWeeks[orderWeeks.count - 1].startOfWeek
+                }else{
+                    date = Date()
+                }
+            }
+        }
+        
+        if let defense = newDefence{
+            if let attack = newAttack{
+                if let d = date{
+                    let newPowerUp: PowerUp = CoreDataStackSingleton.shared.newPowerUp()
+                    newPowerUp.attack = attack
+                    newPowerUp.defense = defense
+                    newPowerUp.date = d
+                    print(newPowerUp.description)
+                    CoreDataStackSingleton.shared.save()
+                    saveLatestPowerUpToCloud()
+                    return true
+
+                }
+            }
+        }
+        
+        return false
     }
 
-
+    func saveLatestPowerUpToCloud(){
+        let powerUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps().sorted(by: {$0.date! > $1.date!})
+        if powerUps.count > 0{
+            let attack = powerUps[0].attack
+            let defence = powerUps[0].defense
+            if let user = Auth.auth().currentUser{
+                if let ref = firebaseRef{
+                    ref.child("users").child(user.uid).child("attack").setValue(attack)
+                    ref.child("users").child(user.uid).child("defence").setValue(defence)
+                    print("Updated power-ups to DEFENCE:\(defence)~ATTACK:\(attack) for user with uid: \(user.uid)")
+                }
+            }else{
+                print("no user logged in so can't save power-ups")
+            }
+        }else{
+            print("no power-ups to save")
+        }
+    }
 
     private func createWorkout(forDate date: Date, exercises: [ExerciseDefaults]) -> Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
@@ -415,10 +567,11 @@ class WorkoutManager: Athlete{
             var setOrder: Int16 = 0
             for r in (1...maxReps).reversed(){
                 let exerciseSet: ExerciseSet = CoreDataStackSingleton.shared.newExerciseSet(forType: e.type.setType())
-                print(exerciseSet)
                 exerciseSet.order = setOrder
                 exerciseSet.plannedKG = e.defaultKG
                 exerciseSet.plan = Double(r)
+                // set actual to the plan as unless the changes this it's assumed they do the plan
+                exerciseSet.actualKG = exerciseSet.plannedKG
                 exercise.addToSets(exerciseSet)
                 setOrder += 1
             }
@@ -429,16 +582,16 @@ class WorkoutManager: Athlete{
     }
 
     private init(){
-        let df: DateFormatter = DateFormatter()
-        df.dateFormat = "E dd-MMM-YYY"
-        print("getting weeks")
-        for w in getWeeks().sorted(by: {$0.date < $1.date}){
-            let dateStr: [String] = w.workouts.map({df.string(from: $0.date!)})
-            print("\(w.weekStr) ~Streak: \(w.consistencyStreak()) ~ (Prev: \(w.previousWeek?.weekStr ?? "") Next: \(w.nextWeek?.weekStr ?? "") ) - \(dateStr.joined(separator: " : "))")
+        firebaseRef = Database.database().reference()
+        if let user = Auth.auth().currentUser{
+            print("User logged in with uid: \(user.uid)")
+            print(firebaseRef!.child("users").child(user.uid).child("attack").observe(.value, with: { (data) in
+                print(data)
+            }))
+            print(firebaseRef!.child("users").child(user.uid).child("defence").observe(.value, with: { (data) in
+                print(data)
+            }))
         }
-        
-
-        
     }
     
 }

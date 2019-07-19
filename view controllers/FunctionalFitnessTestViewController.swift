@@ -12,15 +12,15 @@ class FunctionalFitnessTestViewController: UIViewController {
 
     @IBOutlet weak var dateTextField: UITextField!
     
-    private var datePicker: UIDatePicker?
+    private var datePicker: UIDatePicker = UIDatePicker()
+    
     private let df = DateFormatter()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let testDate: Date = WorkoutManager.shared.nextFunctionalFitnessTest().date ?? Date()
         df.dateFormat = "yyyy-MM-dd"
-        dateTextField.text = df.string(from: testDate)
+
         var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
         if view.backgroundColor?.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) ?? false{
             dateTextField.backgroundColor = UIColor(hue: hue, saturation: saturation, brightness: brightness * 1.1, alpha: alpha)
@@ -29,15 +29,20 @@ class FunctionalFitnessTestViewController: UIViewController {
         }
         dateTextField.textColor = UIColor.white
         
-        datePicker = UIDatePicker()
-        datePicker?.datePickerMode = .date
-        datePicker?.addTarget(self, action: #selector(dateChanged(datePicker:)), for: .valueChanged)
-        datePicker?.date = testDate
+        datePicker.datePickerMode = .date
+        datePicker.addTarget(self, action: #selector(dateChanged(datePicker:)), for: .valueChanged)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
         view.addGestureRecognizer(tapGesture)
         
         dateTextField.inputView = datePicker
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let testDate: Date = WorkoutManager.shared.nextFunctionalFitnessTest().date ?? Date()
+        dateTextField.text = df.string(from: testDate)
+        datePicker.date = testDate
     }
     
     @objc func viewTapped(gestureRecogniser: UITapGestureRecognizer){

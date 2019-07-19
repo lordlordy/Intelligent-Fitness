@@ -10,8 +10,15 @@ import Foundation
 
 extension Date{
     
-    var startOfWeek: Date?{
-        return Calendar(identifier: .iso8601).date(from: Calendar(identifier: .iso8601).dateComponents([Calendar.Component.yearForWeekOfYear, Calendar.Component.weekOfYear], from: self))
+    var startOfWeek: Date{
+        return Calendar.current.date(from: Calendar.current.dateComponents([Calendar.Component.yearForWeekOfYear, Calendar.Component.weekOfYear], from: self))!
     }
     
+    var endOfWeek: Date{
+        return Calendar.current.date(byAdding: DateComponents(day: 6), to: startOfWeek)!
+    }
+    
+    var weekOfYear: Int { return Calendar.current.dateComponents([Calendar.Component.weekOfYear], from: self).weekOfYear!}
+    var year: Int { return Calendar.current.dateComponents([Calendar.Component.yearForWeekOfYear], from: self).yearForWeekOfYear!}
+   
 }

@@ -18,6 +18,11 @@
         <attribute name="restSeconds" attributeType="Integer 16" defaultValueString="30" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="exercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Exercise" inverseName="sets" inverseEntity="Exercise" syncable="YES"/>
     </entity>
+    <entity name="PowerUp" representedClassName="PowerUp" syncable="YES" codeGenerationType="class">
+        <attribute name="attack" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="defense" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
     <entity name="RepSet" representedClassName="RepSet" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class"/>
     <entity name="TimeSet" representedClassName="TimeSet" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class"/>
     <entity name="TouchSet" representedClassName="TouchSet" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class"/>
@@ -32,12 +37,13 @@
         <relationship name="previousWorkout" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Workout" inverseName="nextWorkout" inverseEntity="Workout" syncable="YES"/>
     </entity>
     <elements>
+        <element name="DistanceSet" positionX="-264.17578125" positionY="976.17578125" width="128" height="43"/>
         <element name="Exercise" positionX="-667.34765625" positionY="786.5625" width="128" height="133"/>
         <element name="ExerciseSet" positionX="-417.328125" positionY="741.109375" width="128" height="148"/>
-        <element name="Workout" positionX="-932.73828125" positionY="782.71484375" width="128" height="163"/>
         <element name="RepSet" positionX="-574.984375" positionY="966.44140625" width="128" height="43"/>
         <element name="TimeSet" positionX="-425.015625" positionY="978.71875" width="128" height="43"/>
-        <element name="DistanceSet" positionX="-264.17578125" positionY="976.17578125" width="128" height="43"/>
         <element name="TouchSet" positionX="-104.55078125" positionY="976.90625" width="128" height="43"/>
+        <element name="Workout" positionX="-932.73828125" positionY="782.71484375" width="128" height="163"/>
+        <element name="PowerUp" positionX="-890.16796875" positionY="1061.31640625" width="128" height="88"/>
     </elements>
 </model>

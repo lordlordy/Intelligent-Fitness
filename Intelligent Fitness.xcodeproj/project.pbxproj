@@ -13,6 +13,8 @@
 		730E643422CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */; };
 		731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731D517A22BA828600AA7EA4 /* LoginViewController.swift */; };
 		731D517D22BA83E100AA7EA4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */; };
+		731F80E722E0416C008399AD /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731F80E622E0416C008399AD /* WebViewController.swift */; };
+		731F80E922E0C136008399AD /* PowerUp+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731F80E822E0C136008399AD /* PowerUp+Extension.swift */; };
 		7342CB9422C51F36000A6FB6 /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */; };
 		7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */; };
 		7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */; };
@@ -79,6 +81,8 @@
 		730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionalFitnessTestViewController.swift; sourceTree = "<group>"; };
 		731D517A22BA828600AA7EA4 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		731F80E622E0416C008399AD /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		731F80E822E0C136008399AD /* PowerUp+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PowerUp+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
@@ -168,6 +172,7 @@
 				7300458322C0DAEC00B5720B /* WorkoutViewController.swift */,
 				730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */,
 				73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */,
+				731F80E622E0416C008399AD /* WebViewController.swift */,
 			);
 			path = "view controllers";
 			sourceTree = "<group>";
@@ -260,6 +265,7 @@
 				73CD5EB222DF6CBE00AFFF21 /* TimeSet+Extension.swift */,
 				73CD5EB422DF6EAC00AFFF21 /* DistanceSet+Extension.swift */,
 				73CD5EB622DF6EDF00AFFF21 /* TouchSet+Extension.swift */,
+				731F80E822E0C136008399AD /* PowerUp+Extension.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -545,6 +551,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */,
+				731F80E722E0416C008399AD /* WebViewController.swift in Sources */,
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
 				7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */,
@@ -575,6 +582,7 @@
 				737373BC22B508F200698DD4 /* CoreDataStackSingleton.swift in Sources */,
 				738E445422CB58C500F7BEA6 /* Exercise+Extension.swift in Sources */,
 				7376664022CCB7D9004324B5 /* ProgressView.swift in Sources */,
+				731F80E922E0C136008399AD /* PowerUp+Extension.swift in Sources */,
 				736D6BAC22DC660C003C9056 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

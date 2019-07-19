@@ -17,8 +17,11 @@ class WorkoutViewController: UIViewController {
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var currentStreakTextField: UITextField!
     @IBOutlet weak var bestStreakTextField: UITextField!
+    @IBOutlet weak var workoutsThisWeekTextField: UITextField!
+    @IBOutlet weak var testsThisWeekTextField: UITextField!
+    @IBOutlet weak var currentlyConsistentTextField: UITextField!
     
-    private var datePicker: UIDatePicker?
+    private var datePicker: UIDatePicker = UIDatePicker()
     private let df = DateFormatter()
 
     private let descriptionText: String = "Your aim is to do three sessions per week with no more than two rest days between sessions. Consecutive weeks of consistency will be rewarded with power ups in the 'Fitness Invaders' game."
@@ -27,9 +30,7 @@ class WorkoutViewController: UIViewController {
         super.viewDidLoad()
         descriptionLabel.text = descriptionText
         df.dateFormat = "yyyy-MM-dd"
-        let workoutDate: Date = WorkoutManager.shared.nextWorkout().date ?? Date()
-        print(WorkoutManager.shared.nextWorkout())
-        dateTextField.text = df.string(from: workoutDate)
+        
         var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
         if view.backgroundColor?.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) ?? false{
             dateTextField.backgroundColor = UIColor(hue: hue, saturation: saturation, brightness: brightness * 1.1, alpha: alpha)
@@ -38,16 +39,15 @@ class WorkoutViewController: UIViewController {
         }
         dateTextField.textColor = UIColor.white
         
-        datePicker = UIDatePicker()
-        datePicker?.datePickerMode = .date
-        datePicker?.addTarget(self, action: #selector(dateChanged(datePicker:)), for: .valueChanged)
-        datePicker?.date = workoutDate
+        datePicker.datePickerMode = .date
+        datePicker.addTarget(self, action: #selector(dateChanged(datePicker:)), for: .valueChanged)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
         view.addGestureRecognizer(tapGesture)
         
         dateTextField.inputView = datePicker
     }
+    
     
     
     @objc func viewTapped(gestureRecogniser: UITapGestureRecognizer){
@@ -63,11 +63,47 @@ class WorkoutViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let type: WorkoutType? = WorkoutType(rawValue: WorkoutManager.shared.nextWorkout().type)
+        
+        let nextWorkout: Workout = WorkoutManager.shared.nextWorkout()
+        let d: Date = nextWorkout.date ?? Date()
+        dateTextField.text = df.string(from: d)
+        datePicker.date = d
+
+        let type: WorkoutType? = nextWorkout.workoutType()
         workoutTypeLabel.text = type?.string() ?? "Workout Type Unknown"
         let streak = WorkoutManager.shared.currentStreakData()
         currentStreakTextField.text = "\(streak.current) weeks"
         bestStreakTextField.text = "\(streak.best) weeks"
+        
+        if let currentWeek = WorkoutManager.shared.currentWeek(){
+            if currentWeek.consistent{
+                currentlyConsistentTextField.text = "Yes"
+            }else{
+                currentlyConsistentTextField.text = "No"
+            }
+            let formatter: DateFormatter = DateFormatter()
+            formatter.dateFormat = "E"
+            let completedWorkoutDays: [String] = currentWeek.completeWorkouts.filter({!$0.isTest}).map({formatter.string(from: $0.date!)})
+            let completedTestDays: [String] = currentWeek.completeWorkouts.filter({$0.isTest}).map({formatter.string(from: $0.date!)})
+            let incompleteTestsDays: [String] = currentWeek.incompleteWorkouts.filter({$0.isTest}).map({formatter.string(from: $0.date!)})
+            
+            workoutsThisWeekTextField.text = completedWorkoutDays.joined(separator: ", ")
+            var testsStr: [String] = []
+            if completedTestDays.count > 0{
+                testsStr.append("Done: ")
+                testsStr = testsStr + completedTestDays
+            }
+            if incompleteTestsDays.count > 0{
+                testsStr.append("ToDo: ")
+                testsStr = testsStr + incompleteTestsDays
+            }
+            if testsStr.count == 0{
+                testsThisWeekTextField.text = "No Tests"
+            }else{
+                testsThisWeekTextField.text = testsStr.joined(separator: " ")
+            }
+            
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
