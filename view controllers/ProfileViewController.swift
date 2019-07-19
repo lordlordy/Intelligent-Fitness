@@ -9,8 +9,7 @@
 import UIKit
 import HealthKit
 import Firebase
-import AVKit
-import WebKit
+import FirebaseUI
 
 class ProfileViewController: UITableViewController {
     
@@ -25,6 +24,8 @@ class ProfileViewController: UITableViewController {
     @IBOutlet weak var heightDateTextField: UITextField!
     @IBOutlet weak var weightTextField: UITextField!
     @IBOutlet weak var weightDateTextField: UITextField!
+    @IBOutlet weak var loginRegisterButton: UIButton!
+    private var buttonIsLogin: Bool = true
     
     @IBAction func authorizeHealthKit(_ sender: Any) {
         HealthKitAccess.shared.authorizeHealthKit { (success, error) in
@@ -42,21 +43,35 @@ class ProfileViewController: UITableViewController {
         }
     }
     
-    @IBAction func playVideo(_ sender: Any) {
-//        let player = AVPlayer(url: URL(string: "https://www.youtube.com/embed/gXjNTLSVvGM")!)
-//        let playerViewController = AVPlayerViewController()
-//        playerViewController.player = player
-//        present(playerViewController, animated: true) {
-//            player.play()
-//        }
-//        let webView: WKWebView = WKWebView()
-//        webView.loadHTMLString("<iframe width=\"951\" height=\"535\" src=\"https://www.youtube.com/embed/gXjNTLSVvGM\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>", baseURL: nil)
-        
-        let pw = WebViewController()
-        
-        present(pw, animated: true, completion: nil)
-        
+    @IBAction func loginRegister(_ sender: Any) {
+        if buttonIsLogin{
+            if let authUI = FUIAuth.defaultAuthUI() {
+                authUI.delegate = self
+                let emailAuth = FUIEmailAuth()
+                emailAuth.signIn(withPresenting: self, email: nil)
+                authUI.providers = [emailAuth]
+                let authVC = authUI.authViewController()
+                present(authVC, animated: true, completion: {
+                    self.buttonIsLogin = false
+                    self.loginRegisterButton.titleLabel?.text = "Logout"
+                })
+            }else{
+                
+            }
+        }else{
+            do{
+                try Auth.auth().signOut()
+                self.buttonIsLogin = true
+                self.loginRegisterButton.titleLabel?.text = "Login / Register"
+            }catch{
+                print("signout failed")
+                print(error)
+            }
+        }
+    }
     
+    @IBAction func test(_ sender: UIButton) {
+        WorkoutManager.shared.saveLatestPowerUpToCloud()
     }
     
     @IBAction func restingHRInfoTapped(_ sender: Any) {
@@ -129,15 +144,31 @@ class ProfileViewController: UITableViewController {
                 self.weightDateTextField.text = df.string(from: d)
             }
         }
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let _ = Auth.auth().currentUser{
+            loginRegisterButton.titleLabel?.text = "Logout"
+            buttonIsLogin = false
+        }else{
+            loginRegisterButton.titleLabel?.text = "Login / Register"
+            buttonIsLogin = true
+        }
     }
 
 
     @IBAction func createTestData(_ sender: Any) {
         // create some data to allow testing of various features. For now aim to create a years worth of data
-        // test data first
-//        WorkoutManager.shared.createTestFFTData()
         WorkoutManager.shared.createTestWorkoutData()
 
+    }
+}
+
+extension ProfileViewController: FUIAuthDelegate{
+    func authUI(_ authUI: FUIAuth, didSignInWith authDataResult: AuthDataResult?, url: URL?, error: Error?) {
+        if let error = error{
+            print(error)
+        }
     }
 }

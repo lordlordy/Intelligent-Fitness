@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import Firebase
+import FirebaseDatabase
+import FirebaseAuth
 
 enum ExerciseType: Int16, CaseIterable{
     case gobletSquat, lunge, benchPress, pushUp, pullDown
@@ -128,6 +131,8 @@ class WorkoutManager: Athlete{
 
     
     static var shared: WorkoutManager = WorkoutManager()
+    var firebaseRef: DatabaseReference?
+    
     
     private struct ExerciseDefaults{
         var type: ExerciseType
@@ -217,7 +222,7 @@ class WorkoutManager: Athlete{
             //we have a cache. Just need to see if we need to add more weeks
             if weekCache[weekCache.count-1].endOfWeek >= date{
                 // it's upto date
-                return weekCache.filter({$0.endOfWeek <= date})
+                return weekCache.filter({$0.startOfWeek <= date})
             }else{
                 // add missing weeks
                 startOfWeek = Calendar.current.date(byAdding: DateComponents(day: 7), to: weekCache[weekCache.count-1].startOfWeek)!
@@ -480,14 +485,14 @@ class WorkoutManager: Athlete{
         let maxRepKGEdNum: Int16 = Int16(EddingtonCalculator().eddingtonHistory(timeSeries: timeSeries(forExeciseType: .ALL, andMeasure: .maxRepKG)).eddingtonNumber)
         let orderedPowerUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps().sorted(by: {$0.date! < $1.date!})
         
-        var newStreak: Int16?
-        var newEdNum: Int16?
+        var newDefence: Int16?
+        var newAttack: Int16?
         var date: Date?
         
         if orderedPowerUps.count == 0{
             if maxStreak + maxRepKGEdNum > 0{
-                newStreak = maxStreak
-                newEdNum = maxRepKGEdNum
+                newDefence = maxStreak
+                newAttack = Int16(Double(maxRepKGEdNum).squareRoot())
                 if orderWeeks.count > 0{
                     date = orderWeeks[orderWeeks.count - 1].startOfWeek
                 }else{
@@ -496,9 +501,10 @@ class WorkoutManager: Athlete{
             }
         }else{
             let cPUp = orderedPowerUps[orderedPowerUps.count - 1]
-            if maxStreak > cPUp.defense || maxRepKGEdNum > cPUp.attack{
-                newStreak = max(maxStreak, cPUp.defense)
-                newEdNum = max(maxRepKGEdNum, cPUp.attack)
+            newAttack = Int16(Double(maxRepKGEdNum).squareRoot())
+            if maxStreak > cPUp.defense || newAttack! > cPUp.attack{
+                newDefence = max(maxStreak, cPUp.defense)
+                newAttack = max(newAttack!, cPUp.attack)
                 if orderWeeks.count > 0{
                     date = orderWeeks[orderWeeks.count - 1].startOfWeek
                 }else{
@@ -507,8 +513,8 @@ class WorkoutManager: Athlete{
             }
         }
         
-        if let defense = newStreak{
-            if let attack = newEdNum{
+        if let defense = newDefence{
+            if let attack = newAttack{
                 if let d = date{
                     let newPowerUp: PowerUp = CoreDataStackSingleton.shared.newPowerUp()
                     newPowerUp.attack = attack
@@ -526,8 +532,23 @@ class WorkoutManager: Athlete{
         return false
     }
 
-    private func saveLatestPowerUpToCloud(){
-        print("~~!!~~ TO BE IMPLEMENTED - saving powerups to the cloud")
+    func saveLatestPowerUpToCloud(){
+        let powerUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps().sorted(by: {$0.date! > $1.date!})
+        if powerUps.count > 0{
+            let attack = powerUps[0].attack
+            let defence = powerUps[0].defense
+            if let user = Auth.auth().currentUser{
+                if let ref = firebaseRef{
+                    ref.child("users").child(user.uid).child("attack").setValue(attack)
+                    ref.child("users").child(user.uid).child("defence").setValue(defence)
+                    print("Updated power-ups to DEFENCE:\(defence)~ATTACK:\(attack) for user with uid: \(user.uid)")
+                }
+            }else{
+                print("no user logged in so can't save power-ups")
+            }
+        }else{
+            print("no power-ups to save")
+        }
     }
 
     private func createWorkout(forDate date: Date, exercises: [ExerciseDefaults]) -> Workout{
@@ -561,6 +582,16 @@ class WorkoutManager: Athlete{
     }
 
     private init(){
+        firebaseRef = Database.database().reference()
+        if let user = Auth.auth().currentUser{
+            print("User logged in with uid: \(user.uid)")
+            print(firebaseRef!.child("users").child(user.uid).child("attack").observe(.value, with: { (data) in
+                print(data)
+            }))
+            print(firebaseRef!.child("users").child(user.uid).child("defence").observe(.value, with: { (data) in
+                print(data)
+            }))
+        }
     }
     
 }

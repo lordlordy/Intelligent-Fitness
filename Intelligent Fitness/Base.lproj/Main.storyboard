@@ -930,12 +930,37 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="wyE-gr-FGF">
+                                        <rect key="frame" x="0.0" y="519.33333333333337" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="wyE-gr-FGF" id="e5d-L9-Guj">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.666666666666664"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7U5-rb-387">
+                                                    <rect key="frame" x="144" y="5" width="126" height="34"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                                    <state key="normal" title="Login / Register">
+                                                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="loginRegister:" destination="ytO-ta-4b3" eventType="touchUpInside" id="P1g-Xm-625"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="7U5-rb-387" firstAttribute="centerX" secondItem="e5d-L9-Guj" secondAttribute="centerX" id="EIU-LK-ZhA"/>
+                                                <constraint firstItem="7U5-rb-387" firstAttribute="centerY" secondItem="e5d-L9-Guj" secondAttribute="centerY" id="e8M-Du-8El"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="Testing" id="GXQ-oj-AT6">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="FrN-6M-3LV">
-                                        <rect key="frame" x="0.0" y="575.33333333333337" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="619.33333333333337" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="FrN-6M-3LV" id="Q4B-Oc-bn0">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.666666666666664"/>
@@ -960,18 +985,21 @@
                                         <color key="backgroundColor" red="0.1019607843" green="0.47058823529999999" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Prd-t0-BiN">
-                                        <rect key="frame" x="0.0" y="619.33333333333337" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="663.33333333333337" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Prd-t0-BiN" id="BYb-N7-Ffn">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0UV-fP-pha">
-                                                    <rect key="frame" x="164.66666666666666" y="5" width="85" height="34"/>
+                                                    <rect key="frame" x="131" y="5" width="152" height="34"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                                    <state key="normal" title="Play Video">
+                                                    <state key="normal" title="Test Firebase Save">
                                                         <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </state>
+                                                    <connections>
+                                                        <action selector="test:" destination="ytO-ta-4b3" eventType="touchUpInside" id="kXf-O7-eNR"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
@@ -997,6 +1025,7 @@
                         <outlet property="heightTextField" destination="PoX-GS-eEm" id="afM-49-eCv"/>
                         <outlet property="hrvDateTextField" destination="Qrh-Hk-ylr" id="sWF-lo-GLm"/>
                         <outlet property="hrvTextField" destination="Xyy-gz-SHy" id="ftz-sT-kgC"/>
+                        <outlet property="loginRegisterButton" destination="7U5-rb-387" id="0dy-lT-bOY"/>
                         <outlet property="restingHRDateTextField" destination="mAl-AA-PzO" id="rxO-z1-rCU"/>
                         <outlet property="restingHRTextField" destination="gyp-ZM-nLc" id="gtr-QA-Ew2"/>
                         <outlet property="sexTextField" destination="dER-K7-ibH" id="HWZ-cS-j1m"/>

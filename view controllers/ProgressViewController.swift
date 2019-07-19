@@ -161,8 +161,8 @@ class ProgressViewController: UIViewController {
     }
     
     private func createPowerUpGraph(){
-        chooseButton.isEnabled = true
-        chooseButton.isHidden = false
+        chooseButton.isEnabled = false
+        chooseButton.isHidden = true
         let title: String  = "Power-Ups"
         titleLabel.text = title
         let pUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps()
@@ -210,7 +210,6 @@ class ProgressViewController: UIViewController {
         chooseButton.isEnabled = true
         chooseButton.isHidden = false
         let data: [(Date, Double)] = WorkoutManager.shared.timeSeries(forExeciseType: selectedExercise, andMeasure: selectedMeasure)
-//        let data: [(Date, Double)] = WorkoutManager.shared.getExercises(forType: selectedExercise).map({(date: $0.date!, value: $0.getValue(forMeasure: selectedMeasure))}).sorted(by: {$0.date < $1.date})
         let eddNum: EddingtonCalculator.EddingtonHistory = EddingtonCalculator().eddingtonHistory(timeSeries: data)
 
         var history = eddNum.annualHistory
@@ -278,7 +277,10 @@ class ProgressViewController: UIViewController {
             }else{
                 self.graphData = [(title, data)]
                 self.collapsed = [false]
-                self.graphView.addGraph(graph: Graph(data: data, colour: .magenta))
+                let hrvGraph: Graph = Graph(data: data, colour: .magenta)
+                hrvGraph.point = true
+                hrvGraph.fill = true
+                self.graphView.addGraph(graph: hrvGraph)
             }
         }
     }
