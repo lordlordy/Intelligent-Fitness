@@ -171,13 +171,13 @@ class ProgressViewController: UIViewController {
         graphData = [("Defence", defence), ("Attack", attack)]
         collapsed = [true, false]
         graphView.removeAllGraphs()
-        let defenceLine: Graph = Graph(data: defence, colour: .red)
-        let defencePoints: Graph = Graph(data: defence, colour: .green)
+        let defenceLine: Graph = LineGraph(data: defence, colour: .red)
+        let defencePoints: Graph = PointGraph(data: defence, colour: .green)
         defencePoints.point = true
         defencePoints.fill = true
         defencePoints.pointSize = 10.0
-        let attackLine: Graph = Graph(data: attack, colour: .blue)
-        let attackPoints: Graph  = Graph(data: attack, colour: .cyan)
+        let attackLine: Graph = LineGraph(data: attack, colour: .blue)
+        let attackPoints: Graph  = PointGraph(data: attack, colour: .cyan)
         attackPoints.point = true
         attackPoints.fill = true
         attackPoints.pointSize = 10.0
@@ -200,10 +200,10 @@ class ProgressViewController: UIViewController {
         graphData = [(title, data), ("Max streak", maxValues)]
         collapsed = [false, false]
         graphView.removeAllGraphs()
-        let graph: Graph = Graph(data: data, colour: MAIN_BLUE)
+        let graph: Graph = LineGraph(data: data, colour: MAIN_BLUE)
         graph.fill = true
         graph.invertFill = true
-        graphView.setGraphs(graphs: [graph, Graph(data: maxValues, colour: .red)])
+        graphView.setGraphs(graphs: [graph, LineGraph(data: maxValues, colour: .red)])
     }
     
     private func createEdGraph(){
@@ -225,9 +225,9 @@ class ProgressViewController: UIViewController {
         let edData: [(Date, Double)] = history.map({($0.date, Double($0.edNum))})
         let edContributors: [(Date, Double)] = history.map({($0.date, $0.contributor)})
         let edPlusOne: [(Date, Double)] = history.map({($0.date, Double($0.edNum + $0.plusOne))})
-        let edGraph: Graph = Graph(data: edData, colour: .red)
-        let contribGraph: Graph = Graph(data: edContributors, colour: .cyan)
-        let plusOneGraph: Graph = Graph(data: edPlusOne, colour: .green)
+        let edGraph: Graph = LineGraph(data: edData, colour: .red)
+        let contribGraph: Graph = PointGraph(data: edContributors, colour: .cyan)
+        let plusOneGraph: Graph = LineGraph(data: edPlusOne, colour: .green)
         edGraph.fill = true
         edGraph.invertFill = true
         contribGraph.point = true
@@ -259,7 +259,7 @@ class ProgressViewController: UIViewController {
             if data.count > 0{
                 self.graphData = [(title, data)]
                 self.collapsed = [false]
-                self.graphView.addGraph(graph: Graph(data: data, colour: .red))
+                self.graphView.addGraph(graph: LineGraph(data: data, colour: .red))
             }else{
                 return
             }
@@ -277,7 +277,7 @@ class ProgressViewController: UIViewController {
             }else{
                 self.graphData = [(title, data)]
                 self.collapsed = [false]
-                let hrvGraph: Graph = Graph(data: data, colour: .magenta)
+                let hrvGraph: Graph = PointGraph(data: data, colour: .magenta)
                 hrvGraph.point = true
                 hrvGraph.fill = true
                 self.graphView.addGraph(graph: hrvGraph)
@@ -319,11 +319,11 @@ class ProgressViewController: UIViewController {
                 let tsbData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tsb) })
                 let tssData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.value)})
 
-                let ctlGraph = Graph(data: ctlData, colour: .red)
-                let atlGraph = Graph(data: atlData, colour: .green)
-                let tsbGraph = Graph(data: tsbData, colour: .yellow)
+                let ctlGraph = LineGraph(data: ctlData, colour: .red)
+                let atlGraph = LineGraph(data: atlData, colour: .green)
+                let tsbGraph = LineGraph(data: tsbData, colour: .yellow)
                 tsbGraph.fill = true
-                let tssGraph = Graph(data: tssData, colour: .black)
+                let tssGraph = PointGraph(data: tssData, colour: .black)
                 tssGraph.point = true
                 self.graphData = [("CTL", ctlData), ("ATL", atlData), ("TSB", tsbData), ("Calories", tssData)]
                 self.collapsed = [true, true, true, false]
@@ -366,10 +366,10 @@ class ProgressViewController: UIViewController {
                 let tsbData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tsb) })
                 let tssData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tss) })
 
-                let ctlGraph = Graph(data: ctlData, colour: .red)
-                let atlGraph = Graph(data: atlData, colour: .green)
-                let tsbGraph = Graph(data: tsbData, colour: .yellow)
-                let tssGraph = Graph(data: tssData, colour: .black)
+                let ctlGraph = LineGraph(data: ctlData, colour: .red)
+                let atlGraph = LineGraph(data: atlData, colour: .green)
+                let tsbGraph = LineGraph(data: tsbData, colour: .yellow)
+                let tssGraph = PointGraph(data: tssData, colour: .black)
                 tsbGraph.fill = true
                 tssGraph.point = true
                 self.graphData = [("CTL", ctlData), ("ATL", atlData), ("TSB", tsbData), ("TSS", tssData)]
@@ -418,7 +418,7 @@ class ProgressViewController: UIViewController {
         let data: [(Date, Double)] = WorkoutManager.shared.timeSeries(forExeciseType: exercise, andMeasure: measure)
         titleLabel.text = title
         graphView.removeAllGraphs()
-        let graph: Graph = Graph(data: data , colour: .red)
+        let graph: Graph = PointGraph(data: data , colour: .red)
         graph.point = true
         graphData = [(title, data)]
         collapsed = [false]
