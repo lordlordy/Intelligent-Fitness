@@ -164,14 +164,18 @@ import UIKit
         if graphs.count == 0{
             return (Date(), Date())
         }
-        let minD: Date = graphs.reduce(graphs[0].minDate!, {min($0, $1.minDate!)})
-        let maxD: Date = graphs.reduce(graphs[0].maxDate!, {max($0, $1.maxDate!)})
+        let minD: Date = graphs.reduce(graphs[0].minDate, {min($0, $1.minDate)})
+        let maxD: Date = graphs.reduce(graphs[0].maxDate, {max($0, $1.maxDate)})
         return (minD, maxD)
     }
     
 
     fileprivate func addGraph(_ rect: CGRect, graph: LineGraph) {
     
+        if graph.data.count == 0{
+            return
+        }
+        
         // draw the line graph
         graph.colour.setFill()
         graph.colour.setStroke()
@@ -185,8 +189,8 @@ import UIKit
         graphPath.move(to: coordinates(graph.data[0]))
 
         //add points for each item in the graphPoints array
-        for i in 1..<graph.data.count {
-            let nextPoint = coordinates(graph.data[i])
+        for d in graph.data {
+            let nextPoint = coordinates(d)
             graphPath.addLine(to: nextPoint)
         }
         
@@ -211,23 +215,23 @@ import UIKit
                 eColour = startColour.cgColor
             }
             
-            var colours = (graph.max! > 0) ? [sColour, eColour] : [eColour, sColour]
+            var colours = (graph.max > 0) ? [sColour, eColour] : [eColour, sColour]
             var colourLocations: [CGFloat] = [0.0, 1.0]
             let colourSpace = CGColorSpaceCreateDeviceRGB()
-            if graph.min! < 0 && graph.max! > 0{
+            if graph.min < 0 && graph.max > 0{
                 colours = [sColour, eColour, sColour]
                 let y0 = coordinates((Date(), 0)).y
-                let yMax = coordinates((Date(), graph.max!)).y
-                let yMin = coordinates((Date(), graph.min!)).y
+                let yMax = coordinates((Date(), graph.max)).y
+                let yMin = coordinates((Date(), graph.min)).y
                 colourLocations = [0.0, (y0-yMax)/(yMin-yMax) , 1.0]
             }
             if let gradient = CGGradient(colorsSpace: colourSpace,
                                          colors: colours as CFArray,
                                          locations: colourLocations){
                 let context = UIGraphicsGetCurrentContext()!
-                let max = (graph.max! < 0) ? 0.0 : graph.max!
+                let max = (graph.max < 0) ? 0.0 : graph.max
                 let yMax = coordinates((Date(), max)).y
-                let yMin = coordinates((Date(), graph.min!)).y
+                let yMin = coordinates((Date(), graph.min)).y
                 context.drawLinearGradient(gradient, start: CGPoint(x: Constants.margin, y: yMax), end: CGPoint(x: Constants.margin, y: yMin), options: [])
             }
             UIGraphicsGetCurrentContext()?.restoreGState()
@@ -241,8 +245,8 @@ import UIKit
         graph.colour.setStroke()
         
         // draw points
-        for i in 0..<graph.data.count{
-            let p = coordinates(graph.data[i])
+        for d in graph.data{
+            let p = coordinates(d)
             let path = UIBezierPath(ovalIn: CGRect(x: p.x - graph.pointSize/2, y: p.y - graph.pointSize/2, width: graph.pointSize, height: graph.pointSize))
 
             if graph.fill{
@@ -259,11 +263,11 @@ import UIKit
     
     
     private func maxY() -> Double{
-        return graphs.map({$0.max!}).max() ?? 0.0
+        return graphs.map({$0.max}).max() ?? 0.0
     }
     
     private func minY() -> Double{
-        return graphs.map({$0.min!}).min() ?? 0.0
+        return graphs.map({$0.min}).min() ?? 0.0
     }
 
     

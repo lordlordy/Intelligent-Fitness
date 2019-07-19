@@ -17,10 +17,10 @@ class Graph{
     var point: Bool = false
     var pointSize: CGFloat = 5.0
     
-    var max: Double? { return data.map({$0.value}).max() }
-    var min: Double? { return data.map({$0.value}).min() }
-    var maxDate: Date? { return data.map({$0.date}).max() }
-    var minDate: Date? { return data.map({$0.date}).min() }
+    var max: Double { return data.count>0 ? data.map({$0.value}).max()! : 0.0 }
+    var min: Double { return data.count>0 ? data.map({$0.value}).min()! : 0.0 }
+    var maxDate: Date { return data.count>0 ? data.map({$0.date}).max()! : Date()}
+    var minDate: Date { return data.count>0 ? data.map({$0.date}).min()! : Date()}
     
     init(data: [(Date, Double)], colour: UIColor) {
         self.data = data
