@@ -16,6 +16,7 @@ import UIKit
 
     private struct Constants {
         static let margin: CGFloat = 20.0
+        static let padding: CGFloat = 2.0
         static let topBorder: CGFloat = 20.0
         static let bottomBorder: CGFloat = 30.0
         static let colorAlpha: CGFloat = 0.3
@@ -35,6 +36,7 @@ import UIKit
     
     private var graphs: [Graph] = []
     private var labels: [UITextField] = []
+    private var df: DateFormatter = DateFormatter()
     
     //    dummy data
     var dummyCTLData: [(Date, Double)] = []
@@ -44,6 +46,7 @@ import UIKit
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        df.dateFormat = "dd-MMM-yy"
         colors = [startColour.cgColor, endColour.cgColor]
         colorSpace = CGColorSpaceCreateDeviceRGB()
         colorLocations = [0.0, 1.0]
@@ -95,6 +98,45 @@ import UIKit
         }
         
         addHorizontalLines(rect)
+        createXAXisLabels(rect)
+        addLegend(rect)
+    }
+    
+    private func addLegend(_ rect: CGRect){
+        let coordinates = getCoordinateFunction(rect)
+        let startPoint = coordinates((graphDateRange().from, maxY()))
+        var i: CGFloat = 0.5
+
+        for g in graphs{
+            if g.hasTitle{
+                let y = startPoint.y + Constants.margin*i
+                let line = UIBezierPath()
+                line.move(to: CGPoint(x: startPoint.x, y: y + Constants.margin * 0.5))
+                line.addLine(to: CGPoint(x: startPoint.x + Constants.margin, y: y + Constants.margin * 0.5))
+                g.colour.setStroke()
+                line.lineWidth = 2.0
+                line.stroke()
+        
+                let label = createLabel(value: g.title, origin: CGPoint(x: startPoint.x + Constants.margin + Constants.padding, y: y), size: CGSize(width: Constants.margin*7.0, height: Constants.margin))
+                addSubview(label)
+                labels.append(label)
+                i += 1.0
+            }
+        }
+    }
+    
+    private func createXAXisLabels(_ rect: CGRect){
+        let coordinates = getCoordinateFunction(rect)
+        let y = coordinates((Date(), minY())).y + Constants.margin * 0.5
+        let dateRange = graphDateRange()
+        let x = coordinates((dateRange.to, 0)).x - Constants.margin*2
+        
+        let minDateLabel = createLabel(value: df.string(from: dateRange.from), origin: CGPoint(x: Constants.margin, y: y), size: CGSize(width: Constants.margin*5, height: Constants.margin * 0.75))
+        let maxDateLabel = createLabel(value: df.string(from: dateRange.to), origin: CGPoint(x: x, y: y), size: CGSize(width: Constants.margin*5, height: Constants.margin * 0.75))
+        addSubview(minDateLabel)
+        addSubview(maxDateLabel)
+        labels.append(minDateLabel)
+        labels.append(maxDateLabel)
     }
     
     fileprivate func addHorizontalLines(_ rect: CGRect){
@@ -124,9 +166,9 @@ import UIKit
         let line = UIBezierPath()
         let coordinates = getCoordinateFunction(rect)
         let yCoord: CGFloat = coordinates((Date(), y)).y
-        line.move(to: CGPoint(x: Constants.margin, y: yCoord))
+        line.move(to: CGPoint(x: Constants.margin*2, y: yCoord))
         line.addLine(to: CGPoint(x: rect.width - Constants.margin, y: yCoord))
-        let maxLabel = createLabel(value: String(Int(y)), origin: CGPoint(x: 0.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
+        let maxLabel = createLabel(value: String(Int(y)), origin: CGPoint(x: 5.0, y: yCoord - Constants.margin/2.0), size: CGSize(width: Constants.margin*2, height: Constants.margin))
         addSubview(maxLabel)
         labels.append(maxLabel)
         colour.setStroke()
@@ -289,11 +331,11 @@ import UIKit
             createDummyData()
         }
         
-        let tsbGraph = LineGraph(data: dummyTSBData, colour: .yellow)
+        let tsbGraph = LineGraph(data: dummyTSBData, colour: .yellow, title: "TSB")
         tsbGraph.fill = true
-        let tssGraph = PointGraph(data: dummyTSSData, colour: .black)
-        tssGraph.point = true
-        return [tsbGraph, LineGraph(data: dummyCTLData, colour: .red), LineGraph(data: dummyATLData, colour: .green), tssGraph]
+        let tssGraph = PointGraph(data: dummyTSSData, colour: .black, title: "TSS")
+//        tssGraph.point = true
+        return [tsbGraph, LineGraph(data: dummyCTLData, colour: .red, title: "CTL"), LineGraph(data: dummyATLData, colour: .green, title:"ATL"), tssGraph]
     }
 
     private func createDummyData(){
