@@ -32,6 +32,7 @@
 		73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73759DBA22C25A1C00757C29 /* GraphView.swift */; };
 		73759DBD22C3B82600757C29 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73759DBC22C3B82600757C29 /* ProfileViewController.swift */; };
 		7376664022CCB7D9004324B5 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7376663F22CCB7D9004324B5 /* ProgressView.swift */; };
+		738A526E22E1C38700B8CBB0 /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738A526D22E1C38700B8CBB0 /* Graph.swift */; };
 		738E445222CA544400F7BEA6 /* WorkoutTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E445122CA544400F7BEA6 /* WorkoutTableViewController.swift */; };
 		738E445422CB58C500F7BEA6 /* Exercise+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E445322CB58C500F7BEA6 /* Exercise+Extension.swift */; };
 		73B5B10222BBE9DA00B238ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B5B10122BBE9DA00B238ED /* HealthKit.framework */; };
@@ -106,6 +107,7 @@
 		73759DBA22C25A1C00757C29 /* GraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 		73759DBC22C3B82600757C29 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		7376663F22CCB7D9004324B5 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		738A526D22E1C38700B8CBB0 /* Graph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graph.swift; sourceTree = "<group>"; };
 		738E445122CA544400F7BEA6 /* WorkoutTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTableViewController.swift; sourceTree = "<group>"; };
 		738E445322CB58C500F7BEA6 /* Exercise+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Exercise+Extension.swift"; sourceTree = "<group>"; };
 		73B5B10122BBE9DA00B238ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
@@ -185,6 +187,7 @@
 				7376663F22CCB7D9004324B5 /* ProgressView.swift */,
 				73759DBA22C25A1C00757C29 /* GraphView.swift */,
 				736D6BAB22DC660C003C9056 /* Constants.swift */,
+				738A526D22E1C38700B8CBB0 /* Graph.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -559,6 +562,7 @@
 				73CD5EB122DF67E300AFFF21 /* RepSet+Extension.swift in Sources */,
 				73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */,
 				73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */,
+				738A526E22E1C38700B8CBB0 /* Graph.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
 				73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */,
 				73CD5EB722DF6EDF00AFFF21 /* TouchSet+Extension.swift in Sources */,
