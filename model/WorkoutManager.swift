@@ -249,6 +249,11 @@ class WorkoutManager: Athlete{
             startOfWeek = Calendar.current.date(byAdding: DateComponents(day: 7), to: startOfWeek)!
         }
         
+//        for w in weekCache{
+//            print([w.weekStr, w.daysStr].joined(separator: " : "))
+//            print("Consistent: \(w.consistent) Complete: \(w.completeWorkouts.count) rest: \(w.correctRestDays)")
+//        }
+        
         return weekCache
     }
     
@@ -297,7 +302,7 @@ class WorkoutManager: Athlete{
         var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!.startOfWeek
         let interval: DateComponents = DateComponents(day: 28)
         var previous: Workout?
-        var previousFFT: Workout?
+        let probTestKeepsWeekConsistent: Double = 0.9
         let progression: [ExerciseType: [Double]] = [.gobletSquat: [5, 6, 7, 7, 8, 9, 10, 12, 14, 14, 15, 16, 17, 20],
                                                      .lunge: [5,7,10, 12, 12, 14, 15, 15, 16, 18, 20, 20, 22, 22],
                                                      .benchPress: [3, 4, 5, 6, 7, 8, 8, 10, 11, 12, 14, 15, 18, 20],
@@ -313,57 +318,66 @@ class WorkoutManager: Athlete{
 
         for i in 0..<progression[.gobletSquat]!.count{
             // create tests
+            var fft: Workout?
             if d <= Date(){
                 // only create if on or before today
-                let fft: Workout = createFunctionalFitnessTest(forDate: d)
-                if let p = previousFFT{
+                fft = createFunctionalFitnessTest(forDate: d)
+                if let p = previous{
                     p.nextWorkout = fft
-                    fft.previousWorkout = p
+                    fft!.previousWorkout = p
                 }
                 for (key, value) in testProgression{
-                    if let s = fft.exercises(ofType: key)[0].exerciseSet(atOrder: 0){
+                    if let s = fft!.exercises(ofType: key)[0].exerciseSet(atOrder: 0){
                         s.actual = value[i]
                     }
                 }
-                fft.complete = true
-                previousFFT = fft
+                fft!.complete = true
+                previous = fft
             }
             
             // create weekly workouts
-            for w in 0...3{
-                let date: Date = calendar.date(byAdding: DateComponents(day: w * 7), to: d)!
-        
+            for wkNumber in 0...3{
+                let date: Date = calendar.date(byAdding: DateComponents(day: wkNumber * 7), to: d)!
+                var workoutNumber: Int = 0
+                var firstDayOfWeek: Bool = true
                 for wkDate in createRandomDaysOfWeek(fromDate: date){
                     if wkDate > Date(){
                         break
                     }
-                    let w: Workout = createWorkout(forDate: wkDate, exercises: [
-                        ExerciseDefaults(type: .gobletSquat, defaultPlan: 5, defaultKG: 5.0),
-                        ExerciseDefaults(type: .lunge, defaultPlan: 5, defaultKG: 10.0),
-                        ExerciseDefaults(type: .benchPress, defaultPlan: 5, defaultKG: 5.0),
-                        ExerciseDefaults(type: .pushUp, defaultPlan: progression[.pushUp]![i], defaultKG: 0.0),
-                        ExerciseDefaults(type: .pullDown, defaultPlan: 5, defaultKG: 5.0),
-                        ])
-                    if let p = previous{
-                        p.nextWorkout = w
-                        w.previousWorkout = p
-                    }
-                    for (key, value) in progression{
-                        // randomly move 10% down and 20% up
-                        let percentageMove: Double = Double.random(in: 0...0.3) + 0.9
-                        for s in w.exercises(ofType: key)[0].exerciseSets(){
-                            s.actual = s.plan
-                            if ExerciseDefinitionManager.shared.exerciseDefinition(for: key).usesWeight{
-                                s.actualKG = value[i] * percentageMove
-                            }else{
-                                s.actualKG = 0.0
+                    // this is ensure when we have a test we don't create an additional workout and thus an inconsistent week
+                    // note there's a chance of an inconsistent week just to give some realism to the data
+                    if fft != nil && firstDayOfWeek && wkNumber == 0 && Double.random(in: 0...1) < probTestKeepsWeekConsistent{
+                        fft?.date = wkDate
+                    }else{
+                        let w: Workout = createWorkout(forDate: wkDate, exercises: [
+                            ExerciseDefaults(type: .gobletSquat, defaultPlan: 5, defaultKG: 5.0),
+                            ExerciseDefaults(type: .lunge, defaultPlan: 5, defaultKG: 10.0),
+                            ExerciseDefaults(type: .benchPress, defaultPlan: 5, defaultKG: 5.0),
+                            ExerciseDefaults(type: .pushUp, defaultPlan: progression[.pushUp]![i], defaultKG: 0.0),
+                            ExerciseDefaults(type: .pullDown, defaultPlan: 5, defaultKG: 5.0),
+                            ])
+                        if let p = previous{
+                            p.nextWorkout = w
+                            w.previousWorkout = p
+                        }
+                        for (key, value) in progression{
+                            // randomly move 10% down and 20% up
+                            let percentageMove: Double = Double.random(in: 0...0.3) + 0.9
+                            for s in w.exercises(ofType: key)[0].exerciseSets(){
+                                s.actual = s.plan
+                                if ExerciseDefinitionManager.shared.exerciseDefinition(for: key).usesWeight{
+                                    s.actualKG = value[i] * percentageMove
+                                }else{
+                                    s.actualKG = 0.0
+                                }
                             }
                         }
-                        
+                        w.complete = true
+                        previous = w
                     }
-                    w.complete = true
-                    previous = w
                     CoreDataStackSingleton.shared.save()
+                    workoutNumber += 1
+                    firstDayOfWeek = false
                 }
                 let _: Bool = checkforPowerups(toDate: date)
             }
@@ -374,7 +388,7 @@ class WorkoutManager: Athlete{
     }
     
     private func createRandomDaysOfWeek(fromDate d: Date) -> [Date]{
-        let workoutDaysOfWeek: [[Int]] = [[0,2,4], [1,2,4], [0,1,2], [1,3,5], [1,4,6]]
+        let workoutDaysOfWeek: [[Int]] = [[0,2,4], [0,1,4], [1,2,4], [1,3,5], [1,4,6]]
         let weekly = workoutDaysOfWeek[Int.random(in: 0..<workoutDaysOfWeek.count)]
         var result: [Date] = []
         for dayOfWeek in weekly{
@@ -382,37 +396,7 @@ class WorkoutManager: Athlete{
         }
         return result
     }
-    
-//    func createTestFFTData(){
-//        var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!
-//        let interval: DateComponents = DateComponents(day: 28)
-//        var previous: Workout?
-//        let progression: [ExerciseType: [Double]] = [.standingBroadJump: [1, 1.1, 1.2, 1.3, 1.4, 1.45, 1.45, 1.5, 1.6, 1.6, 1.65, 1.65, 1.67, 1.7],
-//                                                     .deadHang: [20.0, 23.0, 28.0, 33.0, 33.0, 35.0, 38.0, 43.0, 45.0, 46.0, 48, 49, 50, 55],
-//                                                     .farmersCarry: [75.0, 80.0, 90.0, 93.0, 101.0, 102.0, 103.0, 107.0, 112.0, 115.0, 115, 125, 129, 130],
-//                                                     .plank: [15.0, 25.0, 35.0, 36.0, 37.0, 38.0, 40.0, 41.0, 45.0, 50.0, 53, 55, 57, 60],
-//                                                     .squat: [21.0, 22.0, 25.0, 27.0, 27.0, 30.0, 40.0, 41.0, 43.0, 45.0, 50, 60, 59, 65],
-//                                                     .sittingRisingTest: [4, 5, 3, 4, 3, 2, 2, 2, 1, 0, 0, 0, 0, 0]]
-//
-//        for i in 0..<progression[.standingBroadJump]!.count{
-//            let fft: Workout = createFunctionalFitnessTest(forDate: d)
-//            if let p = previous{
-//                p.nextWorkout = fft
-//                fft.previousWorkout = p
-//            }
-//            for (key, value) in progression{
-//                if let s = fft.exercises(ofType: key)[0].exerciseSet(atOrder: 0){
-//                    s.actual = value[i]
-//                }
-//            }
-//            fft.complete = true
-//            previous = fft
-//            d = calendar.date(byAdding: interval, to: d)!
-//        }
-//
-//        CoreDataStackSingleton.shared.save()
-//
-//    }
+
     
     private func createFunctionalFitnessTest(forDate date: Date) ->  Workout{
         let workout: Workout = CoreDataStackSingleton.shared.newWorkout()
@@ -474,16 +458,59 @@ class WorkoutManager: Athlete{
         return newPowerUp
     }
     
+    func weeksForNextDefencePowerUp() -> Int{
+        let powerUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps().sorted(by: {$0.defense > $1.defense})
+        var currentPowerUp: Int16 = 0
+        if powerUps.count > 0{
+            currentPowerUp = powerUps[0].defense
+        }
+        // sum of first n integers formula
+        let weeksForNextPower: Int  = Int(0.5 * Double(currentPowerUp + 1) * Double(currentPowerUp + 2))
+        
+        return weeksForNextPower - currentStreakData().current
+    }
+    
+    func sessionsForNextAttackPowerUp() -> (sessions: Int, repsXKg: Int){
+        let edHistory: EddingtonCalculator.EddingtonHistory = attackPowerUpEdSeries()
+        let sortedHistory = edHistory.ltdHistory.sorted(by: {$0.date > $1.date})
+        let nextEdNum = edHistory.eddingtonNumber + 1
+        let plusOne = sortedHistory.count > 0 ? sortedHistory[0].plusOne : 1
+        return (plusOne, nextEdNum)
+    }
+    
     private func checkforPowerups() -> Bool{
         return checkforPowerups(toDate: Date())
     }
     
+    private func attackPowerUpEdSeries() -> EddingtonCalculator.EddingtonHistory{
+        return EddingtonCalculator().eddingtonHistory(timeSeries: timeSeries(forExeciseType: .ALL, andMeasure: .maxRepKG))
+    }
+    
     private func checkforPowerups(toDate date: Date) -> Bool{
+        // NB power-up is based on n where the sum of the first n integers is the week streak (for defence)
+        // and the eddington number (for attack). This is to make power-ups progressively harder to get
+        // This is double whammy for attack since eddington number itself gets ever harder. However since
+        // we're using Reps X KG the eddington number could get large - imagine 20 reps of 20kg ... this would
+        // be 400 ... accumulating 400 workouts of that level is not unrealistic
+        // by doing this we keep the power-ups smaller numbers
+        /*
+         For a given streak or ed number X we want to find n such that the sum of the first n integers equal X.
+         This means we want: 0.5 * n * (n+1) = X
+         => n * (n + 1) = 2X
+         => n^2 + n - 2X = 0
+         Using formula for quadratic and taking the positive root we get:
+         n = (-1 + Sqrt(1 + 8X)) / 2
+         We take the Int value of this
+         */
         print("Checking whether to update power ups to \(date)")
         let orderWeeks: [Week] = getWeeks(toDate: date).sorted(by: {$0.startOfWeek < $1.startOfWeek})
-        let maxStreak: Int16 = Int16(orderWeeks.reduce(0, {max($0, $1.recursivelyCalculateConsistencyStreak())}))
-        let maxRepKGEdNum: Int16 = Int16(EddingtonCalculator().eddingtonHistory(timeSeries: timeSeries(forExeciseType: .ALL, andMeasure: .maxRepKG)).eddingtonNumber)
+        let maxStreak: Int16 = Int16(Double(orderWeeks.reduce(0, {max($0, $1.recursivelyCalculateConsistencyStreak())})))
+        let maxRepKGEdNum: Int16 = Int16(attackPowerUpEdSeries().eddingtonNumber)
         let orderedPowerUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps().sorted(by: {$0.date! < $1.date!})
+        
+        // power ups using n = (-1 +sqrt(1 + 8X)) / 2
+        let possibleDefencePUp: Int16 = Int16((-1.0 + Double(1 + 8 * maxStreak).squareRoot())/2.0)
+        let possibleAttackPUp: Int16 =  Int16((-1.0 + Double(1 + 8 * maxRepKGEdNum).squareRoot())/2.0)
         
         var newDefence: Int16?
         var newAttack: Int16?
@@ -491,8 +518,8 @@ class WorkoutManager: Athlete{
         
         if orderedPowerUps.count == 0{
             if maxStreak + maxRepKGEdNum > 0{
-                newDefence = maxStreak
-                newAttack = Int16(Double(maxRepKGEdNum).squareRoot())
+                newDefence = possibleDefencePUp
+                newAttack = possibleAttackPUp
                 if orderWeeks.count > 0{
                     date = orderWeeks[orderWeeks.count - 1].startOfWeek
                 }else{
@@ -501,10 +528,9 @@ class WorkoutManager: Athlete{
             }
         }else{
             let cPUp = orderedPowerUps[orderedPowerUps.count - 1]
-            newAttack = Int16(Double(maxRepKGEdNum).squareRoot())
-            if maxStreak > cPUp.defense || newAttack! > cPUp.attack{
-                newDefence = max(maxStreak, cPUp.defense)
-                newAttack = max(newAttack!, cPUp.attack)
+            if possibleDefencePUp > cPUp.defense || possibleAttackPUp > cPUp.attack{
+                newDefence = max(possibleDefencePUp, cPUp.defense)
+                newAttack = max(possibleAttackPUp, cPUp.attack)
                 if orderWeeks.count > 0{
                     date = orderWeeks[orderWeeks.count - 1].startOfWeek
                 }else{

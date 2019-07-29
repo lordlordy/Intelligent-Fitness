@@ -13,6 +13,11 @@ extension Workout{
     var weekOfYear: Int { return calendar.dateComponents([Calendar.Component.weekOfYear], from: date!).weekOfYear!}
     var year: Int { return calendar.dateComponents([Calendar.Component.yearForWeekOfYear], from: date!).yearForWeekOfYear!}
     var weekStr: String { return "\(year)-\(String(format: "%02d", weekOfYear))"}
+    var dayOfWkStr: String {
+        let df: DateFormatter = DateFormatter()
+        df.dateFormat = "E-dd"
+        return df.string(from: date!)
+    }
     
     private var calendar: Calendar{ return Calendar.init(identifier: .iso8601) }
     

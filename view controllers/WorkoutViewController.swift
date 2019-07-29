@@ -20,6 +20,8 @@ class WorkoutViewController: UIViewController {
     @IBOutlet weak var workoutsThisWeekTextField: UITextField!
     @IBOutlet weak var testsThisWeekTextField: UITextField!
     @IBOutlet weak var currentlyConsistentTextField: UITextField!
+    @IBOutlet weak var weeksForNextPowerUp: UITextField!
+    @IBOutlet weak var sessionsForAttackPowerUp: UITextField!
     
     private var datePicker: UIDatePicker = UIDatePicker()
     private let df = DateFormatter()
@@ -74,6 +76,12 @@ class WorkoutViewController: UIViewController {
         let streak = WorkoutManager.shared.currentStreakData()
         currentStreakTextField.text = "\(streak.current) weeks"
         bestStreakTextField.text = "\(streak.best) weeks"
+        
+        let weeksForDefence: Int = WorkoutManager.shared.weeksForNextDefencePowerUp()
+        weeksForNextPowerUp.text = "In \(weeksForDefence) weeks"
+        
+        let attackPower = WorkoutManager.shared.sessionsForNextAttackPowerUp()
+        sessionsForAttackPowerUp.text = "\(attackPower.sessions) sets of \(attackPower.repsXKg) kg-reps"
         
         if let currentWeek = WorkoutManager.shared.currentWeek(){
             if currentWeek.consistent{

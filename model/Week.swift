@@ -24,6 +24,7 @@ class Week{
     var weekOfYear: Int { return startOfWeek.weekOfYear}
     var year: Int { return startOfWeek.year}
     var weekStr: String { return "\(year)-\(String(format: "%02d", weekOfYear))"}
+    var daysStr: String { return workouts.map({$0.dayOfWkStr}).joined(separator: ":")}
     
     var correctNumberOfWorkouts: Bool { return completeWorkouts.count == Week.numberOfWorkoutsPerWeek}
     var correctRestDays: Bool { return daysBetweenWorkouts().max() ?? 0 <= Week.maximumRestInARow}
