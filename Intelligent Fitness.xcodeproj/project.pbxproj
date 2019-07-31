@@ -35,6 +35,7 @@
 		738A526E22E1C38700B8CBB0 /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738A526D22E1C38700B8CBB0 /* Graph.swift */; };
 		738E445222CA544400F7BEA6 /* WorkoutTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E445122CA544400F7BEA6 /* WorkoutTableViewController.swift */; };
 		738E445422CB58C500F7BEA6 /* Exercise+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738E445322CB58C500F7BEA6 /* Exercise+Extension.swift */; };
+		73A43F2D22F18A9500571D65 /* WeekTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73A43F2C22F18A9500571D65 /* WeekTableViewController.swift */; };
 		73B5B10222BBE9DA00B238ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B5B10122BBE9DA00B238ED /* HealthKit.framework */; };
 		73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73B5B10322BBEB8700B238ED /* HealthKitAccess.swift */; };
 		73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CD5EA722DE09F400AFFF21 /* Week.swift */; };
@@ -110,6 +111,7 @@
 		738A526D22E1C38700B8CBB0 /* Graph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graph.swift; sourceTree = "<group>"; };
 		738E445122CA544400F7BEA6 /* WorkoutTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTableViewController.swift; sourceTree = "<group>"; };
 		738E445322CB58C500F7BEA6 /* Exercise+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Exercise+Extension.swift"; sourceTree = "<group>"; };
+		73A43F2C22F18A9500571D65 /* WeekTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekTableViewController.swift; sourceTree = "<group>"; };
 		73B5B10122BBE9DA00B238ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		73B5B10322BBEB8700B238ED /* HealthKitAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitAccess.swift; sourceTree = "<group>"; };
 		73BB343822BA932E001AAED7 /* Intelligent Fitness.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Intelligent Fitness.entitlements"; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */,
 				73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */,
 				731F80E622E0416C008399AD /* WebViewController.swift */,
+				73A43F2C22F18A9500571D65 /* WeekTableViewController.swift */,
 			);
 			path = "view controllers";
 			sourceTree = "<group>";
@@ -588,6 +591,7 @@
 				7376664022CCB7D9004324B5 /* ProgressView.swift in Sources */,
 				731F80E922E0C136008399AD /* PowerUp+Extension.swift in Sources */,
 				736D6BAC22DC660C003C9056 /* Constants.swift in Sources */,
+				73A43F2D22F18A9500571D65 /* WeekTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

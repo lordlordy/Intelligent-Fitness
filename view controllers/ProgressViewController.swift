@@ -62,7 +62,7 @@ class ProgressViewController: UIViewController {
     private var selectedGraph: GraphType = .Sets
     private var selectedExercise: ExerciseType = ExerciseType.gobletSquat
     private var selectedMeasure: ExerciseMeasure = .totalKG
-    private var validMeasures: [ExerciseMeasure]{ return selectedExercise.setType().validMeasures() }
+    private var validMeasures: [ExerciseMeasure]{ return ExerciseDefinitionManager.shared.exerciseDefinition(for: selectedExercise).setType.validMeasures() }
     private var selectedTSB: Int = 0
     private var isLTDEd: Bool = true
     
