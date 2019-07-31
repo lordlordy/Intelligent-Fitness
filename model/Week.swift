@@ -41,6 +41,7 @@ class Week{
         if dateOrderWorkouts.filter({$0.type == WorkoutType.FFT.rawValue}).count > 0{
             str.append("(FFT)")
         }
+        str.append("Max Rest:\(maxRestDays(forDays: datesToCalculateRestDays())) days")
         return str.joined(separator: " ")
     }
     
@@ -103,15 +104,18 @@ class Week{
 
     
     func connectUpWorkouts(){
+        var pWorkout: Workout?
         if let previousWeek = WorkoutManager.shared.getWeek(containingDate: startOfWeek.yesterday){
             if previousWeek.dateOrderWorkouts.count > 0{
-                var pWorkout: Workout = previousWeek.dateOrderWorkouts[previousWeek.dateOrderWorkouts.count-1]
-                for w in dateOrderWorkouts{
-                    pWorkout.nextWorkout = w
-                    w.previousWorkout = pWorkout
-                    pWorkout = w
-                }
+                pWorkout = previousWeek.dateOrderWorkouts[previousWeek.dateOrderWorkouts.count-1]
             }
+        }
+        for w in dateOrderWorkouts{
+            if let p = pWorkout{
+                p.nextWorkout = w
+            }
+            w.previousWorkout = pWorkout
+            pWorkout = w
         }
     }
     
@@ -146,52 +150,26 @@ class Week{
         }
         return nil
     }
-//
-//    private func daysBetweenWorkouts() -> [Int]{
-//        if workouts.count == 0{
-//            return []
-//        }
-//
-//
-//
-//        let calendar: Calendar = Calendar(identifier: .iso8601)
-//        var previousWorkout: Workout?
-//        var result: [Int] = []
-//        let sWorkouts: [Workout] = workouts.sorted(by: {$0.date! < $1.date!})
-//
-//        //calc gap to first
-//        var diff: Int = calendar.dateComponents([.day], from: calendar.startOfDay(for: sWorkouts[0].date!.startOfWeek), to: calendar.startOfDay(for: sWorkouts[0].date!)).day!
-//        result.append(diff)
-//
-//        for w in sWorkouts{
-//            if let p = previousWorkout{
-//                let d: Int = calendar.dateComponents([.day], from: calendar.startOfDay(for: p.date!), to: calendar.startOfDay(for: w.date!)).day!
-//                //want rest days so subtract 1 from this. eg if train on 12th and 14th .. the diff is 2 but there's only 1 rest day between
-//                result.append(d-1)
-//            }
-//            previousWorkout = w
-//        }
-//        //calc end of week
-//        let endW: Date = calendar.date(byAdding: DateComponents(day:6), to: sWorkouts[0].date!.startOfWeek)!
-//        diff = calendar.dateComponents([.day], from: sWorkouts[sWorkouts.count-1].date!, to: endW).day!
-//        result.append(diff)
-//        return result
-//    }
     
     private func restDaysConsistent(forDays days: [Date]) -> Bool{
+        return maxRestDays(forDays: days) <= Week.maximumRestInARow
+    }
+    
+    private func maxRestDays(forDays days: [Date]) -> Int{
         if days.count < 2{
-            return true
+            return 0
         }
-        let oDays: [Date] = days.sorted(by: {$0 > $1})
+        let oDays: [Date] = days.sorted(by: {$0 < $1})
         var pDate: Date = oDays[0]
         var gaps: [Int] = []
         
         for i in 1..<oDays.count{
-            gaps.append(Calendar.current.dateComponents([.day], from: pDate, to: oDays[i]).day!)
+            // -1 since we want number of days without activity - ie not including either of the dates
+            gaps.append(Calendar.current.dateComponents([.day], from: pDate, to: oDays[i]).day! - 1)
             pDate = oDays[i]
         }
-        return gaps.max() ?? 0 <= Week.maximumRestInARow
-        
+        print(gaps)
+        return gaps.max() ?? 0
     }
     
     private func datesToCalculateRestDays() -> [Date]{
@@ -211,7 +189,7 @@ class Week{
 
         // add start of following week
         result.append(calendar.date(byAdding: DateComponents(day:1), to: dateOrderWorkouts[0].date!.endOfWeek)!)
-        
+        print(result)
         return result
     }
     

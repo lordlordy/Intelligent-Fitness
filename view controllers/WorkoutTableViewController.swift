@@ -156,11 +156,16 @@ class WorkoutTableViewController: UITableViewController{
         if segue.identifier == "SaveWorkoutSegue" {
             workout.complete = true
             CoreDataStackSingleton.shared.save()
-            WorkoutManager.shared.createNextWorkout(after: workout)
             if let tabVC = segue.destination as? UITabBarController{
                 tabVC.selectedIndex = 3
             }
             currentExerciseSet = 0
+            if WorkoutManager.shared.createNextWorkout(after: workout){
+                // notify user of new powerup
+                let alert = UIAlertController(title: "New PowerUp", message: "Congratulations you have earned a new powerup for the Fitness Invaders game !", preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
         } else if segue.identifier == "ShowWorkoutVideo"{
             if let webVC = segue.destination as? WebViewController{
                 if let html = workout.exercise(atOrder: currentExerciseSet)?.exerciseDefinition.embedVideoHTML{

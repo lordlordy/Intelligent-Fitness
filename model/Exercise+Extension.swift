@@ -10,18 +10,50 @@ import Foundation
 
 extension Exercise{    
     
-    var percentageComplete: Double{
-        let numerator: Double = exerciseSets().reduce(0.0, {$0 + $1.percentageComplete * $1.actual})
-        let denominator: Double = exerciseSets().reduce(0.0, {$0 + $1.actual})
-        return numerator / denominator
-    }
+    static let percentageForReduction: Double = 0.75
+    static let precentageForIncrease: Double = 0.99
     
+    var percentageComplete: Double{
+        let sets = exerciseSets()
+        if sets.count == 1{
+            return sets[0].percentageComplete
+        }else{
+            let numerator: Double = sets.reduce(0.0, {$0 + $1.percentageComplete * $1.actual})
+            let denominator: Double = sets.reduce(0.0, {$0 + $1.plan})
+            if denominator == 0.0{
+                return 0.0
+            }else{
+                return numerator / denominator
+            }
+        }
+    }
+
     
     var exerciseDefinition: ExerciseDefinition{
         return ExerciseDefinitionManager.shared.exerciseDefinition(for: exerciseType())
     }
     
     var date: Date?{ return workout?.date}
+    private var plan: Double{
+        return exerciseSet(atOrder: 0)?.plan ?? 0.0
+    }
+    private var plannedKG: Double{
+        return exerciseSet(atOrder: 0)?.plannedKG ?? 0.0
+    }
+    
+    
+    func progression(basedOnDefinition definition: WorkoutExerciseDefinition) -> WorkoutExerciseDefinition{
+        if percentageComplete <= 0.75{
+            // failed - reduce exercise
+            return WorkoutExerciseDefinition(type: exerciseType(), plan: max(0,plan - definition.planProgression) , kg: max(0, plannedKG - definition.kgProgression), planProgression: definition.planProgression, kgProgression: definition.kgProgression)
+        }else if percentageComplete < percentageComplete{
+            // close - try same again
+            return WorkoutExerciseDefinition(type: exerciseType(), plan: plan , kg: plannedKG, planProgression: definition.planProgression, kgProgression: definition.kgProgression)
+        }else{
+            // near enough completed so progress
+            return WorkoutExerciseDefinition(type: exerciseType(), plan: max(0, plan + definition.planProgression) , kg: max(0,plannedKG + definition.kgProgression), planProgression: definition.planProgression, kgProgression: definition.kgProgression)
+        }
+    }
     
     func getValue(forMeasure measure: ExerciseMeasure) -> Double{
         if exerciseSets().count == 0{
@@ -68,7 +100,6 @@ extension Exercise{
             }
         }
         return nil
-
     }
     
     func exerciseType() -> ExerciseType{

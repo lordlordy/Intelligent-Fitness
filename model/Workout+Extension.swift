@@ -76,12 +76,9 @@ extension Workout{
         }
     }
     
-    
     func numberOfExercises() -> Int{
         return exercises?.count ?? 0
     }
-    
-
     
     func exercises(ofType type: ExerciseType) -> [Exercise]{
         return orderedExerciseArray().filter({$0.type == type.rawValue})
@@ -156,5 +153,44 @@ extension Workout{
 
         return "Completed: " + strParts.joined(separator: " / ")
         
+    }
+    
+    /*
+     
+     */
+    func workoutProgression() -> WorkoutDefinition{
+        var exercises: [WorkoutExerciseDefinition] = []
+        let defaults: WorkoutDefinition? = WorkoutManager.shared.defaultWorkout(forType: workoutType()!)
+        
+        for e in orderedExerciseArray(){
+            if let d = defaults{
+                if let definition = d.definition(forType: e.exerciseType()){
+                    exercises.append(e.progression(basedOnDefinition: definition))
+                }
+            }
+        }
+        return WorkoutDefinition(type: workoutType()!, exercises: exercises)
+    }
+    
+    func getProgression(forType type: WorkoutType) -> WorkoutDefinition?{
+        if self.type == type.rawValue{
+            return workoutProgression()
+        }else{
+            if let p = previousWorkout{
+                return p.getProgression(forType: type)
+            }
+        }
+        return nil
+    }
+    
+    fileprivate func getLastWorkout(ofType type: WorkoutType) -> Workout?{
+        if let p = previousWorkout{
+            if p.type == type.rawValue{
+                return p
+            }else{
+                return p.getLastWorkout(ofType: type)
+            }
+        }
+        return nil
     }
 }
