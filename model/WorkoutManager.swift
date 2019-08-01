@@ -643,6 +643,7 @@ class WorkoutManager: Athlete{
         
         // create tests first
         let firstTest: Workout = nextFunctionalFitnessTest()
+        var currentTest: Workout = firstTest
         firstTest.date = d
         firstTest.complete = true
         // lets do this first one bang on
@@ -656,8 +657,8 @@ class WorkoutManager: Athlete{
         d = calendar.date(byAdding: interval, to: d)!
         
         while d < Date(){
-            let nextTest = nextFunctionalFitnessTest()
-            nextTest.complete = true
+            currentTest = nextFunctionalFitnessTest()
+            currentTest.complete = true
             let rdn: Int = Int.random(in: 0...100)
             var factor: Double = 1.0
             if rdn <= 15{
@@ -665,7 +666,7 @@ class WorkoutManager: Athlete{
             }else if rdn <= 40{
                 factor = 0.8
             }
-            for e in nextTest.orderedExerciseArray(){
+            for e in currentTest.orderedExerciseArray(){
                 for es in e.exerciseSets(){
                     es.actual = es.plan * factor
                     es.actualKG = es.plannedKG * factor
@@ -674,9 +675,8 @@ class WorkoutManager: Athlete{
             CoreDataStackSingleton.shared.save()
             d = calendar.date(byAdding: interval, to: d)!
         }
-        // make sure the next planned test is in place
-        let _ = nextFunctionalFitnessTest()
 
+        
         // now for workouts.
         var workout: Workout = createNextWorkout(after: firstTest)
         // this is to track max value so chance of failure is only used if at the max or above
@@ -798,6 +798,13 @@ class WorkoutManager: Athlete{
 
             workout = createNextWorkout(after: workout)
         }
+        // make sure the next planned test is in place
+        let nextTest = nextFunctionalFitnessTest()
+        currentTest.nextWorkout = nextTest
+        nextTest.previousWorkout = currentTest
+        CoreDataStackSingleton.shared.save()
+        print(nextFunctionalFitnessTest())
+
     }
     
     func createTestWorkoutData(){

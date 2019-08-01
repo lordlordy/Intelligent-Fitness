@@ -223,7 +223,7 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
                 //defaults
                 lastTestSeconds = 0.5
                 previousResult.text = "None"
-                if let previousFitnessTest = fitnessTest.previousWorkout, let type = test.exercise?.exerciseType(){
+                if let previousFitnessTest = fitnessTest.getPreviousWorkoutOfSameType(), let type = test.exercise?.exerciseType(){
                     let previous: [Exercise] = previousFitnessTest.exercises(ofType: type)
                     if previous.count > 0{
                         let e: Exercise = previous[0]

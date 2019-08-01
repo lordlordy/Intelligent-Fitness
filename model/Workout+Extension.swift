@@ -32,6 +32,27 @@ extension Workout{
         }
     }
     
+    func getPreviousWorkoutOfSameType() -> Workout?{
+        if let t = workoutType(){
+            if let p = previousWorkout{
+                return p.workout(ofType: t)
+            }
+        }
+        return nil
+    }
+    
+    fileprivate func workout(ofType type: WorkoutType) -> Workout?{
+        if self.type == type.rawValue{
+            return self
+        }else{
+            if let p = previousWorkout{
+                return p.workout(ofType: type)
+            }else{
+                return nil
+            }
+        }
+    }
+    
     // returns nil if no exercises of the requested type
     func getValue(forExerciseType type: ExerciseType, andMeasure measure: ExerciseMeasure) -> Double?{
         if type == .ALL{
