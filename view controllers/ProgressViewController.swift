@@ -506,6 +506,21 @@ extension ProgressViewController: UIPickerViewDelegate{
         return nil
     }
     
+    // adjust widths of components. Need for Ed graphs as three components
+    func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        switch selectedGraph {
+        case .Ed:
+            let w = pickerView.frame.width
+            if component == 2{
+                return w * 0.2
+            }else{
+                return w * 0.4
+            }
+        default:
+            return pickerView.frame.width / 2
+        }
+    }
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         switch selectedGraph{
         case .Sets:
