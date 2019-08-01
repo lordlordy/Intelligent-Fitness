@@ -71,7 +71,11 @@ class ProfileViewController: UITableViewController {
     }
     
     @IBAction func test(_ sender: UIButton) {
-        WorkoutManager.shared.saveLatestPowerUpToCloud()
+//        WorkoutManager.shared.saveLatestPowerUpToCloud()
+        let workouts = CoreDataStackSingleton.shared.getChronologicalOrderedWorkouts(ofType: nil, isTest: nil).filter({$0.complete})
+        print(workouts)
+        workouts[workouts.count - 1].testPrintWorkouts(currentCount: 0)
+    
     }
     
     @IBAction func restingHRInfoTapped(_ sender: Any) {
@@ -160,7 +164,8 @@ class ProfileViewController: UITableViewController {
 
     @IBAction func createTestData(_ sender: Any) {
         // create some data to allow testing of various features. For now aim to create a years worth of data
-        WorkoutManager.shared.createTestWorkoutData()
+//        WorkoutManager.shared.createTestWorkoutData()
+        WorkoutManager.shared.createTestDataUsingBuiltInProgresions()
 
     }
 }

@@ -54,7 +54,6 @@ class ProgressViewController: UIViewController {
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var pageControl: UIPageControl!
     @IBOutlet weak var graphSegmentedControl: UISegmentedControl!
-    @IBOutlet weak var chooseButton: UIButton!
     @IBOutlet weak var titleLabel: UILabel!
     
     private var toolBar = UIToolbar()
@@ -62,7 +61,7 @@ class ProgressViewController: UIViewController {
     private var selectedGraph: GraphType = .Sets
     private var selectedExercise: ExerciseType = ExerciseType.gobletSquat
     private var selectedMeasure: ExerciseMeasure = .totalKG
-    private var validMeasures: [ExerciseMeasure]{ return selectedExercise.setType().validMeasures() }
+    private var validMeasures: [ExerciseMeasure]{ return ExerciseDefinitionManager.shared.exerciseDefinition(for: selectedExercise).setType.validMeasures() }
     private var selectedTSB: Int = 0
     private var isLTDEd: Bool = true
     
@@ -110,6 +109,10 @@ class ProgressViewController: UIViewController {
         toolBar.backgroundColor = MAIN_BLUE
         toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
         updateGraph(forExercise: selectedExercise, andMeasure: selectedMeasure )
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
+        graphView.addGestureRecognizer(tapGesture)
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -120,9 +123,15 @@ class ProgressViewController: UIViewController {
         graphView.frame.size = CGSize(width: scrollView.frame.size.width, height: scrollView.frame.size.height)
     }
     
-    @IBAction func chooseTapped(_ sender: Any) {
-        self.view.addSubview(picker)
-        self.view.addSubview(toolBar)
+    @objc func viewTapped(gestureRecogniser: UITapGestureRecognizer){
+        switch selectedGraph{
+        case .Sets, .TSB, .Ed:
+            self.view.addSubview(picker)
+            self.view.addSubview(toolBar)
+        default:
+            // do nothing
+            return
+        }
     }
     
     @objc func onDoneButtonTapped(){
@@ -161,8 +170,6 @@ class ProgressViewController: UIViewController {
     }
     
     private func createPowerUpGraph(){
-        chooseButton.isEnabled = false
-        chooseButton.isHidden = true
         let title: String  = "Power-Ups"
         titleLabel.text = title
         let pUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps()
@@ -183,8 +190,6 @@ class ProgressViewController: UIViewController {
     }
     
     private func createConsistencyGraph(){
-        chooseButton.isEnabled = true
-        chooseButton.isHidden = false
         let title: String = "Consistency Streak"
         titleLabel.text = title
         let data: [(Date, Double)] = WorkoutManager.shared.getWeeks().sorted(by: {$0.startOfWeek < $1.startOfWeek}).map({($0.startOfWeek, Double($0.recursivelyCalculateConsistencyStreak()))})
@@ -205,8 +210,6 @@ class ProgressViewController: UIViewController {
     }
     
     private func createEdGraph(){
-        chooseButton.isEnabled = true
-        chooseButton.isHidden = false
         let data: [(Date, Double)] = WorkoutManager.shared.timeSeries(forExeciseType: selectedExercise, andMeasure: selectedMeasure)
         let eddNum: EddingtonCalculator.EddingtonHistory = EddingtonCalculator().eddingtonHistory(timeSeries: data)
 
@@ -237,14 +240,10 @@ class ProgressViewController: UIViewController {
     }
 
     private func createSetsGraph(){
-        chooseButton.isEnabled = true
-        chooseButton.isHidden = false
         updateGraph(forExercise: selectedExercise, andMeasure: selectedMeasure)
     }
 
     private func createHRGraph(){
-        chooseButton.isEnabled = false
-        chooseButton.isHidden = true
         let title: String = "Heart Rate Variability"
         titleLabel.text = title
         // remove all graphs
@@ -282,8 +281,6 @@ class ProgressViewController: UIViewController {
     }
     
     private func createTSBGraph(){
-        chooseButton.isEnabled = true
-        chooseButton.isHidden = false
         if selectedTSB == 0{
             createExerciseTSBGraph()
         }else{
@@ -507,6 +504,21 @@ extension ProgressViewController: UIPickerViewDelegate{
             return nil
         }
         return nil
+    }
+    
+    // adjust widths of components. Need for Ed graphs as three components
+    func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        switch selectedGraph {
+        case .Ed:
+            let w = pickerView.frame.width
+            if component == 2{
+                return w * 0.2
+            }else{
+                return w * 0.4
+            }
+        default:
+            return pickerView.frame.width / 2
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {

@@ -17,6 +17,15 @@ extension TouchSet{
     @objc var minTouch: Double { return actual }
     @objc var maxTouch: Double { return actual }
     
+    override var percentageComplete: Double{
+        if actual <= plan{
+            return 1
+        }else{
+            // ND plan-actual is -ve. So this is asymptotic to 0 with max of 1 when plan == actual
+            return exp(0.25 * Double(plan - actual))
+        }
+    }
+    
     override func setCompleted() -> Bool {
         return actual <= plan && actualKG >= plannedKG
     }

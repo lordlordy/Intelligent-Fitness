@@ -13,6 +13,11 @@ extension Workout{
     var weekOfYear: Int { return calendar.dateComponents([Calendar.Component.weekOfYear], from: date!).weekOfYear!}
     var year: Int { return calendar.dateComponents([Calendar.Component.yearForWeekOfYear], from: date!).yearForWeekOfYear!}
     var weekStr: String { return "\(year)-\(String(format: "%02d", weekOfYear))"}
+    var dayOfWkStr: String {
+        let df: DateFormatter = DateFormatter()
+        df.dateFormat = "E-dd"
+        return df.string(from: date!)
+    }
     
     private var calendar: Calendar{ return Calendar.init(identifier: .iso8601) }
     
@@ -71,12 +76,9 @@ extension Workout{
         }
     }
     
-    
     func numberOfExercises() -> Int{
         return exercises?.count ?? 0
     }
-    
-
     
     func exercises(ofType type: ExerciseType) -> [Exercise]{
         return orderedExerciseArray().filter({$0.type == type.rawValue})
@@ -126,6 +128,15 @@ extension Workout{
         return nil
     }
     
+    func testPrintWorkouts(currentCount: Int){
+        let c = currentCount + 1
+        print("\(c): \(date!) - \(percentageComplete) - \(workoutType()!.string())")
+        if let p = previousWorkout{
+            p.testPrintWorkouts(currentCount: c)
+        }
+        
+    }
+    
     func orderedExerciseArray() -> [Exercise]{
         var array: [Exercise] = exercises?.allObjects as? [Exercise] ?? []
         array.sort(by: {$0.order < $1.order})
@@ -151,5 +162,44 @@ extension Workout{
 
         return "Completed: " + strParts.joined(separator: " / ")
         
+    }
+    
+    /*
+     
+     */
+    func workoutProgression() -> WorkoutDefinition{
+        var exercises: [WorkoutExerciseDefinition] = []
+        let defaults: WorkoutDefinition? = WorkoutManager.shared.defaultWorkout(forType: workoutType()!)
+        
+        for e in orderedExerciseArray(){
+            if let d = defaults{
+                if let definition = d.definition(forType: e.exerciseType()){
+                    exercises.append(e.progression(basedOnDefinition: definition))
+                }
+            }
+        }
+        return WorkoutDefinition(type: workoutType()!, exercises: exercises)
+    }
+    
+    func getProgression(forType type: WorkoutType) -> WorkoutDefinition?{
+        if self.type == type.rawValue{
+            return workoutProgression()
+        }else{
+            if let p = previousWorkout{
+                return p.getProgression(forType: type)
+            }
+        }
+        return nil
+    }
+    
+    fileprivate func getLastWorkout(ofType type: WorkoutType) -> Workout?{
+        if let p = previousWorkout{
+            if p.type == type.rawValue{
+                return p
+            }else{
+                return p.getLastWorkout(ofType: type)
+            }
+        }
+        return nil
     }
 }

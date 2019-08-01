@@ -8,11 +8,8 @@
 
 import UIKit
 
-class WorkoutViewController: UIViewController {
-
-//    var workout: Workout = WorkoutManager.shared.nextWorkout()
+class WorkoutViewController: UITableViewController {
     
-    @IBOutlet weak var dateTextField: UITextField!
     @IBOutlet weak var workoutTypeLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var currentStreakTextField: UITextField!
@@ -20,8 +17,10 @@ class WorkoutViewController: UIViewController {
     @IBOutlet weak var workoutsThisWeekTextField: UITextField!
     @IBOutlet weak var testsThisWeekTextField: UITextField!
     @IBOutlet weak var currentlyConsistentTextField: UITextField!
+    @IBOutlet weak var weeksForNextPowerUp: UITextField!
+    @IBOutlet weak var sessionsForAttackPowerUp: UITextField!
+    @IBOutlet weak var suggestedDate: UITextField!
     
-    private var datePicker: UIDatePicker = UIDatePicker()
     private let df = DateFormatter()
 
     private let descriptionText: String = "Your aim is to do three sessions per week with no more than two rest days between sessions. Consecutive weeks of consistency will be rewarded with power ups in the 'Fitness Invaders' game."
@@ -30,50 +29,26 @@ class WorkoutViewController: UIViewController {
         super.viewDidLoad()
         descriptionLabel.text = descriptionText
         df.dateFormat = "yyyy-MM-dd"
-        
-        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
-        if view.backgroundColor?.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) ?? false{
-            dateTextField.backgroundColor = UIColor(hue: hue, saturation: saturation, brightness: brightness * 1.1, alpha: alpha)
-        }else{
-            dateTextField.backgroundColor = UIColor.clear
-        }
-        dateTextField.textColor = UIColor.white
-        
-        datePicker.datePickerMode = .date
-        datePicker.addTarget(self, action: #selector(dateChanged(datePicker:)), for: .valueChanged)
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
-        view.addGestureRecognizer(tapGesture)
-        
-        dateTextField.inputView = datePicker
     }
-    
-    
-    
-    @objc func viewTapped(gestureRecogniser: UITapGestureRecognizer){
-        view.endEditing(true)
-    }
-    
-    @objc func dateChanged(datePicker: UIDatePicker){
-        dateTextField.text = df.string(from: datePicker.date)
-        WorkoutManager.shared.nextWorkout().date = datePicker.date
-        view.endEditing(true)
-    }
-    
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         let nextWorkout: Workout = WorkoutManager.shared.nextWorkout()
         let d: Date = nextWorkout.date ?? Date()
-        dateTextField.text = df.string(from: d)
-        datePicker.date = d
+        suggestedDate.text = df.string(from: d)
 
         let type: WorkoutType? = nextWorkout.workoutType()
         workoutTypeLabel.text = type?.string() ?? "Workout Type Unknown"
         let streak = WorkoutManager.shared.currentStreakData()
         currentStreakTextField.text = "\(streak.current) weeks"
         bestStreakTextField.text = "\(streak.best) weeks"
+        
+        let weeksForDefence: Int = WorkoutManager.shared.weeksForNextDefencePowerUp()
+        weeksForNextPowerUp.text = "In \(weeksForDefence) weeks"
+        
+        let attackPower = WorkoutManager.shared.sessionsForNextAttackPowerUp()
+        sessionsForAttackPowerUp.text = "\(attackPower.sessions) sets of \(attackPower.repsXKg) kg-reps"
         
         if let currentWeek = WorkoutManager.shared.currentWeek(){
             if currentWeek.consistent{

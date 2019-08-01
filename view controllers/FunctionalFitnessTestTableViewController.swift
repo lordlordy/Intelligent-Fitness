@@ -91,6 +91,12 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
         updateTest()
     }
     
+    private func notifyUserOfPowerUp(){
+        let alert = UIAlertController(title: "New PowerUp", message: "Congratulations you have earned a new powerup for the Fitness Invaders game !", preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     @IBAction func startStopTimer(_ sender: Any) {
         if testCompleted{
             fitnessTest.complete = true
@@ -98,7 +104,10 @@ class FunctionalFitnessTestTableViewController: UITableViewController {
             // in production would consider removing this and always setting the date to now.
             fitnessTest.date = min(Date(), fitnessTest.date ?? Date())
             CoreDataStackSingleton.shared.save()
-            WorkoutManager.shared.createNextFunctionalFitnessTest(after: fitnessTest)
+            if WorkoutManager.shared.createNextFunctionalFitnessTest(after: fitnessTest){
+                // tell teh user they got a new powerup
+                notifyUserOfPowerUp()
+            }
             performSegue(withIdentifier: "EndOfTest", sender: self)
         }
         timerStatus = timerStatus.nextStatus()
