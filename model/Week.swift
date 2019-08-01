@@ -73,18 +73,23 @@ class Week{
     
     
     func recursivelyCalculateConsistencyStreak() -> Int{
+        return recursivelyCalculateConsistencyStreak(toDate: Date())
+    }
+    
+    func recursivelyCalculateConsistencyStreak(toDate date: Date) -> Int{
         
         //check whether can used cached value
         if let cs = consistencyStreak{
-            if !weekContains(thisDate: Date()){
+            if !weekContains(thisDate: date){
                 // use cached value for all weeks except the current week. Recalc that one each time
                 return cs
             }
         }
+        
 
         if consistent{
             if let p = previousWeek{
-                consistencyStreak = p.recursivelyCalculateConsistencyStreak() + 1
+                consistencyStreak = p.recursivelyCalculateConsistencyStreak(toDate: date) + 1
                 return consistencyStreak!
             }else{
                 consistencyStreak = 1
@@ -93,7 +98,7 @@ class Week{
         }else{
 //            return 0
             if let p = previousWeek{
-                consistencyStreak = Int(Double(p.recursivelyCalculateConsistencyStreak()) * streakDecay)
+                consistencyStreak = Int(Double(p.recursivelyCalculateConsistencyStreak(toDate: date)) * streakDecay)
                 return consistencyStreak!
             }else{
                 consistencyStreak = 0
@@ -168,7 +173,6 @@ class Week{
             gaps.append(Calendar.current.dateComponents([.day], from: pDate, to: oDays[i]).day! - 1)
             pDate = oDays[i]
         }
-        print(gaps)
         return gaps.max() ?? 0
     }
     
@@ -189,7 +193,6 @@ class Week{
 
         // add start of following week
         result.append(calendar.date(byAdding: DateComponents(day:1), to: dateOrderWorkouts[0].date!.endOfWeek)!)
-        print(result)
         return result
     }
     

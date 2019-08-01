@@ -128,6 +128,15 @@ extension Workout{
         return nil
     }
     
+    func testPrintWorkouts(currentCount: Int){
+        let c = currentCount + 1
+        print("\(c): \(date!) - \(percentageComplete) - \(workoutType()!.string())")
+        if let p = previousWorkout{
+            p.testPrintWorkouts(currentCount: c)
+        }
+        
+    }
+    
     func orderedExerciseArray() -> [Exercise]{
         var array: [Exercise] = exercises?.allObjects as? [Exercise] ?? []
         array.sort(by: {$0.order < $1.order})

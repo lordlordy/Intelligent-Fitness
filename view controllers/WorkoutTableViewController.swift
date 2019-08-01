@@ -160,7 +160,8 @@ class WorkoutTableViewController: UITableViewController{
                 tabVC.selectedIndex = 3
             }
             currentExerciseSet = 0
-            if WorkoutManager.shared.createNextWorkout(after: workout){
+            let _: Workout = WorkoutManager.shared.createNextWorkout(after: workout)
+            if WorkoutManager.shared.checkforPowerups(){
                 // notify user of new powerup
                 let alert = UIAlertController(title: "New PowerUp", message: "Congratulations you have earned a new powerup for the Fitness Invaders game !", preferredStyle: .actionSheet)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))

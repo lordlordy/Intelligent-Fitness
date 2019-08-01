@@ -43,7 +43,10 @@ extension Exercise{
     
     
     func progression(basedOnDefinition definition: WorkoutExerciseDefinition) -> WorkoutExerciseDefinition{
-        if percentageComplete <= 0.75{
+        if percentageComplete <= 0.6{
+            // failed badly - reduce by double
+            return WorkoutExerciseDefinition(type: exerciseType(), plan: max(0,plan - definition.planProgression * 2) , kg: max(0, plannedKG - definition.kgProgression * 2), planProgression: definition.planProgression, kgProgression: definition.kgProgression)
+        }else if percentageComplete <= 0.8{
             // failed - reduce exercise
             return WorkoutExerciseDefinition(type: exerciseType(), plan: max(0,plan - definition.planProgression) , kg: max(0, plannedKG - definition.kgProgression), planProgression: definition.planProgression, kgProgression: definition.kgProgression)
         }else if percentageComplete < percentageComplete{

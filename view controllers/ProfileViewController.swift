@@ -71,7 +71,11 @@ class ProfileViewController: UITableViewController {
     }
     
     @IBAction func test(_ sender: UIButton) {
-        WorkoutManager.shared.saveLatestPowerUpToCloud()
+//        WorkoutManager.shared.saveLatestPowerUpToCloud()
+        let workouts = CoreDataStackSingleton.shared.getChronologicalOrderedWorkouts(ofType: nil, isTest: nil).filter({$0.complete})
+        print(workouts)
+        workouts[workouts.count - 1].testPrintWorkouts(currentCount: 0)
+    
     }
     
     @IBAction func restingHRInfoTapped(_ sender: Any) {

@@ -65,7 +65,7 @@ class ExerciseDefinitionManager{
             case .pullDown:
                 dict[e] = ExerciseDefinitionImpl(name: "Pull Down", setType: .Reps, usesWeight: true, description: "a exercise description", embedVideoHTML: nil)
             case .pressUp:
-                dict[e] = ExerciseDefinitionImpl(name: "Push Up", setType: .Reps, usesWeight: false, description: "a exercise description", embedVideoHTML: nil)
+                dict[e] = ExerciseDefinitionImpl(name: "Press Up", setType: .Reps, usesWeight: false, description: "a exercise description", embedVideoHTML: nil)
             case .sittingRisingTest:
                 dict[e] = ExerciseDefinitionImpl(name: "Sitting Rising Test", setType: .Touches, usesWeight: false, description: "a exercise description", embedVideoHTML: nil)
             case .squat:

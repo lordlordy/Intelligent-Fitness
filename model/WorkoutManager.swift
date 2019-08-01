@@ -185,6 +185,7 @@ class WorkoutManager: Athlete{
         return defaultDefinitions[type]
     }
     
+
     // MARK: - Athlete Protocol
     
     func timeSeries(forExeciseType type: ExerciseType, andMeasure measure: ExerciseMeasure) -> [(date: Date, value: Double)] {
@@ -253,7 +254,6 @@ class WorkoutManager: Athlete{
         var startOfWeek: Date
         var previousWeek: Week?
 
-        print("Cache contains: \(weekCache.count) weeks")
         
         // see if can use cache
         if weekCache.count > 0{
@@ -343,9 +343,7 @@ class WorkoutManager: Athlete{
             print("Shouldn't really get here: nextWorkout as the next workout should have been created ")
             let workouts: [Workout] = CoreDataStackSingleton.shared.getChronologicalOrderedWorkouts(ofType: nil, isTest: nil).sorted(by: {$0.date! > $1.date!})
             if workouts.count > 0{
-                let _: Bool = createNextWorkout(after: workouts[0])
-                // have created next workout so call this method re-cursively
-                return nextWorkout()
+                return createNextWorkout(after: workouts[0])
             }else{
                 
                 let newWorkout: Workout = createWorkout(forDate: Date(), session: defaultWorkout(forType: .DescendingReps)!)
@@ -371,15 +369,22 @@ class WorkoutManager: Athlete{
             return d
         }
     }
-
-    func createNextWorkout(after: Workout) -> Bool{
+    
+    func createNextWorkout(after: Workout) -> Workout{
         let nextDate: Date = nextWorkoutDate(onOrAfter: after.date!.tomorrow)
         let type: WorkoutType = after.type == WorkoutType.DescendingReps.rawValue ? WorkoutType.ConstantReps : WorkoutType.DescendingReps
         
+        // make sure provided workout has been connected to previous
+        if let w = getWeek(containingDate: after.date!){
+            w.connectUpWorkouts()
+        }
+        
+        var workout: Workout?
+        
         if let progression = after.getProgression(forType: type){
-            let _: Workout = createWorkout(forDate: nextDate, session: progression)
+            workout = createWorkout(forDate: nextDate, session: progression)
         }else{
-            let _:Workout = createWorkout(forDate: nextDate, session: defaultWorkout(forType: type)!)
+            workout = createWorkout(forDate: nextDate, session: defaultWorkout(forType: type)!)
         }
         
         CoreDataStackSingleton.shared.save()
@@ -387,8 +392,7 @@ class WorkoutManager: Athlete{
             w.connectUpWorkouts()
             CoreDataStackSingleton.shared.save()
         }
-        let newPowerUp: Bool = checkforPowerups()
-        return newPowerUp
+        return workout!
     }
     
     
@@ -510,7 +514,7 @@ class WorkoutManager: Athlete{
         return (plusOne, targetEdNum)
     }
     
-    private func checkforPowerups() -> Bool{
+    func checkforPowerups() -> Bool{
         return checkforPowerups(toDate: Date())
     }
     
@@ -536,7 +540,7 @@ class WorkoutManager: Athlete{
          */
         print("Checking whether to update power ups to \(date)")
         let orderWeeks: [Week] = getWeeks(toDate: date).sorted(by: {$0.startOfWeek < $1.startOfWeek})
-        let maxStreak: Int16 = Int16(Double(orderWeeks.reduce(0, {max($0, $1.recursivelyCalculateConsistencyStreak())})))
+        let maxStreak: Int16 = Int16(Double(orderWeeks.reduce(0, {max($0, $1.recursivelyCalculateConsistencyStreak(toDate: date))})))
         let maxRepKGEdNum: Int16 = Int16(attackPowerUpEdSeries().eddingtonNumber)
         let orderedPowerUps: [PowerUp] = CoreDataStackSingleton.shared.getPowerUps().sorted(by: {$0.date! < $1.date!})
         
@@ -628,7 +632,14 @@ class WorkoutManager: Athlete{
     
     func createTestDataUsingBuiltInProgresions(){
         var d: Date = calendar.date(byAdding: DateComponents(year: -1), to: Date())!.startOfWeek
+        let firstDate: Date = d
         let interval: DateComponents = DateComponents(day: 28)
+        // clear any existing workouts
+        let existing: [Workout] = CoreDataStackSingleton.shared.getChronologicalOrderedWorkouts(ofType: nil, isTest: nil)
+        for e in existing{
+            CoreDataStackSingleton.shared.delete(e)
+        }
+        CoreDataStackSingleton.shared.save()
         
         // create tests first
         let firstTest: Workout = nextFunctionalFitnessTest()
@@ -665,7 +676,128 @@ class WorkoutManager: Athlete{
         }
         // make sure the next planned test is in place
         let _ = nextFunctionalFitnessTest()
-        print(CoreDataStackSingleton.shared.getFunctionalFitnessTests())
+
+        // now for workouts.
+        var workout: Workout = createNextWorkout(after: firstTest)
+        // this is to track max value so chance of failure is only used if at the max or above
+        var maxDictionary: [ExerciseType: (actual: Double, actualKG: Double)] = [:]
+        // populate with zeroes
+        for t in ExerciseType.allCases{
+            let setType: SetType = ExerciseDefinitionManager.shared.exerciseDefinition(for: t).setType
+            if setType.moreIsBetter(){
+                maxDictionary[t] = (actual: 0.0, actualKG: 0.0)
+            }else{
+                // really only touches case where we want minimums
+                maxDictionary[t] = (10.0, 0.0)
+            }
+        }
+        while workout.date! < Date(){
+            let daysSinceFirstDate: Double = Double(Calendar.current.dateComponents([.day], from: firstDate, to: workout.date!).day!)
+            // probability of failure needs to increase as we progress and weights get tougher. This function is asymptotic to 1.
+            // after 365 days it's ~ 70% chance of failing
+            let probabilityOfFailure: Double = daysSinceFirstDate / (150 + daysSinceFirstDate)
+            print("Probability of failure: \(probabilityOfFailure)")
+            if Double.random(in: 0...1) < probabilityOfFailure{
+                // fail
+                let factor: Double = Double.random(in: 0.4...0.8)
+                for e in workout.orderedExerciseArray(){
+                    let maximums = maxDictionary[e.exerciseType()]
+                    let exerciseDefinition: ExerciseDefinition = ExerciseDefinitionManager.shared.exerciseDefinition(for: e.exerciseType())
+                    let setType: SetType = exerciseDefinition.setType
+                    switch setType{
+                    case .Distance, .Time:
+                        for es in e.exerciseSets(){
+                            es.actualKG = es.plannedKG
+                            if es.plan >= maximums?.actual ?? 0.0{
+                                es.actual = es.plan * factor
+                            }else{
+                                es.actual = es.plan
+                            }
+                        }
+                    case .Reps:
+                        for es in e.exerciseSets(){
+                            es.actualKG = es.plannedKG
+                            if exerciseDefinition.usesWeight{
+                                if es.actualKG >= maximums?.actualKG ?? 0.0 {
+                                    // use Int here to make sure it's an exact number of reps
+                                    es.actual = Double(Int(es.plan * factor))
+                                }else{
+                                    es.actual = es.plan
+                                }
+                            }else{
+                                if es.plan >= maximums?.actual ?? 0.0{
+                                    // use Int here to make sure it's an exact number of reps
+                                    es.actual = Double(Int(es.plan * factor))
+                                }else{
+                                    es.actual = es.plan
+                                }
+                            }
+                        }
+                    case .Touches:
+                        for es in e.exerciseSets(){
+                            es.actualKG = es.plannedKG
+                            if es.plan <= maximums?.actual ?? 0.0{
+                                es.actual = es.plan + 1
+                            }else{
+                                es.actual = es.plan
+                            }
+                        }
+                    case .All:
+                        // shouldn't get here
+                        print("Shouldn't get this case when generating workouts in WorkoutManager.shared.createTestDataUsingBuiltInProgresions()")
+                    }
+                }
+            }else{
+                // success
+                for e in workout.orderedExerciseArray(){
+                    let setType: SetType = ExerciseDefinitionManager.shared.exerciseDefinition(for: e.exerciseType()).setType
+                    for es in e.exerciseSets(){
+                        es.actualKG = es.plannedKG
+                        es.actual = es.plan
+                        // update maxes
+                        let current = maxDictionary[e.exerciseType()]
+                        if setType.moreIsBetter(){
+                            maxDictionary[e.exerciseType()] = (max(current?.actual ?? 0.0, es.actual), max(current?.actualKG ?? 0.0, es.actualKG))
+                        }else{
+                            // touches. So want to track the least touches
+                            maxDictionary[e.exerciseType()] = (min(current?.actual ?? 10.0, es.actual), max(current?.actualKG ?? 0.0, es.actualKG))
+                        }
+                    }
+                }
+            }
+            workout.complete = true
+            CoreDataStackSingleton.shared.save()
+            // randomly add an extra workout to ensure some weeks are not consistent.
+            // don't want too many ... so say 1 in 50 chance
+            if let w = getWeek(containingDate: workout.date!){
+                // check if week already has 3 workouts. If we add a workout prior to it already having 3
+                // then the createNextWorkout method will still make the week consistent
+                if w.dateOrderWorkouts.count > 2{
+                    if Double.random(in: 0...1) < 0.1{
+                        let d: Date = workout.date!
+                        workout = createNextWorkout(after: workout)
+                        // ensure in same week
+                        workout.date = d
+                        workout.complete = true
+                        // complete the workout
+                        for e in workout.orderedExerciseArray(){
+                            for es in e.exerciseSets(){
+                                es.actual = es.plan
+                                es.actualKG = es.plannedKG
+                            }
+                        }
+                        CoreDataStackSingleton.shared.save()
+                        print("Added extra workout: \(d)")
+                    }
+                }
+            }
+            
+            if checkforPowerups(toDate: workout.date!){
+                print("Powerup gained on \(workout.date!)")
+            }
+
+            workout = createNextWorkout(after: workout)
+        }
     }
     
     func createTestWorkoutData(){
