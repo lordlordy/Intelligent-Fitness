@@ -68,7 +68,9 @@ enum SetType: Int16{
     func string(forValue d: Double) -> String{
         switch self{
         case .Reps: return "\(Int(d)) reps"
-        case .Distance: return "\(d)m"
+        case .Distance:
+            return String(format: "%.2fm", d)
+//            return "\(d)m"
         case .Time: return "\(Int(d))s"
         case .Touches: return "\(Int(d)) touches"
         case .All: return "\(Int(d))"

@@ -26,7 +26,8 @@ extension DistanceSet{
         }else{
             str += "Not started"
         }
-        str += " (\(partOfTest() ? "Goal:" : "Plan:") \(plan)"
+        str += " (\(partOfTest() ? "Goal:" : "Plan:") "
+        str += String(format: "%.2fm", plan)
         if plannedKG > 0{
             str += " with \(plannedKG)kg"
         }
