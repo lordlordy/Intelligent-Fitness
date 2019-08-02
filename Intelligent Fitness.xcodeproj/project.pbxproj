@@ -18,6 +18,7 @@
 		7342CB9422C51F36000A6FB6 /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */; };
 		7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */; };
 		7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */; };
+		7349ED5122F4742600E67218 /* PersonalityInsightManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7349ED5022F4742600E67218 /* PersonalityInsightManager.swift */; };
 		736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1722B3B2E20071EA3B /* AppDelegate.swift */; };
 		736CFC1A22B3B2E20071EA3B /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1922B3B2E20071EA3B /* TestViewController.swift */; };
 		736CFC1F22B3B2E20071EA3B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 736CFC1D22B3B2E20071EA3B /* Main.storyboard */; };
@@ -88,6 +89,7 @@
 		7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
+		7349ED5022F4742600E67218 /* PersonalityInsightManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalityInsightManager.swift; sourceTree = "<group>"; };
 		736CFC1422B3B2E20071EA3B /* Intelligent Fitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Intelligent Fitness.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		736CFC1722B3B2E20071EA3B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		736CFC1922B3B2E20071EA3B /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
@@ -272,6 +274,7 @@
 				73CD5EB422DF6EAC00AFFF21 /* DistanceSet+Extension.swift */,
 				73CD5EB622DF6EDF00AFFF21 /* TouchSet+Extension.swift */,
 				731F80E822E0C136008399AD /* PowerUp+Extension.swift */,
+				7349ED5022F4742600E67218 /* PersonalityInsightManager.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -568,6 +571,7 @@
 				738A526E22E1C38700B8CBB0 /* Graph.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
 				73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */,
+				7349ED5122F4742600E67218 /* PersonalityInsightManager.swift in Sources */,
 				73CD5EB722DF6EDF00AFFF21 /* TouchSet+Extension.swift in Sources */,
 				73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */,
 				73CD5EB522DF6EAC00AFFF21 /* DistanceSet+Extension.swift in Sources */,

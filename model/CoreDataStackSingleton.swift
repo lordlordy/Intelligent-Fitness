@@ -12,6 +12,7 @@ import CoreData
 
 enum EntityType: String{
     case Exercise, ExerciseSet, Workout, RepSet, TimeSet, DistanceSet, TouchSet, PowerUp
+    case PersonalityInsight, Insight
 }
 
 /*

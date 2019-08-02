@@ -18,6 +18,23 @@
         <attribute name="restSeconds" attributeType="Integer 16" defaultValueString="30" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="exercise" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Exercise" inverseName="sets" inverseEntity="Exercise" syncable="YES"/>
     </entity>
+    <entity name="Insight" representedClassName="Insight" syncable="YES" codeGenerationType="class">
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="parentInsight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Insight" inverseName="subInsights" inverseEntity="Insight" syncable="YES"/>
+        <relationship name="personalityInsight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PersonalityInsight" inverseName="insights" inverseEntity="PersonalityInsight" syncable="YES"/>
+        <relationship name="readings" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="InsightReading" inverseName="insight" inverseEntity="InsightReading" syncable="YES"/>
+        <relationship name="subInsights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Insight" inverseName="parentInsight" inverseEntity="Insight" syncable="YES"/>
+    </entity>
+    <entity name="InsightReading" representedClassName="InsightReading" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="percentile" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="insight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Insight" inverseName="readings" inverseEntity="Insight" syncable="YES"/>
+    </entity>
+    <entity name="PersonalityInsight" representedClassName="PersonalityInsight" syncable="YES" codeGenerationType="class">
+        <attribute name="lastUpdate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="insights" toMany="YES" deletionRule="Nullify" destinationEntity="Insight" inverseName="personalityInsight" inverseEntity="Insight" syncable="YES"/>
+    </entity>
     <entity name="PowerUp" representedClassName="PowerUp" syncable="YES" codeGenerationType="class">
         <attribute name="attack" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="date" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -44,5 +61,8 @@
         <element name="TimeSet" positionX="-425.015625" positionY="978.71875" width="128" height="43"/>
         <element name="TouchSet" positionX="-104.55078125" positionY="976.90625" width="128" height="43"/>
         <element name="Workout" positionX="-932.73828125" positionY="782.71484375" width="128" height="148"/>
+        <element name="Insight" positionX="-320.62109375" positionY="1098.30859375" width="128" height="118"/>
+        <element name="PersonalityInsight" positionX="-598.08984375" positionY="1101.6953125" width="128" height="88"/>
+        <element name="InsightReading" positionX="-103.0234375" positionY="1111.0546875" width="128" height="88"/>
     </elements>
 </model>
