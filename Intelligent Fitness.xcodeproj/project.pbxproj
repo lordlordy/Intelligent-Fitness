@@ -52,6 +52,8 @@
 		73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */; };
 		73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */; };
 		73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */; };
+		73F8061F22F88DB200E6CC47 /* PersonalityInsight+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */; };
+		73F8062122F89D0200E6CC47 /* Insight+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062022F89D0200E6CC47 /* Insight+Extension.swift */; };
 		9B7E1A27CAFCABAA54613FD0 /* Pods_Intelligent_Fitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD2F45FBC7133D7A831CCAF /* Pods_Intelligent_Fitness.framework */; };
 		FA3860FA8964F1672AF23A42 /* Pods_Intelligent_FitnessUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57027BDECC969C348D8A3E12 /* Pods_Intelligent_FitnessUITests.framework */; };
 /* End PBXBuildFile section */
@@ -130,6 +132,8 @@
 		73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workout+Extension.swift"; sourceTree = "<group>"; };
 		73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailTableViewController.swift; sourceTree = "<group>"; };
 		73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDefinition.swift; sourceTree = "<group>"; };
+		73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersonalityInsight+Extension.swift"; sourceTree = "<group>"; };
+		73F8062022F89D0200E6CC47 /* Insight+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Insight+Extension.swift"; sourceTree = "<group>"; };
 		9A15EECFB09ABBC8856BA641 /* Pods_Intelligent_FitnessTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Intelligent_FitnessTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A621DD4A3C3F73C2603DB12E /* Pods-Intelligent Fitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent Fitness.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent Fitness/Pods-Intelligent Fitness.debug.xcconfig"; sourceTree = "<group>"; };
 		CC9FB4B13A229373A6DE344C /* Pods-Intelligent FitnessUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent FitnessUITests.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent FitnessUITests/Pods-Intelligent FitnessUITests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -275,6 +279,8 @@
 				73CD5EB622DF6EDF00AFFF21 /* TouchSet+Extension.swift */,
 				731F80E822E0C136008399AD /* PowerUp+Extension.swift */,
 				7349ED5022F4742600E67218 /* PersonalityInsightManager.swift */,
+				73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */,
+				73F8062022F89D0200E6CC47 /* Insight+Extension.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -560,8 +566,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */,
+				73F8061F22F88DB200E6CC47 /* PersonalityInsight+Extension.swift in Sources */,
 				731F80E722E0416C008399AD /* WebViewController.swift in Sources */,
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
+				73F8062122F89D0200E6CC47 /* Insight+Extension.swift in Sources */,
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
 				7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */,
 				73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */,

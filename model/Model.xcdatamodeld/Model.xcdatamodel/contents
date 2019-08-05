@@ -22,7 +22,7 @@
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="parentInsight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Insight" inverseName="subInsights" inverseEntity="Insight" syncable="YES"/>
         <relationship name="personalityInsight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PersonalityInsight" inverseName="insights" inverseEntity="PersonalityInsight" syncable="YES"/>
-        <relationship name="readings" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="InsightReading" inverseName="insight" inverseEntity="InsightReading" syncable="YES"/>
+        <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="InsightReading" inverseName="insight" inverseEntity="InsightReading" syncable="YES"/>
         <relationship name="subInsights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Insight" inverseName="parentInsight" inverseEntity="Insight" syncable="YES"/>
     </entity>
     <entity name="InsightReading" representedClassName="InsightReading" syncable="YES" codeGenerationType="class">
@@ -56,13 +56,13 @@
         <element name="DistanceSet" positionX="-264.17578125" positionY="976.17578125" width="128" height="43"/>
         <element name="Exercise" positionX="-667.34765625" positionY="786.5625" width="128" height="133"/>
         <element name="ExerciseSet" positionX="-417.328125" positionY="741.109375" width="128" height="148"/>
+        <element name="Insight" positionX="-320.62109375" positionY="1098.30859375" width="128" height="118"/>
+        <element name="InsightReading" positionX="-103.0234375" positionY="1111.0546875" width="128" height="88"/>
+        <element name="PersonalityInsight" positionX="-598.08984375" positionY="1101.6953125" width="128" height="88"/>
         <element name="PowerUp" positionX="-890.16796875" positionY="1061.31640625" width="128" height="88"/>
         <element name="RepSet" positionX="-574.984375" positionY="966.44140625" width="128" height="43"/>
         <element name="TimeSet" positionX="-425.015625" positionY="978.71875" width="128" height="43"/>
         <element name="TouchSet" positionX="-104.55078125" positionY="976.90625" width="128" height="43"/>
         <element name="Workout" positionX="-932.73828125" positionY="782.71484375" width="128" height="148"/>
-        <element name="Insight" positionX="-320.62109375" positionY="1098.30859375" width="128" height="118"/>
-        <element name="PersonalityInsight" positionX="-598.08984375" positionY="1101.6953125" width="128" height="88"/>
-        <element name="InsightReading" positionX="-103.0234375" positionY="1111.0546875" width="128" height="88"/>
     </elements>
 </model>

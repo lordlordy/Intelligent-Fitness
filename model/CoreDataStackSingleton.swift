@@ -12,7 +12,7 @@ import CoreData
 
 enum EntityType: String{
     case Exercise, ExerciseSet, Workout, RepSet, TimeSet, DistanceSet, TouchSet, PowerUp
-    case PersonalityInsight, Insight
+    case PersonalityInsight, Insight, InsightReading
 }
 
 /*
@@ -65,6 +65,27 @@ class CoreDataStackSingleton{
     }
     func newExercise() -> Exercise {return newEntity(ofType: .Exercise) as! Exercise}
     func newPowerUp() -> PowerUp {return newEntity(ofType: .PowerUp) as! PowerUp}
+    func newPersonalityInsight() -> PersonalityInsight { return newEntity(ofType: .PersonalityInsight) as! PersonalityInsight}
+    func newInsight() -> Insight { return newEntity(ofType: .Insight) as! Insight}
+    func newInsightReading() -> InsightReading { return newEntity(ofType: .InsightReading) as! InsightReading}
+    
+    func getPersonalityInsights() -> [PersonalityInsight]{
+        return getAllEntities(ofType: .PersonalityInsight, predicate: nil) as? [PersonalityInsight] ?? []
+    }
+    
+    func getPersonalityInsight(forType type: InsightType) -> PersonalityInsight{
+        if let pi = getAllEntities(ofType: .PersonalityInsight, predicate: nil) as? [PersonalityInsight]{
+            for i in pi{
+                if i.type == type.rawValue{
+                    return i
+                }
+            }
+        }
+        let pi: PersonalityInsight = newPersonalityInsight()
+        pi.type = type.rawValue
+        save()
+        return pi
+    }
     
     func getPowerUps() -> [PowerUp] { return getAllEntities(ofType: .PowerUp, predicate: nil) as? [PowerUp] ?? [] }
     

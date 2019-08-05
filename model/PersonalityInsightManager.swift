@@ -8,6 +8,10 @@
 
 import Foundation
 
+enum InsightType: String{
+    case needs, values, personality
+}
+
 class PersonalityInsightManager{
     
     public static let shared: PersonalityInsightManager = PersonalityInsightManager()
@@ -15,70 +19,80 @@ class PersonalityInsightManager{
     private let insightsURL: URL = URL(string: "https://lord-lordy2.eu-gb.mybluemix.net/twitter")!
     
     
-    func saveInsights(){
-        
+    func saveInsights(completion: @escaping ([PersonalityInsight]) -> Swift.Void){
+        readAndUpdateInsights(completion: completion)
     }
     
     func printInsightsToConsole(){
+        for pi in CoreDataStackSingleton.shared.getPersonalityInsights(){
+            pi.printSummary()
+        }
+    }
+    
+    private func readAndUpdateInsights(completion: @escaping ([PersonalityInsight]) -> Swift.Void){
         var request = URLRequest(url: insightsURL)
         request.httpMethod = "GET"
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let d = data{
+                var result: [PersonalityInsight] = []
                 do{
                     let jsonDict = try JSONSerialization.jsonObject(with: d, options: .allowFragments) as! Dictionary<String, Any>
-                    if let needs = jsonDict["needs"] as? NSArray{
-                        print("NEEDS:")
+                    if let needs = jsonDict[InsightType.needs.rawValue] as? NSArray{
+                        let pi: PersonalityInsight = CoreDataStackSingleton.shared.getPersonalityInsight(forType: .needs)
+                        result.append(pi)
                         for n in needs{
                             if let dict = n as? Dictionary<String, Any>{
                                 if let name = dict["name"] as? String{
                                     if let p = dict["percentile"] as? Double{
-                                        print("\t\(name): \(p)")
+                                        pi.getInsight(forType: name).setReading(toValue: p, forDate: Date())
                                     }
                                 }
                             }
                         }
                     }
                     
-                    if let values = jsonDict["values"] as? NSArray{
-                        print("VALUES:")
+                    if let values = jsonDict[InsightType.values.rawValue] as? NSArray{
+                        let pi: PersonalityInsight = CoreDataStackSingleton.shared.getPersonalityInsight(forType: .values)
+                        result.append(pi)
                         for v in values{
                             if let dict = v as? Dictionary<String, Any>{
                                 if let name = dict["name"] as? String{
                                     if let p = dict["percentile"] as? Double{
-                                        print("\t\(name): \(p)")
+                                        pi.getInsight(forType: name).setReading(toValue: p, forDate: Date())
                                     }
                                 }
                             }
                         }
                     }
                     
-                    if let personality = jsonDict["personality"] as? NSArray{
-                        print("PERSONALITY:")
+                    if let personality = jsonDict[InsightType.personality.rawValue] as? NSArray{
+                        let pi: PersonalityInsight = CoreDataStackSingleton.shared.getPersonalityInsight(forType: .personality)
+                        result.append(pi)
                         for v in personality{
                             if let dict = v as? Dictionary<String, Any>{
                                 if let name = dict["name"] as? String{
+                                    print(name)
                                     if let p = dict["percentile"] as? Double{
-                                        print("\t\(name): \(p)")
+                                        pi.getInsight(forType: name).setReading(toValue: p, forDate: Date())
                                     }
-                                }
-                                if let children = dict["children"] as? NSArray{
-                                    print("\tSUB-CATEGORIES:")
-                                    for c in children{
-                                        if let cDict = c as? Dictionary<String, Any>{
-                                            if let name = cDict["name"] as? String{
-                                                if let p = cDict["percentile"] as? Double{
-                                                    print("\t\t\(name): \(p)")
+                                    if let children = dict["children"] as? NSArray{
+                                        for c in children{
+                                            if let cDict = c as? Dictionary<String, Any>{
+                                                if let n = cDict["name"] as? String{
+                                                    print("Sub: \(n)")
+                                                    if let p = cDict["percentile"] as? Double{
+                                                        pi.getInsight(forType: name).getSubCategory(forType: n).setReading(toValue: p, forDate: Date())
+                                                    }
                                                 }
                                             }
                                         }
-                                    }                                }
+                                    }
+                                }
                             }
                         }
                     }
                     
-                    //                    if let personality = jsonDict["personality"]{
-                    //                        print(personality)
-                    //                    }
+                    completion(result)
                     
                 }catch{
                     print(error)
@@ -87,10 +101,6 @@ class PersonalityInsightManager{
         }
         task.resume()
     }
-    
-//    private func getInsightsJSON() -> Dictionary<String, Any>{
-//        
-//    }
     
     private init(){
         
