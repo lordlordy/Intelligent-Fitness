@@ -14,6 +14,10 @@ enum PersonalityInsightProperty: String{
 
 extension PersonalityInsight{
     
+    var insightCount: Int{
+        return insightsArray.count
+    }
+    
     func getInsight(forType type: String) -> Insight{
         for i in insightsArray{
             if i.type == type{
@@ -27,7 +31,22 @@ extension PersonalityInsight{
         CoreDataStackSingleton.shared.save()
         return insight
     }
+    
+    func getInsight(atIndex index: Int) -> Insight?{
+        if index < insightsArray.count{
+            return insightsArray[index]
+        }
+        return nil
+    }
 
+    func numberOfInsights() -> Int{
+        var count: Int = 0
+        for i in insightsArray{
+            count = count + 1 + i.subInsightArray.count
+        }
+        return count
+    }
+    
     func printSummary(){
         print("\(type ?? "Not set")")
         for i in insightsArray{
@@ -36,6 +55,7 @@ extension PersonalityInsight{
     }
     
     private var insightsArray: [Insight]{
-        return insights?.allObjects as? [Insight] ?? []
+        let array = insights?.allObjects as? [Insight] ?? []
+        return array.sorted(by: {$0.type! < $1.type!})
     }
 }

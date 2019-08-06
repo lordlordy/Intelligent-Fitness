@@ -71,7 +71,6 @@ class PersonalityInsightManager{
                         for v in personality{
                             if let dict = v as? Dictionary<String, Any>{
                                 if let name = dict["name"] as? String{
-                                    print(name)
                                     if let p = dict["percentile"] as? Double{
                                         pi.getInsight(forType: name).setReading(toValue: p, forDate: Date())
                                     }
@@ -79,7 +78,6 @@ class PersonalityInsightManager{
                                         for c in children{
                                             if let cDict = c as? Dictionary<String, Any>{
                                                 if let n = cDict["name"] as? String{
-                                                    print("Sub: \(n)")
                                                     if let p = cDict["percentile"] as? Double{
                                                         pi.getInsight(forType: name).getSubCategory(forType: n).setReading(toValue: p, forDate: Date())
                                                     }

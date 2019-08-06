@@ -54,6 +54,8 @@
 		73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */; };
 		73F8061F22F88DB200E6CC47 /* PersonalityInsight+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */; };
 		73F8062122F89D0200E6CC47 /* Insight+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062022F89D0200E6CC47 /* Insight+Extension.swift */; };
+		73F8062322F9935500E6CC47 /* InsightsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062222F9935500E6CC47 /* InsightsTableViewController.swift */; };
+		73F8062522F9B04300E6CC47 /* InsightReadingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062422F9B04300E6CC47 /* InsightReadingsTableViewController.swift */; };
 		9B7E1A27CAFCABAA54613FD0 /* Pods_Intelligent_Fitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD2F45FBC7133D7A831CCAF /* Pods_Intelligent_Fitness.framework */; };
 		FA3860FA8964F1672AF23A42 /* Pods_Intelligent_FitnessUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57027BDECC969C348D8A3E12 /* Pods_Intelligent_FitnessUITests.framework */; };
 /* End PBXBuildFile section */
@@ -134,6 +136,8 @@
 		73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDefinition.swift; sourceTree = "<group>"; };
 		73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersonalityInsight+Extension.swift"; sourceTree = "<group>"; };
 		73F8062022F89D0200E6CC47 /* Insight+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Insight+Extension.swift"; sourceTree = "<group>"; };
+		73F8062222F9935500E6CC47 /* InsightsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsTableViewController.swift; sourceTree = "<group>"; };
+		73F8062422F9B04300E6CC47 /* InsightReadingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightReadingsTableViewController.swift; sourceTree = "<group>"; };
 		9A15EECFB09ABBC8856BA641 /* Pods_Intelligent_FitnessTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Intelligent_FitnessTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A621DD4A3C3F73C2603DB12E /* Pods-Intelligent Fitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent Fitness.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent Fitness/Pods-Intelligent Fitness.debug.xcconfig"; sourceTree = "<group>"; };
 		CC9FB4B13A229373A6DE344C /* Pods-Intelligent FitnessUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent FitnessUITests.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent FitnessUITests/Pods-Intelligent FitnessUITests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -184,6 +188,8 @@
 				73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */,
 				731F80E622E0416C008399AD /* WebViewController.swift */,
 				73A43F2C22F18A9500571D65 /* WeekTableViewController.swift */,
+				73F8062222F9935500E6CC47 /* InsightsTableViewController.swift */,
+				73F8062422F9B04300E6CC47 /* InsightReadingsTableViewController.swift */,
 			);
 			path = "view controllers";
 			sourceTree = "<group>";
@@ -566,6 +572,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */,
+				73F8062522F9B04300E6CC47 /* InsightReadingsTableViewController.swift in Sources */,
 				73F8061F22F88DB200E6CC47 /* PersonalityInsight+Extension.swift in Sources */,
 				731F80E722E0416C008399AD /* WebViewController.swift in Sources */,
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
@@ -577,6 +584,7 @@
 				73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */,
 				73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */,
 				738A526E22E1C38700B8CBB0 /* Graph.swift in Sources */,
+				73F8062322F9935500E6CC47 /* InsightsTableViewController.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
 				73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */,
 				7349ED5122F4742600E67218 /* PersonalityInsightManager.swift in Sources */,

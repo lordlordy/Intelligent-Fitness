@@ -19,16 +19,34 @@ extension Insight{
     }
     
     var insightReadingArray: [InsightReading]{
-        return readings?.allObjects as? [InsightReading] ?? []
+        let array = readings?.allObjects as? [InsightReading] ?? []
+        return array.sorted(by: {$0.date! > $1.date!})
+    }
+    
+    var currentReading: InsightReading{
+        let sortedReadings = insightReadingArray.sorted(by: {$0.date! > $1.date!})
+        return sortedReadings[0]
+    }
+    
+    func remove(insightReading reading: InsightReading){
+        CoreDataStackSingleton.shared.delete(reading)
+        CoreDataStackSingleton.shared.save()
     }
     
     func setReading(toValue value: Double, forDate date: Date?){
         let readingDate: Date = date ?? Date()
-        let newReading: InsightReading = CoreDataStackSingleton.shared.newInsightReading()
+        let newReading: InsightReading = reading(forDate: readingDate)
         newReading.date = readingDate
         newReading.percentile = value
         self.mutableSetValue(forKey: InsightProperty.readings.rawValue).add(newReading)
         CoreDataStackSingleton.shared.save()
+    }
+    
+    func subCategory(atIndex index: Int) -> Insight?{
+        if index < subInsightArray.count{
+            return subInsightArray[index]
+        }
+        return nil
     }
 
     func getSubCategory(forType type: String) -> Insight{
@@ -61,5 +79,16 @@ extension Insight{
         }
     }
     
+    // returns existing if one exists for this date otherwise returns a new one
+    private func reading(forDate date: Date) -> InsightReading{
+        for i in insightReadingArray{
+            if Calendar.current.compare(i.date!, to: date, toGranularity: .day) == ComparisonResult.orderedSame{
+                return i
+            }
+        }
+        let newReading: InsightReading = CoreDataStackSingleton.shared.newInsightReading()
+        newReading.date = date
+        return newReading
+    }
     
 }

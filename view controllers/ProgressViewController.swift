@@ -93,8 +93,6 @@ class ProgressViewController: UIViewController {
         tableView.dataSource = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: CELL_ID)
-        tableView.register(DataHeader.self, forHeaderFooterViewReuseIdentifier: DataHeader.reuseIdentifier)
         scrollView.addSubview(tableView)
         
         graphSegmentedControl.selectedSegmentIndex = 0
@@ -109,6 +107,9 @@ class ProgressViewController: UIViewController {
         toolBar.backgroundColor = MAIN_BLUE
         toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
         updateGraph(forExercise: selectedExercise, andMeasure: selectedMeasure )
+
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: CELL_ID)
+        tableView.register(DataHeader.self, forHeaderFooterViewReuseIdentifier: DataHeader.reuseIdentifier)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
         graphView.addGestureRecognizer(tapGesture)

@@ -169,6 +169,22 @@ class ProfileViewController: UITableViewController {
         WorkoutManager.shared.createTestDataUsingBuiltInProgresions()
 
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "insightsSegue"{
+            if let vc = segue.destination as? InsightsTableViewController{
+                // look for a new reading
+                PersonalityInsightManager.shared.saveInsights { (insights) in
+                    // once reading complete update the table
+                    DispatchQueue.main.async {
+                        // needs to be done on main thread as GUI related
+                        vc.update()
+                    }
+                }
+
+            }
+        }
+    }
 }
 
 extension ProfileViewController: FUIAuthDelegate{
