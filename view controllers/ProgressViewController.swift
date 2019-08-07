@@ -328,15 +328,11 @@ class ProgressViewController: UIViewController {
                 self.graphData = [("CTL", self.graphView.dummyCTLData), ("ATL", self.graphView.dummyATLData), ("TSB", self.graphView.dummyTSBData)]
                 self.collapsed = [true, true, false]
             }else{
-                let trainingStressData = self.createTSBData(from: data)
-                // just show last 90 days of data
-                let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
-                let filteredData = trainingStressData.filter({$0.date >= ninetyDaysAgo})
-                
-                let ctlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.ctl) })
-                let atlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.atl) })
-                let tsbData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tsb) })
-                let tssData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.value)})
+
+                let ctlData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.ctl) })
+                let atlData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.atl) })
+                let tsbData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.tsb) })
+                let tssData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.tss)})
 
                 let ctlGraph = LineGraph(data: ctlData, colour: .red, title: "CTL")
                 let atlGraph = LineGraph(data: atlData, colour: .green, title: "ATL")

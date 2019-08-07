@@ -157,7 +157,7 @@ class HealthKitAccess {
         }
     }
     
-    func getCalorieSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([(date: Date, value: Double)]) -> Swift.Void){
+    func getCalorieSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([TSBDataPoint]) -> Swift.Void){
         getActivitySummary(dateRange: dateRange) { (summaryArray) in
             var result: [(date: Date, value: Double)] = []
             for s in summaryArray{
@@ -166,7 +166,8 @@ class HealthKitAccess {
                     result.append((d, s.activeEnergyBurned.doubleValue(for: HKUnit.largeCalorie())))
                 }
             }
-            completion(result)
+            let tsbData: [TSBDataPoint] = self.createTSBData(from: result)
+            completion(tsbData)
         }
     }
 
@@ -320,5 +321,43 @@ class HealthKitAccess {
             // TO DO - better handle earlier iOS version
             print("not implement for pre iOS 9.3")
         }
+    }
+    
+    private func createTSBData(from: [(date: Date, value: Double)]) -> [TSBDataPoint]{
+        // need to have an ordered series of dates without any gaps
+        let orderedInput = from.sorted { $0.date < $1.date}
+        var gaplessData: [(date: Date, value: Double)] = []
+        var previousDate: Date? = nil
+        var haveFirstNoneZero: Bool = false
+        for d in orderedInput{
+            haveFirstNoneZero = haveFirstNoneZero || (d.value > 0.001)
+            if haveFirstNoneZero{
+                if let pd = previousDate{
+                    var nextDay = Calendar.current.date(byAdding: DateComponents(day:1), to: pd)!
+                    while !Calendar.current.isDate(d.date, inSameDayAs: nextDay){
+                        gaplessData.append((nextDay, 0.0))
+                        nextDay = Calendar.current.date(byAdding: DateComponents(day:1), to: nextDay)!
+                    }
+                }
+                gaplessData.append(d)
+                previousDate = d.date
+            }
+        }
+        var atl: Double = 0.0
+        var ctl: Double = 0.0
+        var result: [TSBDataPoint] = []
+        // aim to ignore loads of low values at the start of the data set
+        var started: Bool = false
+        for d in gaplessData{
+            if !started && d.value > 5.0{
+                started = true
+            }
+            if started{
+                ctl = d.value * (1 - TSBDataPoint.ctlFactor) + ctl * TSBDataPoint.ctlFactor
+                atl = d.value * (1 - TSBDataPoint.atlFactor) + atl * TSBDataPoint.atlFactor
+                result.append(TSBDataPoint(date: d.date, tss: d.value, atl: atl, ctl: ctl))
+            }
+        }
+        return result
     }
 }
