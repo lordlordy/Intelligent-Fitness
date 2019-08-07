@@ -18,6 +18,7 @@
 		7342CB9422C51F36000A6FB6 /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */; };
 		7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */; };
 		7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */; };
+		7349ED5122F4742600E67218 /* PersonalityInsightManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7349ED5022F4742600E67218 /* PersonalityInsightManager.swift */; };
 		736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1722B3B2E20071EA3B /* AppDelegate.swift */; };
 		736CFC1A22B3B2E20071EA3B /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736CFC1922B3B2E20071EA3B /* TestViewController.swift */; };
 		736CFC1F22B3B2E20071EA3B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 736CFC1D22B3B2E20071EA3B /* Main.storyboard */; };
@@ -51,6 +52,16 @@
 		73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */; };
 		73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */; };
 		73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */; };
+		73F8061F22F88DB200E6CC47 /* PersonalityInsight+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */; };
+		73F8062122F89D0200E6CC47 /* Insight+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062022F89D0200E6CC47 /* Insight+Extension.swift */; };
+		73F8062322F9935500E6CC47 /* InsightsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062222F9935500E6CC47 /* InsightsTableViewController.swift */; };
+		73F8062522F9B04300E6CC47 /* InsightReadingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062422F9B04300E6CC47 /* InsightReadingsTableViewController.swift */; };
+		73F8062722F9CBFC00E6CC47 /* InsightsGraphViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062622F9CBFC00E6CC47 /* InsightsGraphViewController.swift */; };
+		73F8062922FA174700E6CC47 /* DocumentTone+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062822FA174700E6CC47 /* DocumentTone+Extension.swift */; };
+		73F8062B22FA191300E6CC47 /* Tone+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062A22FA191300E6CC47 /* Tone+Extension.swift */; };
+		73F8062D22FA1B0B00E6CC47 /* ToneReading+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062C22FA1B0B00E6CC47 /* ToneReading+Extension.swift */; };
+		73F8062F22FA86DA00E6CC47 /* InsightCategoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8062E22FA86DA00E6CC47 /* InsightCategoryProtocol.swift */; };
+		73F8063122FA884A00E6CC47 /* InsightProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8063022FA884A00E6CC47 /* InsightProtocol.swift */; };
 		9B7E1A27CAFCABAA54613FD0 /* Pods_Intelligent_Fitness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AD2F45FBC7133D7A831CCAF /* Pods_Intelligent_Fitness.framework */; };
 		FA3860FA8964F1672AF23A42 /* Pods_Intelligent_FitnessUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57027BDECC969C348D8A3E12 /* Pods_Intelligent_FitnessUITests.framework */; };
 /* End PBXBuildFile section */
@@ -88,6 +99,7 @@
 		7342CB9322C51F36000A6FB6 /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9522C526DC000A6FB6 /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
 		7342CB9B22C533F4000A6FB6 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
+		7349ED5022F4742600E67218 /* PersonalityInsightManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalityInsightManager.swift; sourceTree = "<group>"; };
 		736CFC1422B3B2E20071EA3B /* Intelligent Fitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Intelligent Fitness.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		736CFC1722B3B2E20071EA3B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		736CFC1922B3B2E20071EA3B /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
@@ -128,6 +140,16 @@
 		73D9BE2522C7B2FF00879CF1 /* Workout+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Workout+Extension.swift"; sourceTree = "<group>"; };
 		73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailTableViewController.swift; sourceTree = "<group>"; };
 		73EB4C5622D77A0B00BC0C09 /* ExerciseDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDefinition.swift; sourceTree = "<group>"; };
+		73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersonalityInsight+Extension.swift"; sourceTree = "<group>"; };
+		73F8062022F89D0200E6CC47 /* Insight+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Insight+Extension.swift"; sourceTree = "<group>"; };
+		73F8062222F9935500E6CC47 /* InsightsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsTableViewController.swift; sourceTree = "<group>"; };
+		73F8062422F9B04300E6CC47 /* InsightReadingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightReadingsTableViewController.swift; sourceTree = "<group>"; };
+		73F8062622F9CBFC00E6CC47 /* InsightsGraphViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsGraphViewController.swift; sourceTree = "<group>"; };
+		73F8062822FA174700E6CC47 /* DocumentTone+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DocumentTone+Extension.swift"; sourceTree = "<group>"; };
+		73F8062A22FA191300E6CC47 /* Tone+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tone+Extension.swift"; sourceTree = "<group>"; };
+		73F8062C22FA1B0B00E6CC47 /* ToneReading+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToneReading+Extension.swift"; sourceTree = "<group>"; };
+		73F8062E22FA86DA00E6CC47 /* InsightCategoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightCategoryProtocol.swift; sourceTree = "<group>"; };
+		73F8063022FA884A00E6CC47 /* InsightProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightProtocol.swift; sourceTree = "<group>"; };
 		9A15EECFB09ABBC8856BA641 /* Pods_Intelligent_FitnessTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Intelligent_FitnessTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A621DD4A3C3F73C2603DB12E /* Pods-Intelligent Fitness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent Fitness.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent Fitness/Pods-Intelligent Fitness.debug.xcconfig"; sourceTree = "<group>"; };
 		CC9FB4B13A229373A6DE344C /* Pods-Intelligent FitnessUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Intelligent FitnessUITests.debug.xcconfig"; path = "Target Support Files/Pods-Intelligent FitnessUITests/Pods-Intelligent FitnessUITests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -178,6 +200,9 @@
 				73EB4C5422D748BD00BC0C09 /* WorkoutDetailTableViewController.swift */,
 				731F80E622E0416C008399AD /* WebViewController.swift */,
 				73A43F2C22F18A9500571D65 /* WeekTableViewController.swift */,
+				73F8062222F9935500E6CC47 /* InsightsTableViewController.swift */,
+				73F8062422F9B04300E6CC47 /* InsightReadingsTableViewController.swift */,
+				73F8062622F9CBFC00E6CC47 /* InsightsGraphViewController.swift */,
 			);
 			path = "view controllers";
 			sourceTree = "<group>";
@@ -272,6 +297,14 @@
 				73CD5EB422DF6EAC00AFFF21 /* DistanceSet+Extension.swift */,
 				73CD5EB622DF6EDF00AFFF21 /* TouchSet+Extension.swift */,
 				731F80E822E0C136008399AD /* PowerUp+Extension.swift */,
+				7349ED5022F4742600E67218 /* PersonalityInsightManager.swift */,
+				73F8061E22F88DB200E6CC47 /* PersonalityInsight+Extension.swift */,
+				73F8062022F89D0200E6CC47 /* Insight+Extension.swift */,
+				73F8062822FA174700E6CC47 /* DocumentTone+Extension.swift */,
+				73F8062A22FA191300E6CC47 /* Tone+Extension.swift */,
+				73F8062C22FA1B0B00E6CC47 /* ToneReading+Extension.swift */,
+				73F8062E22FA86DA00E6CC47 /* InsightCategoryProtocol.swift */,
+				73F8063022FA884A00E6CC47 /* InsightProtocol.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -557,8 +590,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */,
+				73F8062522F9B04300E6CC47 /* InsightReadingsTableViewController.swift in Sources */,
+				73F8061F22F88DB200E6CC47 /* PersonalityInsight+Extension.swift in Sources */,
 				731F80E722E0416C008399AD /* WebViewController.swift in Sources */,
+				73F8062D22FA1B0B00E6CC47 /* ToneReading+Extension.swift in Sources */,
 				731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */,
+				73F8062122F89D0200E6CC47 /* Insight+Extension.swift in Sources */,
 				736CFC1822B3B2E20071EA3B /* AppDelegate.swift in Sources */,
 				7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */,
 				73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */,
@@ -566,16 +603,22 @@
 				73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */,
 				73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */,
 				738A526E22E1C38700B8CBB0 /* Graph.swift in Sources */,
+				73F8062F22FA86DA00E6CC47 /* InsightCategoryProtocol.swift in Sources */,
+				73F8062322F9935500E6CC47 /* InsightsTableViewController.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
 				73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */,
+				7349ED5122F4742600E67218 /* PersonalityInsightManager.swift in Sources */,
 				73CD5EB722DF6EDF00AFFF21 /* TouchSet+Extension.swift in Sources */,
+				73F8062722F9CBFC00E6CC47 /* InsightsGraphViewController.swift in Sources */,
 				73EB4C5522D748BD00BC0C09 /* WorkoutDetailTableViewController.swift in Sources */,
 				73CD5EB522DF6EAC00AFFF21 /* DistanceSet+Extension.swift in Sources */,
 				73759DBB22C25A1C00757C29 /* GraphView.swift in Sources */,
 				7342CB9622C526DC000A6FB6 /* UITextView+Extension.swift in Sources */,
+				73F8062922FA174700E6CC47 /* DocumentTone+Extension.swift in Sources */,
 				73CD5EB322DF6CBE00AFFF21 /* TimeSet+Extension.swift in Sources */,
 				73759DBD22C3B82600757C29 /* ProfileViewController.swift in Sources */,
 				73CD5EAF22DF52DF00AFFF21 /* Athlete.swift in Sources */,
+				73F8063122FA884A00E6CC47 /* InsightProtocol.swift in Sources */,
 				738E445222CA544400F7BEA6 /* WorkoutTableViewController.swift in Sources */,
 				736CFC1A22B3B2E20071EA3B /* TestViewController.swift in Sources */,
 				73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */,
@@ -586,6 +629,7 @@
 				730E643422CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift in Sources */,
 				73D9BE2222C7911900879CF1 /* WorkoutManager.swift in Sources */,
 				730E63F122CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift in Sources */,
+				73F8062B22FA191300E6CC47 /* Tone+Extension.swift in Sources */,
 				737373BC22B508F200698DD4 /* CoreDataStackSingleton.swift in Sources */,
 				738E445422CB58C500F7BEA6 /* Exercise+Extension.swift in Sources */,
 				7376664022CCB7D9004324B5 /* ProgressView.swift in Sources */,

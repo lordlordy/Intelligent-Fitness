@@ -46,16 +46,21 @@ import UIKit
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        initialise()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        initialise()
+    }
+    
+    private func initialise(){
         df.dateFormat = "dd-MMM-yy"
         colors = [startColour.cgColor, endColour.cgColor]
         colorSpace = CGColorSpaceCreateDeviceRGB()
         colorLocations = [0.0, 1.0]
         gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: colorLocations)!
         createDummyData()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     func setGraphs(graphs: [Graph]){
