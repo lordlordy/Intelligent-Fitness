@@ -105,7 +105,6 @@ class InsightsTableViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print(sender)
         if segue.identifier == "insightReadingsSegue"{
             if let insight = sender as? InsightProtocol{
                 if let vc = segue.destination as? InsightReadingsTableViewController{
