@@ -42,13 +42,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "view controllers/InsightsTableViewController.swift"
-            timestampString = "586877415.459365"
+            timestampString = "586895331.152679"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "100"
             endingLineNumber = "100"
-            landmarkName = "tableView(_:didSelectRowAt:)"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -73,13 +73,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "view controllers/InsightsTableViewController.swift"
-            timestampString = "586877415.460003"
+            filePath = "Intelligent Fitness/HealthKitAccess.swift"
+            timestampString = "586903271.816875"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
-            landmarkName = "prepare(for:sender:)"
+            startingLineNumber = "275"
+            endingLineNumber = "275"
+            landmarkName = "getDailyQuantityData(quantityType:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

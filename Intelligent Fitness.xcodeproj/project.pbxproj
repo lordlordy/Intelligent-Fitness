@@ -11,6 +11,11 @@
 		7300458422C0DAEC00B5720B /* WorkoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7300458322C0DAEC00B5720B /* WorkoutViewController.swift */; };
 		730E63F122CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730E63F022CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift */; };
 		730E643422CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */; };
+		7318927722FB34CC00EA8D00 /* HRVDataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7318927622FB34CC00EA8D00 /* HRVDataPoint.swift */; };
+		7318927922FB377600EA8D00 /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7318927822FB377600EA8D00 /* Maths.swift */; };
+		7318927B22FB3F6E00EA8D00 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7318927A22FB3F6E00EA8D00 /* LinkedList.swift */; };
+		7318927D22FB3F9800EA8D00 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7318927C22FB3F9800EA8D00 /* Queue.swift */; };
+		7318927F22FB405900EA8D00 /* RollingSumQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7318927E22FB405900EA8D00 /* RollingSumQueue.swift */; };
 		731D517B22BA828600AA7EA4 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731D517A22BA828600AA7EA4 /* LoginViewController.swift */; };
 		731D517D22BA83E100AA7EA4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */; };
 		731F80E722E0416C008399AD /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 731F80E622E0416C008399AD /* WebViewController.swift */; };
@@ -92,6 +97,11 @@
 		7300458322C0DAEC00B5720B /* WorkoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViewController.swift; sourceTree = "<group>"; };
 		730E63F022CCF2CC00A6A5F3 /* FunctionalFitnessTestTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionalFitnessTestTableViewController.swift; sourceTree = "<group>"; };
 		730E643322CE464300A6A5F3 /* FunctionalFitnessTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionalFitnessTestViewController.swift; sourceTree = "<group>"; };
+		7318927622FB34CC00EA8D00 /* HRVDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HRVDataPoint.swift; sourceTree = "<group>"; };
+		7318927822FB377600EA8D00 /* Maths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Maths.swift; sourceTree = "<group>"; };
+		7318927A22FB3F6E00EA8D00 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
+		7318927C22FB3F9800EA8D00 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
+		7318927E22FB405900EA8D00 /* RollingSumQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingSumQueue.swift; sourceTree = "<group>"; };
 		731D517A22BA828600AA7EA4 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		731F80E622E0416C008399AD /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
@@ -257,6 +267,7 @@
 				736CFC2522B3B2E20071EA3B /* Info.plist */,
 				731D517C22BA83E100AA7EA4 /* GoogleService-Info.plist */,
 				73B5B10322BBEB8700B238ED /* HealthKitAccess.swift */,
+				7318927822FB377600EA8D00 /* Maths.swift */,
 			);
 			path = "Intelligent Fitness";
 			sourceTree = "<group>";
@@ -305,6 +316,7 @@
 				73F8062C22FA1B0B00E6CC47 /* ToneReading+Extension.swift */,
 				73F8062E22FA86DA00E6CC47 /* InsightCategoryProtocol.swift */,
 				73F8063022FA884A00E6CC47 /* InsightProtocol.swift */,
+				7318927622FB34CC00EA8D00 /* HRVDataPoint.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -313,6 +325,9 @@
 			isa = PBXGroup;
 			children = (
 				73CD5EAA22DE472700AFFF21 /* Date+Extension.swift */,
+				7318927A22FB3F6E00EA8D00 /* LinkedList.swift */,
+				7318927C22FB3F9800EA8D00 /* Queue.swift */,
+				7318927E22FB405900EA8D00 /* RollingSumQueue.swift */,
 			);
 			path = "Type Extensions";
 			sourceTree = "<group>";
@@ -591,6 +606,7 @@
 			files = (
 				73CD5EAD22DF417D00AFFF21 /* EddingtonCalculator.swift in Sources */,
 				73F8062522F9B04300E6CC47 /* InsightReadingsTableViewController.swift in Sources */,
+				7318927B22FB3F6E00EA8D00 /* LinkedList.swift in Sources */,
 				73F8061F22F88DB200E6CC47 /* PersonalityInsight+Extension.swift in Sources */,
 				731F80E722E0416C008399AD /* WebViewController.swift in Sources */,
 				73F8062D22FA1B0B00E6CC47 /* ToneReading+Extension.swift in Sources */,
@@ -601,11 +617,13 @@
 				73B5B10422BBEB8700B238ED /* HealthKitAccess.swift in Sources */,
 				73CD5EB122DF67E300AFFF21 /* RepSet+Extension.swift in Sources */,
 				73D9BE2422C7B2C100879CF1 /* ExerciseSet+Extension.swift in Sources */,
+				7318927F22FB405900EA8D00 /* RollingSumQueue.swift in Sources */,
 				73D9BE2622C7B2FF00879CF1 /* Workout+Extension.swift in Sources */,
 				738A526E22E1C38700B8CBB0 /* Graph.swift in Sources */,
 				73F8062F22FA86DA00E6CC47 /* InsightCategoryProtocol.swift in Sources */,
 				73F8062322F9935500E6CC47 /* InsightsTableViewController.swift in Sources */,
 				7342CB9C22C533F4000A6FB6 /* HistoryViewController.swift in Sources */,
+				7318927922FB377600EA8D00 /* Maths.swift in Sources */,
 				73CD5EA822DE09F400AFFF21 /* Week.swift in Sources */,
 				7349ED5122F4742600E67218 /* PersonalityInsightManager.swift in Sources */,
 				73CD5EB722DF6EDF00AFFF21 /* TouchSet+Extension.swift in Sources */,
@@ -618,10 +636,12 @@
 				73CD5EB322DF6CBE00AFFF21 /* TimeSet+Extension.swift in Sources */,
 				73759DBD22C3B82600757C29 /* ProfileViewController.swift in Sources */,
 				73CD5EAF22DF52DF00AFFF21 /* Athlete.swift in Sources */,
+				7318927D22FB3F9800EA8D00 /* Queue.swift in Sources */,
 				73F8063122FA884A00E6CC47 /* InsightProtocol.swift in Sources */,
 				738E445222CA544400F7BEA6 /* WorkoutTableViewController.swift in Sources */,
 				736CFC1A22B3B2E20071EA3B /* TestViewController.swift in Sources */,
 				73EB4C5722D77A0B00BC0C09 /* ExerciseDefinition.swift in Sources */,
+				7318927722FB34CC00EA8D00 /* HRVDataPoint.swift in Sources */,
 				73CD5EAB22DE472700AFFF21 /* Date+Extension.swift in Sources */,
 				73759DB922C24F6600757C29 /* ProgressViewController.swift in Sources */,
 				7342CB9422C51F36000A6FB6 /* UITextField+Extension.swift in Sources */,

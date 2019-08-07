@@ -251,13 +251,15 @@ class ProgressViewController: UIViewController {
         titleLabel.text = title
         // remove all graphs
         graphView.removeAllGraphs()
+        graphData = []
+        collapsed = []
         // the following calls will add graphs
         
         let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
         HealthKitAccess.shared.getRestingHRData(dateRange: (from: ninetyDaysAgo, to:Date())) { (data) in
             if data.count > 0{
-                self.graphData = [(title, data)]
-                self.collapsed = [false]
+                self.graphData.append(("Heart Rate", data))
+                self.collapsed.append(false)
                 self.graphView.addGraph(graph: LineGraph(data: data, colour: .red, title: "Heart Rate"))
             }else{
                 return
@@ -274,11 +276,32 @@ class ProgressViewController: UIViewController {
                 self.graphData = [("CTL", self.graphView.dummyCTLData), ("ATL", self.graphView.dummyATLData), ("TSB", self.graphView.dummyTSBData)]
                 self.collapsed = [true, true, false]
             }else{
-                self.graphData = [(title, data)]
-                self.collapsed = [false]
-                let hrvGraph: PointGraph = PointGraph(data: data, colour: .magenta, title: "Heart Rate Variability")
+                let nf: NumberFormatter = NumberFormatter()
+                nf.numberStyle = .percent
+                let sdnn = data.map({($0.date, $0.sdnn)})
+                self.graphData.append((title, sdnn))
+                self.collapsed.append(false)
+                let hrvGraph: PointGraph = PointGraph(data: sdnn, colour: .magenta, title: "Heart Rate Variability")
                 hrvGraph.fill = true
                 self.graphView.addGraph(graph: hrvGraph)
+                let off = data.map({($0.date, $0.offValue)})
+                let tOff: String = "HRV Off (\(nf.string(from: NSNumber(value: HRVDataPoint.hrvOffPercentile)) ?? ""))"
+                self.graphData.append((tOff, off))
+                self.collapsed.append(false)
+                let offGraph: LineGraph = LineGraph(data: off, colour: .white, title: tOff)
+                self.graphView.addGraph(graph: offGraph)
+                let easy = data.map({($0.date, $0.easyValue)})
+                let tEasy: String = "HRV Easy (\(nf.string(from: NSNumber(value: HRVDataPoint.hrvEasyPercentile)) ?? ""))"
+                self.graphData.append((tEasy, easy))
+                self.collapsed.append(false)
+                let easyGraph: LineGraph = LineGraph(data: easy, colour: .cyan, title: tEasy)
+                self.graphView.addGraph(graph: easyGraph)
+                let hard = data.map({($0.date, $0.hardValue)})
+                let tHard: String = "HRV Hard (\(nf.string(from: NSNumber(value: HRVDataPoint.hrvHardPercentile)) ?? ""))"
+                self.graphData.append((tHard, hard))
+                self.collapsed.append(false)
+                let hardGraph: LineGraph = LineGraph(data: hard, colour: .yellow, title: tHard)
+                self.graphView.addGraph(graph: hardGraph)
             }
         }
     }
