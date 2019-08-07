@@ -69,13 +69,47 @@ class ProfileViewController: UITableViewController {
             }
         }
     }
+    @IBAction func createTestInsightData(_ sender: Any) {
+        // really just one a series of data points that fluctuate a little around the current reading. It's merely so I can demonstrate graphing
+        PersonalityInsightManager.shared.saveInsights { (personalityInsights) in
+            for pi in personalityInsights{
+                for insight in pi.insightsArray(){
+                    for i in 1...10{
+                        // create 10 readings randomly around the base
+                        let date: Date = Calendar.current.date(byAdding: DateComponents(day: -7 * i), to: insight.mostRecentReading().date)!
+                        let newInsight: Double = insight.mostRecentReading().value * Double.random(in: 0.9...1.1)
+                        insight.setInsightReading(forDate: date, toValue: newInsight)
+                    }
+                    for subCat in insight.subInsightsArray(){
+                        for i in 1...10{
+                            // create 10 readings randomly around the base
+                            let date: Date = Calendar.current.date(byAdding: DateComponents(day: -7 * i), to: subCat.mostRecentReading().date)!
+                            let newInsight: Double = subCat.mostRecentReading().value * Double.random(in: 0.9...1.1)
+                            subCat.setInsightReading(forDate: date, toValue: newInsight)
+                        }
+                    }
+                }
+            }
+        }
+    }
     
-    @IBAction func test(_ sender: UIButton) {
-//        WorkoutManager.shared.saveLatestPowerUpToCloud()
-//        let workouts = CoreDataStackSingleton.shared.getChronologicalOrderedWorkouts(ofType: nil, isTest: nil).filter({$0.complete})
-//        print(workouts)
-//        workouts[workouts.count - 1].testPrintWorkouts(currentCount: 0)
-        
+    @IBAction func createTestToneData(_ sender: Any) {
+        // really just one a series of data points that fluctuate a little around the current reading. It's merely so I can demonstrate graphing
+        PersonalityInsightManager.shared.saveTones { (documentTones) in
+            for dt in documentTones{
+                for tone in dt.toneArray{
+                    for i in 1...10{
+                        // create 10 readings randomly around the base
+                        let date: Date = Calendar.current.date(byAdding: DateComponents(day: -7 * i), to: tone.currentReading.date!)!
+                        let newScore: Double = tone.currentReading.score * Double.random(in: 0.9...1.1)
+                        tone.setReading(toValue: newScore, forDate: date)
+                    }
+                }
+            }
+        }
+    }
+    
+    @IBAction func test(_ sender: UIButton) {        
         PersonalityInsightManager.shared.printInsightsToConsole()
     }
     
@@ -83,6 +117,10 @@ class ProfileViewController: UITableViewController {
         let alert = UIAlertController(title: "Resting Heart Rate Explantion", message: "This is a message", preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    @IBAction func printTones(_ sender: Any) {
+        PersonalityInsightManager.shared.printTonesToConsole()
     }
     
     @IBAction func hrvInfoTapped(_ sender: Any) {
@@ -165,23 +203,45 @@ class ProfileViewController: UITableViewController {
 
     @IBAction func createTestData(_ sender: Any) {
         // create some data to allow testing of various features. For now aim to create a years worth of data
-//        WorkoutManager.shared.createTestWorkoutData()
         WorkoutManager.shared.createTestDataUsingBuiltInProgresions()
-
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "insightsSegue"{
             if let vc = segue.destination as? InsightsTableViewController{
+                // set current data prior to checking for a new reading
+                vc.set(insights: CoreDataStackSingleton.shared.getPersonalityInsights())
                 // look for a new reading
                 PersonalityInsightManager.shared.saveInsights { (insights) in
                     // once reading complete update the table
                     DispatchQueue.main.async {
                         // needs to be done on main thread as GUI related
-                        vc.update()
+                        vc.set(insights: CoreDataStackSingleton.shared.getPersonalityInsights())
                     }
                 }
 
+            }
+        }else if segue.identifier == "tonesSegue"{
+            if let vc = segue.destination as? InsightsTableViewController{
+                // set current data prior to checking for a new reading
+                vc.set(insights: CoreDataStackSingleton.shared.getDocumentTones())
+                // look for a new reading
+                PersonalityInsightManager.shared.saveTones { (documentTones) in
+                    // once reading complete update the table
+                    DispatchQueue.main.async {
+                        // needs to be done on main thread as GUI related
+                        vc.set(insights: CoreDataStackSingleton.shared.getDocumentTones())
+                    }
+                }
+                
+            }
+        }else if segue.identifier == "insightsGraphSegue"{
+            if let vc = segue.destination as? InsightsGraphViewController{
+                vc.set(insights: CoreDataStackSingleton.shared.getPersonalityInsights())
+            }
+        }else if segue.identifier == "toneGraphSegue"{
+            if let vc = segue.destination as? InsightsGraphViewController{
+                vc.set(insights: CoreDataStackSingleton.shared.getDocumentTones())
             }
         }
     }

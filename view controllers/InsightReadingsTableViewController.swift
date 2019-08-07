@@ -10,8 +10,8 @@ import UIKit
 
 class InsightReadingsTableViewController: UITableViewController {
 
-    var insight: Insight?
-    private var readings: [InsightReading]{ return insight?.insightReadingArray ?? []}
+    var insight: InsightProtocol?
+    private var readings: [(date: Date, value: Double)]{ return insight?.insightReadings() ?? []}
     private var formatter: NumberFormatter = NumberFormatter()
     private var df: DateFormatter = DateFormatter()
     private var collapsed: [Bool] = [false, false]
@@ -19,9 +19,9 @@ class InsightReadingsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         formatter.numberStyle = .percent
-        df.dateFormat = "E dd-MM-yy hh:mm:ss"
+        df.dateFormat = "E dd-MMM-yy HH:mm:ss"
         self.navigationItem.rightBarButtonItem = self.editButtonItem
-        tableView.register(CollapsableHeader.self, forHeaderFooterViewReuseIdentifier: CollapsableHeader.reuseIdentifier)
+        tableView.register(ReadingsCollapsableHeader.self, forHeaderFooterViewReuseIdentifier: ReadingsCollapsableHeader.reuseIdentifier)
 
     }
     
@@ -36,7 +36,7 @@ class InsightReadingsTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         if let i = insight{
-            if i.subInsightArray.count > 0{
+            if i.subInsightsArray().count > 0{
                 return 2
             }
         }
@@ -44,7 +44,12 @@ class InsightReadingsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return section == 0 ? "\(insight?.type ?? "") - READINGS" : "\(insight?.type ?? "") - SUB-CATEGORIES"
+        if section == 0{
+            return "\(insight?.name() ?? "") - READINGS (\(readings.count))"
+        }else{
+            return "\(insight?.name() ?? "") - SUB-CATEGORIES (\(insight?.subInsightsArray().count ?? 0))"
+        }
+
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -57,7 +62,7 @@ class InsightReadingsTableViewController: UITableViewController {
             return readings.count
         }else{
             if let i = insight{
-                return i.subInsightArray.count
+                return i.subInsightsArray().count
             }
             return 0
         }
@@ -70,14 +75,14 @@ class InsightReadingsTableViewController: UITableViewController {
         if indexPath.section == 0{
             if indexPath.row < readings.count{
                 let r = readings[indexPath.row]
-                cell.textLabel?.text = formatter.string(from: NSNumber(value: r.percentile))
-                cell.detailTextLabel?.text = df.string(from: r.date!)
+                cell.textLabel?.text = formatter.string(from: NSNumber(value: r.value))
+                cell.detailTextLabel?.text = df.string(from: r.date)
             }
         }else{
-            if let subCats = insight?.subInsightArray{
+            if let subCats = insight?.subInsightsArray(){
                 if indexPath.row < subCats.count{
                     
-                    cell.textLabel?.text = "\(subCats[indexPath.row].type ?? ""): \(formatter.string(from: NSNumber(value: subCats[indexPath.row].currentReading.percentile)) ?? "0%")"
+                    cell.textLabel?.text = "\(subCats[indexPath.row].name()): \(formatter.string(from: NSNumber(value: subCats[indexPath.row].mostRecentReading().value)) ?? "0%")"
                     cell.detailTextLabel?.text = ""
                     cell.accessoryType = .detailDisclosureButton
                 }
@@ -88,12 +93,12 @@ class InsightReadingsTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: CollapsableHeader.reuseIdentifier) else {
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ReadingsCollapsableHeader.reuseIdentifier) else {
             print("returning nil")
             return nil
         }
 
-        if let h = header as? CollapsableHeader{
+        if let h = header as? ReadingsCollapsableHeader{
             h.section = section
             h.vc = self
         }
@@ -107,7 +112,7 @@ class InsightReadingsTableViewController: UITableViewController {
             // note we can't delete sub categories - just readings. Hence only if section 0
             if indexPath.section == 0 && indexPath.row < readings.count{
                 if let i = insight{
-                    i.remove(insightReading: readings[indexPath.row])
+                    i.removeReading(forDate: readings[indexPath.row].date)
                     tableView.reloadData()
                 }
             }
@@ -121,7 +126,7 @@ class InsightReadingsTableViewController: UITableViewController {
         if indexPath.section == 1{
             // selected a sub category
             if let i = insight{
-                if let subInsight: Insight = i.subCategory(atIndex: indexPath.row){
+                if let subInsight: InsightProtocol = i.subInsight(atIndex: indexPath.row){
                     let storyboard = UIStoryboard(name: "Main", bundle: nil)
                     if let vc = storyboard.instantiateViewController(withIdentifier: "readingsViewController") as? InsightReadingsTableViewController{
                         vc.insight = subInsight
@@ -133,20 +138,11 @@ class InsightReadingsTableViewController: UITableViewController {
         }
     }
     
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    
-
 }
 
-class CollapsableHeader: UITableViewHeaderFooterView{
+class ReadingsCollapsableHeader: UITableViewHeaderFooterView{
     
-    static let reuseIdentifier = "CollapsableHeader"
+    static let reuseIdentifier = "ReadingsCollapsableHeader"
     var section: Int = 0
     fileprivate var vc: InsightReadingsTableViewController?
     
@@ -164,7 +160,6 @@ class CollapsableHeader: UITableViewHeaderFooterView{
     }
     
     @objc func viewTapped(gestureRecogniser: UITapGestureRecognizer){
-        print("\(String(describing: textLabel?.text)) TAPPED")
         vc?.toggle(section: section)
     }
 }

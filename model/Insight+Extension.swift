@@ -14,7 +14,7 @@ enum InsightProperty: String{
 
 extension Insight{
     
-    var subInsightArray: [Insight]{
+    private var subIArray: [Insight]{
         return subInsights?.allObjects as? [Insight] ?? []
     }
     
@@ -43,14 +43,14 @@ extension Insight{
     }
     
     func subCategory(atIndex index: Int) -> Insight?{
-        if index < subInsightArray.count{
-            return subInsightArray[index]
+        if index < subIArray.count{
+            return subIArray[index]
         }
         return nil
     }
 
     func getSubCategory(forType type: String) -> Insight{
-        for i in subInsightArray{
+        for i in subIArray{
             if i.type == type{
                 return i
             }
@@ -71,9 +71,9 @@ extension Insight{
         for r in insightReadingArray{
             print(str + "\(r.date!): \(r.percentile)")
         }
-        if subInsightArray.count > 0{
+        if subIArray.count > 0{
             print(str + "CHILDREN:")
-            for s in subInsightArray{
+            for s in subIArray{
                 s.printSummary(tabCount: tabCount+1)
             }
         }
@@ -89,6 +89,46 @@ extension Insight{
         let newReading: InsightReading = CoreDataStackSingleton.shared.newInsightReading()
         newReading.date = date
         return newReading
+    }
+    
+}
+
+extension Insight: InsightProtocol{
+    func name() -> String {
+        return type ?? "Not Set"
+    }
+    
+    func numberOfReadings() -> Int {
+        return insightReadingArray.count
+    }
+    
+    func mostRecentReading() -> (date: Date, value: Double) {
+        return (date: currentReading.date!, value: currentReading.percentile)
+    }
+    
+    func insightReadings() -> [(date: Date, value: Double)] {
+        return insightReadingArray.map({($0.date!, $0.percentile)})
+    }
+    
+    func subInsightsArray() -> [InsightProtocol] {
+        return subIArray
+    }
+    
+    func subInsight(atIndex index: Int) -> InsightProtocol?{
+        return subCategory(atIndex: index)
+    }
+    
+    func removeReading(forDate date: Date){
+        for r in insightReadingArray{
+            if Calendar.current.compare(date, to: r.date!, toGranularity: .day) == ComparisonResult.orderedSame{
+                remove(insightReading: r)
+                return
+            }
+        }
+    }
+    
+    func setInsightReading(forDate date: Date, toValue value: Double){
+        setReading(toValue: value, forDate: date)
     }
     
 }

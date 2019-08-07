@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14492.1" systemVersion="18F132" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="DistanceSet" representedClassName="DistanceSet" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class"/>
+    <entity name="DocumentTone" representedClassName="DocumentTone" syncable="YES" codeGenerationType="class">
+        <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="tones" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tone" inverseName="documentTone" inverseEntity="Tone" syncable="YES"/>
+    </entity>
     <entity name="Exercise" representedClassName="Exercise" syncable="YES" codeGenerationType="class">
         <attribute name="endedEarly" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isTest" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -42,6 +46,16 @@
     </entity>
     <entity name="RepSet" representedClassName="RepSet" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class"/>
     <entity name="TimeSet" representedClassName="TimeSet" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class"/>
+    <entity name="Tone" representedClassName="Tone" syncable="YES" codeGenerationType="class">
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="documentTone" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DocumentTone" inverseName="tones" inverseEntity="DocumentTone" syncable="YES"/>
+        <relationship name="readings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ToneReading" inverseName="tone" inverseEntity="ToneReading" syncable="YES"/>
+    </entity>
+    <entity name="ToneReading" representedClassName="ToneReading" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="score" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="tone" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tone" inverseName="readings" inverseEntity="Tone" syncable="YES"/>
+    </entity>
     <entity name="TouchSet" representedClassName="TouchSet" parentEntity="ExerciseSet" syncable="YES" codeGenerationType="class"/>
     <entity name="Workout" representedClassName="Workout" syncable="YES" codeGenerationType="class">
         <attribute name="complete" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -64,5 +78,8 @@
         <element name="TimeSet" positionX="-425.015625" positionY="978.71875" width="128" height="43"/>
         <element name="TouchSet" positionX="-104.55078125" positionY="976.90625" width="128" height="43"/>
         <element name="Workout" positionX="-932.73828125" positionY="782.71484375" width="128" height="148"/>
+        <element name="DocumentTone" positionX="-569.46875" positionY="1267.21484375" width="128" height="73"/>
+        <element name="Tone" positionX="-346.78125" positionY="1269.04296875" width="128" height="88"/>
+        <element name="ToneReading" positionX="-130.34765625" positionY="1260.49609375" width="128" height="88"/>
     </elements>
 </model>

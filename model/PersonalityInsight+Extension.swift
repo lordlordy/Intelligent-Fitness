@@ -15,11 +15,11 @@ enum PersonalityInsightProperty: String{
 extension PersonalityInsight{
     
     var insightCount: Int{
-        return insightsArray.count
+        return iArray.count
     }
     
     func getInsight(forType type: String) -> Insight{
-        for i in insightsArray{
+        for i in iArray{
             if i.type == type{
                 return i
             }
@@ -33,29 +33,57 @@ extension PersonalityInsight{
     }
     
     func getInsight(atIndex index: Int) -> Insight?{
-        if index < insightsArray.count{
-            return insightsArray[index]
+        if index < iArray.count{
+            return iArray[index]
         }
         return nil
     }
 
-    func numberOfInsights() -> Int{
-        var count: Int = 0
-        for i in insightsArray{
-            count = count + 1 + i.subInsightArray.count
-        }
-        return count
-    }
+//    func numberOfInsights() -> Int{
+//        var count: Int = 0
+//        for i in iArray{
+//            count = count + 1 + i.subInsightsArray().count
+//        }
+//        return count
+//    }
     
     func printSummary(){
         print("\(type ?? "Not set")")
-        for i in insightsArray{
+        for i in iArray{
             i.printSummary(tabCount: 1)
         }
     }
     
-    private var insightsArray: [Insight]{
+    private var iArray: [Insight]{
         let array = insights?.allObjects as? [Insight] ?? []
         return array.sorted(by: {$0.type! < $1.type!})
     }
+}
+
+extension PersonalityInsight: InsightCategoryProtocol{
+    func numberOfInsights() -> Int {
+        return iArray.count
+    }
+    
+    func categoryName() -> String {
+        return type ?? "not set"
+    }
+    
+    func insightsArray() -> [InsightProtocol] {
+        return iArray
+    }
+    
+    func insight(atIndex index: Int) -> InsightProtocol? {
+        return getInsight(atIndex: index)
+    }
+    
+    func hasSubInsights() -> Bool{
+        for s in insightsArray(){
+            if s.subInsightsArray().count > 0{
+                return true
+            }
+        }
+        return false
+    }
+    
 }

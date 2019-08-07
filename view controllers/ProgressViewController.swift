@@ -102,10 +102,12 @@ class ProgressViewController: UIViewController {
         picker.setValue(UIColor.white, forKey: "textColor")
         picker.contentMode = .center
         picker.frame = CGRect(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 300)
+        
         toolBar = UIToolbar.init(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 50))
         toolBar.barStyle = .default
         toolBar.backgroundColor = MAIN_BLUE
         toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
+        
         updateGraph(forExercise: selectedExercise, andMeasure: selectedMeasure )
 
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CELL_ID)
@@ -670,7 +672,6 @@ class DataHeader: UITableViewHeaderFooterView{
     }
     
     @objc func viewTapped(gestureRecogniser: UITapGestureRecognizer){
-        print("\(String(describing: textLabel?.text)) TAPPED")
         vc?.toggle(section: section)
     }
 }
