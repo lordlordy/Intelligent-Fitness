@@ -159,7 +159,7 @@ class HealthKitAccess {
     
     func getCalorieSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([TSBDataPoint]) -> Swift.Void){
         getActivitySummary(dateRange: dateRange) { (summaryArray) in
-            var result: [(date: Date, value: Double)] = []
+            var result: [(date: Date, tss: Double)] = []
             for s in summaryArray{
                 let dc = s.dateComponents(for: Calendar.current)
                 if let d = dc.date{
@@ -171,6 +171,24 @@ class HealthKitAccess {
         }
     }
 
+    func getTSBBasedOnRPE(dateRange: (from: Date, to:Date)?, completion: @escaping ([TSBDataPoint]) -> Swift.Void){
+        getExerciseTimeSummary(dateRange: dateRange) { (timeSummary) in
+            //this data is in hours. For now assume a RPE of 5 using 7 as benchmark for threshol. ie hour at RPE 7 is TSS 100
+            //This comes about as estimating TSS from time and rpe we have: TSS ~ (RPE * RPE) * hrs
+            //We want RPE 7 to give 100. Thus we have:
+            //TSS for 1 hour @ 7 = 100. Thus we want to find factor, f such (7*7)*1*f = 100 => f = 100/49
+            //Thus is we're assuming RPE 5 then TSS = Hrs * 5 * 5 * f = hrs * 25 * 100 /49 = hrs * 2500 / 49
+            let tssFactor: Double = 2500.0 / 49.0
+            var baseTSSData: [(date: Date, tss: Double)] = []
+            for d in timeSummary{
+                baseTSSData.append((date:d.date, tss: d.value * tssFactor))
+            }
+            let tsbData: [TSBDataPoint] = self.createTSBData(from: baseTSSData)
+            completion(tsbData)
+        }
+    }
+
+    
     func getExerciseTimeSummary(dateRange: (from: Date, to:Date)?, completion: @escaping ([(date: Date, value: Double)]) -> Swift.Void){
         getActivitySummary(dateRange: dateRange) { (summaryArray) in
             var result: [(date: Date, value: Double)] = []
@@ -285,12 +303,6 @@ class HealthKitAccess {
     private func getActivitySummary(dateRange: (from: Date, to: Date)?, completion: @escaping ([HKActivitySummary]) -> Swift.Void) {
         if #available(iOS 9.3, *) {
             
-            // this only checks write permissions so no need here. If no read permissions then just no data returned
-//            // check for permissions
-//            if healthStore.authorizationStatus(for: HKObjectType.activitySummaryType()) != .{
-//                return false
-//            }
-            
             var dateRangePredicate: NSPredicate? = nil
             
             if let dateRange = dateRange{
@@ -323,14 +335,14 @@ class HealthKitAccess {
         }
     }
     
-    private func createTSBData(from: [(date: Date, value: Double)]) -> [TSBDataPoint]{
+    private func createTSBData(from: [(date: Date, tss: Double)]) -> [TSBDataPoint]{
         // need to have an ordered series of dates without any gaps
         let orderedInput = from.sorted { $0.date < $1.date}
-        var gaplessData: [(date: Date, value: Double)] = []
+        var gaplessData: [(date: Date, tss: Double)] = []
         var previousDate: Date? = nil
         var haveFirstNoneZero: Bool = false
         for d in orderedInput{
-            haveFirstNoneZero = haveFirstNoneZero || (d.value > 0.001)
+            haveFirstNoneZero = haveFirstNoneZero || (d.tss > 0.001)
             if haveFirstNoneZero{
                 if let pd = previousDate{
                     var nextDay = Calendar.current.date(byAdding: DateComponents(day:1), to: pd)!
@@ -349,13 +361,13 @@ class HealthKitAccess {
         // aim to ignore loads of low values at the start of the data set
         var started: Bool = false
         for d in gaplessData{
-            if !started && d.value > 5.0{
+            if !started && d.tss > 5.0{
                 started = true
             }
             if started{
-                ctl = d.value * (1 - TSBDataPoint.ctlFactor) + ctl * TSBDataPoint.ctlFactor
-                atl = d.value * (1 - TSBDataPoint.atlFactor) + atl * TSBDataPoint.atlFactor
-                result.append(TSBDataPoint(date: d.date, tss: d.value, atl: atl, ctl: ctl))
+                ctl = d.tss * (1 - TSBDataPoint.ctlFactor) + ctl * TSBDataPoint.ctlFactor
+                atl = d.tss * (1 - TSBDataPoint.atlFactor) + atl * TSBDataPoint.atlFactor
+                result.append(TSBDataPoint(date: d.date, tss: d.tss, atl: atl, ctl: ctl))
             }
         }
         return result

@@ -349,7 +349,7 @@ class ProgressViewController: UIViewController {
 
     private func createExerciseTSBGraph(){
         self.titleLabel.text = "Training Stress Balance"
-        HealthKitAccess.shared.getExerciseTimeSummary(dateRange: nil) { (data) in
+        HealthKitAccess.shared.getTSBBasedOnRPE(dateRange: nil) { (data) in
             if data.count == 0{
                 DispatchQueue.main.async {
                     // needs to be set on main thread
@@ -361,25 +361,11 @@ class ProgressViewController: UIViewController {
                     self.tableView.reloadData()
                 }
             }else{
-                //this data is in hours. For now assume a RPE of 5 using 7 as benchmark for threshol. ie hour at RPE 7 is TSS 100
-                //This comes about as estimating TSS from time and rpe we have: TSS ~ (RPE * RPE) * hrs
-                //We want RPE 7 to give 100. Thus we have:
-                //TSS for 1 hour @ 7 = 100. Thus we want to find factor, f such (7*7)*1*f = 100 => f = 100/49
-                //Thus is we're assuming RPE 5 then TSS = Hrs * 5 * 5 * f = hrs * 25 * 100 /49 = hrs * 2500 / 49
-                let tssFactor: Double = 2500.0 / 49.0
-                var baseTSSData: [(date: Date, value: Double)] = []
-                for d in data{
-                    baseTSSData.append((date:d.date, value: d.value * tssFactor))
-                }
-                let trainingStressData = self.createTSBData(from: baseTSSData)
-                // just show last 90 days of data
-                let ninetyDaysAgo: Date = Calendar.current.date(byAdding: DateComponents(day: -90), to: Date())!
-                let filteredData = trainingStressData.filter({$0.date >= ninetyDaysAgo})
-                let ctlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.ctl) })
-                let atlData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.atl) })
-                let tsbData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tsb) })
-                let tssData: [(Date, Double)] = filteredData.map({ (date: $0.date, value: $0.tss) })
-
+                let ctlData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.ctl) })
+                let atlData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.atl) })
+                let tsbData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.tsb) })
+                let tssData: [(Date, Double)] = data.map({ (date: $0.date, value: $0.tss) })
+                
                 let ctlGraph = LineGraph(data: ctlData, colour: .red, title: "CTL")
                 let atlGraph = LineGraph(data: atlData, colour: .green, title: "ATL")
                 let tsbGraph = LineGraph(data: tsbData, colour: .yellow, title: "TSB")

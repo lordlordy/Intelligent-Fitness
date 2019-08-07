@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Intelligent Fitness/HealthKitAccess.swift"
-            timestampString = "586905450.622642"
+            timestampString = "586906173.5459861"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "276"
-            endingLineNumber = "276"
+            startingLineNumber = "294"
+            endingLineNumber = "294"
             landmarkName = "getDailyQuantityData(quantityType:completion:)"
             landmarkType = "7">
          </BreakpointContent>
