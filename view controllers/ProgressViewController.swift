@@ -59,8 +59,8 @@ class ProgressViewController: UIViewController {
     private var toolBar = UIToolbar()
     private var picker = UIPickerView()
     private var selectedGraph: GraphType = .Sets
-    private var selectedExercise: ExerciseType = ExerciseType.gobletSquat
-    private var selectedMeasure: ExerciseMeasure = .totalKG
+    private var selectedExercise: ExerciseType = ExerciseType.ALL
+    private var selectedMeasure: ExerciseMeasure = .maxRepKG
     private var validMeasures: [ExerciseMeasure]{ return ExerciseDefinitionManager.shared.exerciseDefinition(for: selectedExercise).setType.validMeasures() }
     private var selectedTSB: Int = 0
     private var isLTDEd: Bool = true
@@ -72,6 +72,8 @@ class ProgressViewController: UIViewController {
     private var collapsed: [Bool] = []
     private let CELL_ID = "DefaultCell"
     private var df: DateFormatter = DateFormatter()
+    
+    private var tapGesture: UITapGestureRecognizer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,9 +115,35 @@ class ProgressViewController: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CELL_ID)
         tableView.register(DataHeader.self, forHeaderFooterViewReuseIdentifier: DataHeader.reuseIdentifier)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
-        graphView.addGestureRecognizer(tapGesture)
-        
+        tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped(gestureRecogniser:)))
+//        graphView.addGestureRecognizer(tapGesture!)
+        checkPracticality()
+    }
+    
+    private func checkPracticality(){
+        // if high enough score add choice of graphs
+        PersonalityInsightManager.shared.saveInsights { (personalityInsights) in
+            var needs: PersonalityInsight?
+            for pi in personalityInsights{
+                if pi.type == "needs"{
+                    needs = pi
+                }
+            }
+            if let n = needs{
+                if n.getInsight(forType: "Practicality").mostRecentReading().value >= 0.5{
+                    // practical enough to change graphs
+                    if let tg = self.tapGesture{
+                        DispatchQueue.main.sync {
+                            self.graphView.addGestureRecognizer(tg)
+                        }
+                    }else{
+                        print("Other graphs not availabile as Practicality is less than 50%")
+                    }
+                }
+            }else{
+                print("Could not find Personality Insight for category 'needs'")
+            }
+        }
     }
     
     override func viewDidLayoutSubviews() {

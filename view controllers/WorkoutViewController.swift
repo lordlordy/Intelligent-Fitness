@@ -23,7 +23,7 @@ class WorkoutViewController: UITableViewController {
     
     private let df = DateFormatter()
 
-    private let descriptionText: String = "Your aim is to do three sessions per week with no more than two rest days between sessions. Consecutive weeks of consistency will be rewarded with power ups in the 'Fitness Invaders' game."
+    private let descriptionText: String = "Your aim is to do three sessions per week with no more than two rest days between sessions. Consecutive weeks of consistency will be rewarded with power ups in the 'Fitness Invaders' game. "
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,6 +78,46 @@ class WorkoutViewController: UITableViewController {
                 testsThisWeekTextField.text = testsStr.joined(separator: " ")
             }
             
+        }
+        
+        adjustDescriptioBasedOnPreparedNess()
+        
+    }
+    
+    private func adjustDescriptioBasedOnPreparedNess(){
+        var additionalText: String = ""
+        WorkoutManager.shared.latestPreparedness { (preparednessDataPoint) in
+            // check sadness
+            var restDayDueToSadness: Bool = false
+            if let sadness = preparednessDataPoint.sadnessTone{
+                // arbitrary for now - sadness score of more than 75% and have an easy day
+                restDayDueToSadness = sadness.score > 0.75
+            }
+            // again relatively arbitrary - eventually the app should calculate this number based on some analysis
+            let restDayDueToTSB: Bool = preparednessDataPoint.tsb.tsb < -75.0
+            
+            if preparednessDataPoint.hrv.dayOff{
+                // HRV reading very low should take the day off
+                additionalText += "We suggest you take today off from training since your heart rate variability is in the bottom 3%."
+            }else if preparednessDataPoint.hrv.goEasy{
+                // HRV reading low.
+                additionalText += "Your HRV in is the bottom 25% so we suggest either an easy day or the day off"
+            }else if restDayDueToTSB{
+                additionalText += "You've been training excellently and have accumulated a lot of fatigue so we suggest you take a rest day today"
+            }else if restDayDueToSadness{
+                // don't give explanation for this
+                additionalText += "We think you would really benefit from not training today and getting extra sleep"
+            }else if (true || preparednessDataPoint.hrv.goHard){
+                // good HRV score potentially go hard.
+                additionalText += "Your HRV is in the top 25% suggesting you're in excellent shape to train today. Consider doing extra in your session today and perhaps adding some cardio"
+            }
+            
+            if additionalText != ""{
+                // we want to add something to the description. This needs to be one on main thread
+                DispatchQueue.main.async {
+                    self.descriptionLabel.text = (self.descriptionLabel.text ?? "") + "\r\r" + additionalText
+                }
+            }
         }
     }
     
