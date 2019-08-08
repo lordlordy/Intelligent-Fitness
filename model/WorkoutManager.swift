@@ -148,6 +148,12 @@ struct WorkoutDefinition{
     }
 }
 
+struct PreparednessDataPoint{
+    var hrv: HRVDataPoint
+    var tsb: TSBDataPoint
+    var sadnessTone: ToneReading?
+}
+
 class WorkoutManager: Athlete{
     
     static var shared: WorkoutManager = WorkoutManager()
@@ -155,6 +161,7 @@ class WorkoutManager: Athlete{
     
     var exerciseTypes: [ExerciseType]{ return ExerciseType.allCases}
     private var weekCache: [Week] = []
+    private var preparednessCache: (date: Date, preparedness: PreparednessDataPoint)?
     
     var calendar: Calendar{ return Calendar(identifier: .iso8601)}
     
@@ -187,6 +194,60 @@ class WorkoutManager: Athlete{
         return defaultDefinitions[type]
     }
     
+    func latestPreparedness(completion: @escaping (PreparednessDataPoint) -> Void){
+        if let p = preparednessCache{
+            // there is a cache item check it's current enough
+            let hours = Calendar.current.dateComponents([.hour], from: p.date, to: Date()).hour ?? 0
+            if hours < 6{
+                // not more than 6 hours old
+                completion(p.preparedness)
+                return
+            }
+        }
+        // no cache or cache is too old. Get latest readings
+        // all these readings require completions. We can't end till all done
+        // to acheive this need to embed teh competions within each other
+        HealthKitAccess.shared.getTSBBasedOnRPE(dateRange: nil) { (tsb) in
+            // note no date range - we want it to calculate from as early as possible to give most accurate latest information
+            // now have tsb lets get latest hrv
+            let range: (from: Date, to: Date) = (from: Calendar.current.date(byAdding: DateComponents(day: -7), to: Date())!, to: Date())
+            HealthKitAccess.shared.getHRVData(dateRange: range, completion: { (hrv) in
+                // look at past 7 days - if older than that then not much use to us
+                // finally get latest sadness tone
+                PersonalityInsightManager.shared.saveTones(completion: { (documentTones) in
+                    // have all we need lets construct the preparedness
+                    var hrvDP: HRVDataPoint = HRVDataPoint(date: Date(), sdnn: 0.0, offValue: 0.0, easyValue: 0.0, hardValue: 0.0)
+                    if hrv.count > 0{
+                        hrvDP = hrv.sorted(by: {$0.date > $1.date})[0]
+                    }
+                    var tsbDP: TSBDataPoint = TSBDataPoint(date: Date(), tss: 0.0, atl: 0.0, ctl: 0.0)
+                    if tsb.count > 0{
+                        tsbDP = tsb.sorted(by: {$0.date > $1.date})[0]
+                    }
+                    var emotion: DocumentTone? = nil
+                    for dt in documentTones{
+                        if dt.categoryName() == "Emotion Tone"{
+                            emotion = dt
+                        }
+                    }
+                    var sadness: ToneReading? = nil
+                    if let e = emotion{
+                        sadness = e.getTone(forName: "Sadness").currentReading
+                        if sadness == nil{
+                            print("No readings found for tone: 'Sadness'")
+                        }
+                    }else{
+                        print("Didn't fine docment tone for 'Emotion Tone'")
+                    }
+                    
+                    let pDP: PreparednessDataPoint = PreparednessDataPoint(hrv: hrvDP, tsb: tsbDP, sadnessTone: sadness)
+                    self.preparednessCache = (date: Date(), preparedness: pDP)
+                    completion(pDP)
+                })
+            })
+        }
+        
+    }
 
     // MARK: - Athlete Protocol
     
